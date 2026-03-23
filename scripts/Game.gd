@@ -195,11 +195,12 @@ func _input(event):
 			PhoneSystem.close_phone()
 			return
 		# 如果菜单已打开，按ESC关闭
-		var existing = get_tree().root.get_node_or_null("EscOverlay")
+		var existing = get_tree().root.get_node_or_null("EscMenuLayer")
 		if existing:
 			existing.queue_free()
-			time_running = true
-			_update_time_display()
+			if not game_over:
+				time_running = true
+				_update_time_display()
 			return
 		_show_esc_menu()
 
@@ -207,29 +208,41 @@ func _show_esc_menu():
 	if game_over:
 		return
 	# 防止重复打开
-	if get_tree().root.has_node("EscOverlay"):
+	if get_tree().root.has_node("EscMenuLayer"):
 		return
+
 	var was_running = time_running
 	time_running = false
 	_update_time_display()
 
-	# 全屏遮罩层 - 用 CanvasLayer 确保在最上层
-	var canvas = CanvasLayer.new()
-	canvas.name = "EscOverlay"
-	canvas.layer = 200
-	get_tree().root.add_child(canvas)
+	# 使用 CanvasLayer 确保在最顶层
+	var menu_layer = CanvasLayer.new()
+	menu_layer.name = "EscMenuLayer"
+	menu_layer.layer = 200
+	get_tree().root.add_child(menu_layer)
 
+	# 全屏遮罩
 	var overlay = ColorRect.new()
 	overlay.color = Color(0, 0, 0, 0.6)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	canvas.add_child(overlay)
+	menu_layer.add_child(overlay)
+
+	# 点击空白处关闭
+	overlay.gui_input.connect(func(event):
+		if event is InputEventMouseButton and event.pressed:
+			menu_layer.queue_free()
+			time_running = was_running
+			_update_time_display()
+	)
 
 	# 居中容器
 	var center = CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	canvas.add_child(center)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	menu_layer.add_child(center)
 
+	# 面板
 	var panel = PanelContainer.new()
 	panel.custom_minimum_size = Vector2(320, 0)
 	var ps = StyleBoxFlat.new()
@@ -241,6 +254,7 @@ func _show_esc_menu():
 	ps.content_margin_left = 28; ps.content_margin_right = 28
 	ps.content_margin_top = 24; ps.content_margin_bottom = 24
 	panel.add_theme_stylebox_override("panel", ps)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	center.add_child(panel)
 
 	var vbox = VBoxContainer.new()
@@ -256,48 +270,54 @@ func _show_esc_menu():
 
 	vbox.add_child(HSeparator.new())
 
-	var btn_data = [
-		{"text": "继续游戏", "action": "resume"},
-		{"text": "保存游戏", "action": "save"},
-		{"text": "返回主菜单", "action": "menu"},
-		{"text": "退出游戏", "action": "quit"},
-	]
-
-	for bd in btn_data:
-		var btn = Button.new()
-		btn.text = bd.text
-		btn.custom_minimum_size = Vector2(0, 44)
-		_style_choice_btn(btn)
-		var action = bd.action
-		btn.pressed.connect(func():
-			match action:
-				"resume":
-					canvas.queue_free()
-					time_running = was_running
-					_update_time_display()
-				"save":
-					_do_save()
-					_append("[color=#555][ 已保存 ][/color]\n")
-					canvas.queue_free()
-					time_running = was_running
-					_update_time_display()
-				"menu":
-					_do_save()
-					canvas.queue_free()
-					get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
-				"quit":
-					_do_save()
-					get_tree().quit()
-		)
-		vbox.add_child(btn)
-
-	# 点击遮罩空白处关闭
-	overlay.gui_input.connect(func(event):
-		if event is InputEventMouseButton and event.pressed:
-			canvas.queue_free()
-			time_running = was_running
-			_update_time_display()
+	# 继续游戏
+	var resume_btn = Button.new()
+	resume_btn.text = "继续游戏"
+	resume_btn.custom_minimum_size = Vector2(260, 44)
+	_style_choice_btn(resume_btn)
+	resume_btn.pressed.connect(func():
+		menu_layer.queue_free()
+		time_running = was_running
+		_update_time_display()
 	)
+	vbox.add_child(resume_btn)
+
+	# 保存游戏
+	var save_btn = Button.new()
+	save_btn.text = "保存游戏"
+	save_btn.custom_minimum_size = Vector2(260, 44)
+	_style_choice_btn(save_btn)
+	save_btn.pressed.connect(func():
+		_do_save()
+		_append("[color=#555][ 已保存 ][/color]\n")
+		menu_layer.queue_free()
+		time_running = was_running
+		_update_time_display()
+	)
+	vbox.add_child(save_btn)
+
+	# 返回主菜单
+	var menu_btn = Button.new()
+	menu_btn.text = "返回主菜单"
+	menu_btn.custom_minimum_size = Vector2(260, 44)
+	_style_choice_btn(menu_btn)
+	menu_btn.pressed.connect(func():
+		_do_save()
+		menu_layer.queue_free()
+		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+	)
+	vbox.add_child(menu_btn)
+
+	# 退出游戏
+	var quit_btn = Button.new()
+	quit_btn.text = "退出游戏"
+	quit_btn.custom_minimum_size = Vector2(260, 44)
+	_style_choice_btn(quit_btn)
+	quit_btn.pressed.connect(func():
+		_do_save()
+		get_tree().quit()
+	)
+	vbox.add_child(quit_btn)
 
 # ══════════════════════════════════════════════
 #             JSON 事件加载

@@ -37,11 +37,16 @@ var intro_active: bool = false
 var intro_texts: Array = []
 
 func _ready():
-	# 让自身铺满整个屏幕
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build_ui()
+	# 确保所有面板初始状态关闭
+	overlay.visible = false
+	save_panel.visible = false
+	char_panel.visible = false
+	if intro_overlay:
+		intro_overlay.visible = false
 	_animate_entrance()
-	AudioManager.play("menu") 
+	AudioManager.play("menu")
 
 # ══════════════════════════════════════════════
 #              构建 UI
@@ -409,11 +414,10 @@ func _on_continue():
 			break
 	if not has_any:
 		return
-	# 进入专门的存档选择页面
 	_show_load_page()
 	
 func _show_load_page():
-	# 隐藏主菜单内容，显示存档选择全屏页面
+	# 隐藏主菜单所有内容
 	for child in get_children():
 		if child != intro_overlay:
 			child.visible = false
@@ -433,7 +437,6 @@ func _show_load_page():
 	main_box.custom_minimum_size = Vector2(520, 0)
 	center.add_child(main_box)
 
-	# 标题
 	var header = Label.new()
 	header.text = "选择存档"
 	header.add_theme_font_size_override("font_size", 28)
@@ -450,17 +453,11 @@ func _show_load_page():
 
 	main_box.add_child(HSeparator.new())
 
-	# 存档列表
 	for i in range(SaveManager.MAX_SLOTS):
-		var slot_info = {
-			"slot": i,
-			"exists": SaveManager.has_save(i),
-			"meta": SaveManager.get_save_meta(i),
-		}
-		if not slot_info.exists:
+		if not SaveManager.has_save(i):
 			continue
+		var m = SaveManager.get_save_meta(i)
 
-		var m = slot_info.meta
 		var card = PanelContainer.new()
 		card.custom_minimum_size = Vector2(0, 90)
 		var card_style = StyleBoxFlat.new()
@@ -489,7 +486,7 @@ func _show_load_page():
 		info_vbox.add_child(name_lbl)
 
 		var detail_lbl = Label.new()
-		detail_lbl.text = "%s  ·  大%s  ·  %s  ·  GPA:%.0f" % [
+		detail_lbl.text = "%s · 大%s · %s · GPA:%.0f" % [
 			_tier_str(m.get("university_tier", "")),
 			_year_cn(m.get("year", 1)),
 			m.get("phase", ""),
@@ -505,14 +502,13 @@ func _show_load_page():
 		time_lbl.add_theme_color_override("font_color", Color(0.35, 0.37, 0.42))
 		info_vbox.add_child(time_lbl)
 
-		# 读取按钮
+		var slot = i
 		var load_btn = Button.new()
 		load_btn.text = "读 取"
 		load_btn.custom_minimum_size = Vector2(80, 50)
 		_style_panel_btn(load_btn, Color(0.2, 0.45, 0.65))
 		load_btn.add_theme_color_override("font_color", Color(1, 1, 1))
 		load_btn.add_theme_font_size_override("font_size", 16)
-		var slot = i
 		load_btn.pressed.connect(func():
 			var data = SaveManager.load_game(slot)
 			if not data.is_empty():
@@ -523,7 +519,6 @@ func _show_load_page():
 		)
 		hbox.add_child(load_btn)
 
-		# 删除按钮
 		var del_btn = Button.new()
 		del_btn.text = "删除"
 		del_btn.custom_minimum_size = Vector2(60, 50)
@@ -532,7 +527,6 @@ func _show_load_page():
 		del_btn.pressed.connect(func():
 			SaveManager.delete_save(slot)
 			load_page.queue_free()
-			# 刷新：如果还有存档重新打开，没有就回主菜单
 			var still_has = false
 			for j in range(SaveManager.MAX_SLOTS):
 				if SaveManager.has_save(j):
@@ -541,14 +535,14 @@ func _show_load_page():
 			if still_has:
 				_show_load_page()
 			else:
-				_back_to_main_menu(load_page)
+				_back_from_load_page(null)
 		)
 		hbox.add_child(del_btn)
 
-	# 底部间距
-	main_box.add_child(Control.new())
+	var spacer = Control.new()
+	spacer.custom_minimum_size = Vector2(0, 10)
+	main_box.add_child(spacer)
 
-	# 返回按钮
 	var back_btn = Button.new()
 	back_btn.text = "← 返回主菜单"
 	back_btn.custom_minimum_size = Vector2(0, 44)
@@ -556,9 +550,29 @@ func _show_load_page():
 	back_btn.add_theme_color_override("font_color", colors.dim)
 	back_btn.add_theme_font_size_override("font_size", 16)
 	back_btn.pressed.connect(func():
-		_back_to_main_menu(load_page)
+		_back_from_load_page(load_page)
 	)
 	main_box.add_child(back_btn)
+	
+func _back_from_load_page(load_page_node):
+	if load_page_node:
+		load_page_node.queue_free()
+	# 恢复主菜单显示
+	for child in get_children():
+		child.visible = true
+	# 确保弹出面板关闭
+	overlay.visible = false
+	save_panel.visible = false
+	char_panel.visible = false
+	if intro_overlay:
+		intro_overlay.visible = false
+	# 刷新继续按钮状态
+	var has_any = false
+	for i in range(SaveManager.MAX_SLOTS):
+		if SaveManager.has_save(i):
+			has_any = true
+			break
+	continue_btn.modulate = Color(1, 1, 1, 1) if has_any else Color(1, 1, 1, 0.4)
 
 func _back_to_main_menu(load_page_node):
 	load_page_node.queue_free()
