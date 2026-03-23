@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cj6f7vu70deon"]
+
+[ext_resource type="Script" uid="uid://bs4uhhtvcp7vj" path="res://scripts/Game.gd" id="1_ibkli"]
+
+[node name="VBoxContainer" type="VBoxContainer" unique_id=242561084]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ibkli")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=1786217271]
+custom_minimum_size = Vector2(0, 4000)
+layout_mode = 2
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="." unique_id=1222359295]
+layout_mode = 2
+
+[node name="NextButton" type="Button" parent="." unique_id=809245152]
+layout_mode = 2
+text = "下一年"

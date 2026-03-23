@@ -1,0 +1,1321 @@
+extends VBoxContainer
+# ══════════════════════════════════════════════
+#          大学四年人生模拟器 v5.0
+#         整合存档 + NPC姓名 + 角色
+# ══════════════════════════════════════════════
+
+# ========== 角色属性 ==========
+var gpa: float = 70.0
+var social: float = 40.0
+var ability: float = 20.0
+var money: float = 50.0
+var mental: float = 70.0
+var health: float = 80.0
+
+# ========== 玩家信息 ==========
+var player_name: String = "你"
+var player_gender: String = "male"
+var save_slot: int = 0
+
+# ========== NPC 角色定义 ==========
+const NPC_ROLES = {
+	"roommate_gamer": "male",
+	"roommate_studious": "male",
+	"roommate_quiet": "male",
+	"crush_target": "female",
+	"debate_senior": "male",
+	"tech_senior": "male",
+	"union_minister": "male",
+	"neighbor_classmate": "female",
+	"counselor": "female",
+}
+
+# ========== 日历系统 ==========
+var day_index: int = 0
+var total_days: int = 1460
+
+var year_calendar = [
+	[0,   6,   "开学季",         1],
+	[7,   13,  "军训",           1],
+	[14,  90,  "上学期日常",     1],
+	[91,  105, "上学期复习周",   1],
+	[106, 120, "上学期考试周",   1],
+	[121, 136, "寒假前",         1],
+	[137, 176, "寒假",           0],
+	[177, 183, "新学期开学",     2],
+	[184, 280, "下学期日常",     2],
+	[281, 295, "下学期复习周",   2],
+	[296, 310, "下学期考试周",   2],
+	[311, 364, "暑假",           0],
+]
+
+var month_table = [
+	[9, 30], [10, 31], [11, 30], [12, 31],
+	[1, 31], [2, 28], [3, 31], [4, 30],
+	[5, 31], [6, 30], [7, 31], [8, 31]
+]
+
+# ========== 时间控制 ==========
+var time_running: bool = false
+var time_speed: float = 1.0
+var day_interval: float = 1.8
+var day_timer: float = 0.0
+var waiting_for_choice: bool = false
+var available_speeds = [1.0, 2.0, 4.0]
+
+# ========== 标签系统 ==========
+var tags: Array = []
+var used_event_ids: Array = []
+var event_last_triggered: Dictionary = {}
+
+# ========== 游戏状态 ==========
+var game_started: bool = false
+var game_over: bool = false
+var university_tier: String = ""
+var status_expanded: bool = false
+var last_display_day: int = -1
+var text_line_count: int = 0
+var max_text_lines: int = 300
+
+# ========== 自动存档 ==========
+var auto_save_interval: int = 30
+var last_auto_save_day: int = 0
+
+# ========== 节点引用 ==========
+@onready var event_text = $RichTextLabel
+@onready var choices_container = $ChoicesContainer
+@onready var next_btn = $NextButton
+
+# ========== 动态UI引用 ==========
+var status_bar: Button
+var status_panel: PanelContainer
+var progress_bars: Dictionary = {}
+var value_labels: Dictionary = {}
+var tags_label: Label
+var time_label: Label
+var time_control_bar: HBoxContainer
+var pause_btn: Button
+var speed_label: Label
+var date_label: Label
+var speed_buttons: Array = []
+
+# ========== 颜色配置 ==========
+var attr_colors = {
+	"gpa": Color(0.3, 0.7, 0.9, 1),
+	"social": Color(1.0, 0.6, 0.3, 1),
+	"ability": Color(0.6, 0.9, 0.3, 1),
+	"money": Color(1.0, 0.85, 0.2, 1),
+	"mental": Color(0.8, 0.5, 1.0, 1),
+	"health": Color(0.9, 0.3, 0.35, 1),
+}
+
+var attr_names = {
+	"gpa": "GPA", "social": "社交", "ability": "能力",
+	"money": "金钱", "mental": "心理", "health": "健康",
+}
+
+var attr_color_hex = {
+	"gpa": "#4db8e6", "social": "#ff9933", "ability": "#99e64d",
+	"money": "#e6d94d", "mental": "#b380ff", "health": "#e64d56",
+}
+
+var colors = {
+	"text": Color(0.9, 0.92, 0.95, 1),
+	"accent": Color(0.3, 0.7, 0.9, 1),
+	"dim": Color(0.5, 0.5, 0.55, 1),
+	"panel": Color(0.13, 0.14, 0.18, 1),
+	"panel_dark": Color(0.1, 0.11, 0.15, 1),
+	"btn": Color(0.2, 0.22, 0.28, 1),
+	"btn_hover": Color(0.25, 0.28, 0.35, 1),
+}
+
+var all_events: Array = []
+var last_phase: String = ""
+
+# ══════════════════════════════════════════════
+#                    入口
+# ══════════════════════════════════════════════
+func _ready():
+	add_to_group("game")
+	set_process_input(true)
+	_create_status_ui()
+	_create_time_controls()
+	_setup_main_ui()
+	_load_all_events()
+
+	var init_data = null
+	if SaveManager.has_meta("pending_game_init"):
+		init_data = SaveManager.get_meta("pending_game_init")
+		SaveManager.remove_meta("pending_game_init")
+
+	if init_data != null:
+		if init_data.get("is_new_game", true):
+			player_name = init_data.get("player_name", "你")
+			player_gender = init_data.get("player_gender", "male")
+			save_slot = init_data.get("save_slot", 0)
+			_init_npc_names()
+			RelationshipManager.init_all_npcs()
+			WechatSystem.init_conversations()
+			_show_opening()
+		else:
+			_load_from_save(init_data.get("save_data", {}))
+			save_slot = init_data.get("save_slot", 0)
+	else:
+		player_name = "测试"
+		NamePool.init_new_game()
+		_init_npc_names()
+		RelationshipManager.init_all_npcs()
+		_show_opening()
+
+func _init_npc_names():
+	for role_id in NPC_ROLES:
+		NamePool.assign_name(role_id, NPC_ROLES[role_id])
+
+func _replace_names(text: String) -> String:
+	for role_id in NPC_ROLES:
+		text = text.replace("{%s}" % role_id, NamePool.get_nickname(role_id))
+		text = text.replace("{%s.full}" % role_id, NamePool.get_full_name(role_id))
+	text = text.replace("{player}", player_name)
+	return text
+
+# ══════════════════════════════════════════════
+#                 主循环
+# ══════════════════════════════════════════════
+func _process(delta):
+	if not game_started or game_over or not time_running or waiting_for_choice:
+		return
+	day_timer += delta * time_speed
+	if day_timer >= day_interval:
+		day_timer = 0.0
+		_advance_one_day()
+		
+func _input(event):
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		if PhoneSystem.is_open:
+			PhoneSystem.close_phone()
+			return
+		# 如果菜单已打开，按ESC关闭
+		var existing = get_tree().root.get_node_or_null("EscOverlay")
+		if existing:
+			existing.queue_free()
+			time_running = true
+			_update_time_display()
+			return
+		_show_esc_menu()
+
+func _show_esc_menu():
+	if game_over:
+		return
+	# 防止重复打开
+	if get_tree().root.has_node("EscOverlay"):
+		return
+	var was_running = time_running
+	time_running = false
+	_update_time_display()
+
+	# 全屏遮罩层 - 用 CanvasLayer 确保在最上层
+	var canvas = CanvasLayer.new()
+	canvas.name = "EscOverlay"
+	canvas.layer = 200
+	get_tree().root.add_child(canvas)
+
+	var overlay = ColorRect.new()
+	overlay.color = Color(0, 0, 0, 0.6)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	canvas.add_child(overlay)
+
+	# 居中容器
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	canvas.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(320, 0)
+	var ps = StyleBoxFlat.new()
+	ps.bg_color = Color(0.1, 0.11, 0.15, 1)
+	ps.set_corner_radius_all(12)
+	ps.border_width_left = 1; ps.border_width_right = 1
+	ps.border_width_top = 1; ps.border_width_bottom = 1
+	ps.border_color = Color(0.25, 0.27, 0.32)
+	ps.content_margin_left = 28; ps.content_margin_right = 28
+	ps.content_margin_top = 24; ps.content_margin_bottom = 24
+	panel.add_theme_stylebox_override("panel", ps)
+	center.add_child(panel)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 14)
+	panel.add_child(vbox)
+
+	var title = Label.new()
+	title.text = "暂停菜单"
+	title.add_theme_font_size_override("font_size", 22)
+	title.add_theme_color_override("font_color", colors.accent)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
+
+	vbox.add_child(HSeparator.new())
+
+	var btn_data = [
+		{"text": "继续游戏", "action": "resume"},
+		{"text": "保存游戏", "action": "save"},
+		{"text": "返回主菜单", "action": "menu"},
+		{"text": "退出游戏", "action": "quit"},
+	]
+
+	for bd in btn_data:
+		var btn = Button.new()
+		btn.text = bd.text
+		btn.custom_minimum_size = Vector2(0, 44)
+		_style_choice_btn(btn)
+		var action = bd.action
+		btn.pressed.connect(func():
+			match action:
+				"resume":
+					canvas.queue_free()
+					time_running = was_running
+					_update_time_display()
+				"save":
+					_do_save()
+					_append("[color=#555][ 已保存 ][/color]\n")
+					canvas.queue_free()
+					time_running = was_running
+					_update_time_display()
+				"menu":
+					_do_save()
+					canvas.queue_free()
+					get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+				"quit":
+					_do_save()
+					get_tree().quit()
+		)
+		vbox.add_child(btn)
+
+	# 点击遮罩空白处关闭
+	overlay.gui_input.connect(func(event):
+		if event is InputEventMouseButton and event.pressed:
+			canvas.queue_free()
+			time_running = was_running
+			_update_time_display()
+	)
+
+# ══════════════════════════════════════════════
+#             JSON 事件加载
+# ══════════════════════════════════════════════
+func _load_all_events():
+	var file = FileAccess.open("res://data/events.json", FileAccess.READ)
+	if file == null:
+		push_warning("无法打开 events.json")
+		all_events = []
+		return
+	var json_text = file.get_as_text()
+	file.close()
+	var json = JSON.new()
+	if json.parse(json_text) == OK:
+		all_events = json.data
+	else:
+		push_error("JSON 解析错误：%s" % json.get_error_message())
+		all_events = []
+
+# ══════════════════════════════════════════════
+#              日历系统
+# ══════════════════════════════════════════════
+func get_date_info() -> Dictionary:
+	var year = day_index / 365
+	var day_in_year = day_index % 365
+	var weekday = day_index % 7
+
+	var phase_name = ""
+	var semester = 1
+	for entry in year_calendar:
+		if day_in_year >= entry[0] and day_in_year <= entry[1]:
+			phase_name = entry[2]
+			semester = entry[3]
+			break
+	if phase_name == "":
+		phase_name = "暑假"
+		semester = 0
+
+	var is_exam = "考试周" in phase_name
+	var is_holiday = phase_name in ["寒假", "暑假"]
+	var is_weekend = weekday >= 5
+	var is_review = "复习周" in phase_name
+	var is_military = phase_name == "军训"
+	var md = _index_to_month_day(day_in_year)
+
+	return {
+		"day_index": day_index, "year": year + 1, "semester": semester,
+		"day_in_year": day_in_year, "week": day_in_year / 7 + 1,
+		"weekday": weekday,
+		"weekday_name": ["周一","周二","周三","周四","周五","周六","周日"][weekday],
+		"phase": phase_name, "is_exam": is_exam, "is_holiday": is_holiday,
+		"is_weekend": is_weekend, "is_review": is_review, "is_military": is_military,
+		"month": md[0], "day": md[1],
+	}
+
+func _index_to_month_day(day_in_year: int) -> Array:
+	var accumulated = 0
+	for md in month_table:
+		if day_in_year < accumulated + md[1]:
+			return [md[0], day_in_year - accumulated + 1]
+		accumulated += md[1]
+	return [8, 31]
+
+func _year_cn(y: int) -> String:
+	match y:
+		1: return "一"
+		2: return "二"
+		3: return "三"
+		4: return "四"
+	return str(y)
+
+# ══════════════════════════════════════════════
+#              每日推进
+# ══════════════════════════════════════════════
+func _advance_one_day():
+	day_index += 1
+	if day_index >= total_days:
+		time_running = false
+		_show_graduation()
+		return
+
+	var info = get_date_info()
+	_check_phase_change(info)
+	_apply_daily_changes(info)
+
+	var event_data = _check_daily_event(info)
+	if event_data != null:
+		waiting_for_choice = true
+		_show_event(event_data)
+	else:
+		_maybe_show_flavor(info)
+
+	_update_time_display()
+	update_ui()
+	_check_dropout()
+	# 微信消息检查
+	var stats = {"gpa": gpa, "social": social, "ability": ability,
+		"money": money, "mental": mental, "health": health}
+	WechatSystem.check_daily_messages(day_index, tags, stats)
+	_do_auto_save()
+
+func _check_phase_change(info: Dictionary):
+	if info.phase != last_phase:
+		last_phase = info.phase
+		_append("\n[color=#6ec6ff]━━━ 大%s · %s ━━━[/color]\n" % [_year_cn(info.year), info.phase])
+
+# ══════════════════════════════════════════════
+#            每日自然属性变化
+# ══════════════════════════════════════════════
+func _apply_daily_changes(info: Dictionary):
+	if info.is_exam:
+		mental -= randf_range(0.2, 0.6)
+		health -= randf_range(0.1, 0.3)
+		gpa += randf_range(0.05, 0.2)
+	elif info.is_review:
+		mental -= randf_range(0.1, 0.3)
+		health -= randf_range(0.0, 0.15)
+		gpa += randf_range(0.03, 0.1)
+	elif info.is_military:
+		health += randf_range(0.05, 0.2)
+		mental -= randf_range(0.1, 0.3)
+		social += randf_range(0.05, 0.15)
+	elif info.is_holiday:
+		health += randf_range(0.05, 0.25)
+		mental += randf_range(0.05, 0.2)
+		money -= randf_range(0.02, 0.1)
+	elif info.is_weekend:
+		mental += randf_range(0.0, 0.15)
+		health += randf_range(0.0, 0.1)
+	else:
+		gpa += randf_range(0.01, 0.04)
+		mental -= randf_range(0.0, 0.08)
+	money -= randf_range(0.02, 0.08)
+	_clamp_all()
+
+# ══════════════════════════════════════════════
+#            事件触发检查
+# ══════════════════════════════════════════════
+func _check_daily_event(info: Dictionary):
+	var story_candidates = []
+	var daily_candidates = []
+
+	for e in all_events:
+		if not _passes_basic_filters(e, info):
+			continue
+		var etype = e.get("type", "story")
+		if etype == "story":
+			if _check_story_timing(e, info):
+				story_candidates.append(e)
+		else:
+			if _check_day_conditions(e, info):
+				daily_candidates.append(e)
+
+	if story_candidates.size() > 0:
+		var chance = 0.15
+		for e in story_candidates:
+			chance += float(e.get("weight", 5)) * 0.02
+		chance = clampf(chance, 0.1, 0.6)
+		if randf() < chance:
+			return _weighted_random(story_candidates)
+
+	if daily_candidates.size() > 0:
+		var chance = 0.08
+		for e in daily_candidates:
+			chance += float(e.get("weight", 3)) * 0.01
+		chance = clampf(chance, 0.03, 0.25)
+		if randf() < chance:
+			return _weighted_random(daily_candidates)
+
+	return null
+
+func _passes_basic_filters(e: Dictionary, info: Dictionary) -> bool:
+	if e.get("once", false) and e["id"] in used_event_ids:
+		return false
+	var year = info.year
+	if year < e.get("year_min", 1) or year > e.get("year_max", 4):
+		return false
+	var cd = e.get("cooldown_days", 0)
+	if cd > 0 and e["id"] in event_last_triggered:
+		if day_index - event_last_triggered[e["id"]] < cd:
+			return false
+	for tag in e.get("requires", []):
+		if tag not in tags:
+			return false
+	for tag in e.get("excludes", []):
+		if tag in tags:
+			return false
+	var conditions = e.get("conditions", {})
+	for attr in conditions:
+		var val = _get_attr(attr)
+		var cond = conditions[attr]
+		if cond.has("min") and val < float(cond["min"]):
+			return false
+		if cond.has("max") and val > float(cond["max"]):
+			return false
+	return true
+
+func _check_story_timing(e: Dictionary, info: Dictionary) -> bool:
+	if e.has("semester") and info.semester != int(e["semester"]):
+		return false
+	if e.has("phase"):
+		var phase_map = {
+			0: ["开学季", "军训", "新学期开学"],
+			1: ["上学期日常", "下学期日常"],
+			2: ["上学期考试周", "下学期考试周", "上学期复习周", "下学期复习周"],
+			3: ["寒假", "暑假", "寒假前"],
+		}
+		var allowed = phase_map.get(int(e["phase"]), [])
+		if info.phase not in allowed:
+			return false
+	return true
+
+func _check_day_conditions(e: Dictionary, info: Dictionary) -> bool:
+	var dc = e.get("day_conditions", {})
+	if dc.is_empty():
+		return true
+	if dc.has("is_holiday") and info.is_holiday != dc["is_holiday"]:
+		return false
+	if dc.has("is_weekend") and info.is_weekend != dc["is_weekend"]:
+		return false
+	if dc.has("is_exam") and info.is_exam != dc["is_exam"]:
+		return false
+	if dc.has("is_review") and info.is_review != dc["is_review"]:
+		return false
+	if dc.has("weekday") and info.weekday not in dc["weekday"]:
+		return false
+	return true
+
+func _weighted_random(events: Array) -> Dictionary:
+	var total = 0
+	for e in events:
+		total += int(e.get("weight", 5))
+	if total == 0:
+		return events[0]
+	var roll = randi() % total
+	var cum = 0
+	for e in events:
+		cum += int(e.get("weight", 5))
+		if roll < cum:
+			return e
+	return events[0]
+
+# ══════════════════════════════════════════════
+#              日常短句
+# ══════════════════════════════════════════════
+func _maybe_show_flavor(info: Dictionary):
+	if time_speed >= 4.0 and randi() % 3 != 0:
+		return
+	if day_index - last_display_day < 2:
+		return
+	if randi() % 4 != 0:
+		return
+	last_display_day = day_index
+	var text = _get_flavor_text(info)
+	if text != "":
+		_append("[color=#555]%s[/color]\n" % _replace_names(text))
+
+func _get_flavor_text(info: Dictionary) -> String:
+	var pool: Array = []
+	if info.is_exam:
+		pool = ["图书馆满员了，走廊里都是背书的人。", "又背了一天，脑子嗡嗡的。",
+			"室友凌晨还在刷题。", "考完一门，不敢对答案。", "食堂排队时还在默念公式。",
+			"复印店排起了长队。", "咖啡喝了三杯。"]
+	elif info.is_review:
+		pool = ["开始翻学期初的笔记，字迹都认不出来了。", "图书馆的位子越来越难抢了。",
+			"{roommate_gamer}说要卖游戏装备认真复习。", "整理了一天笔记。",
+			"和同学交换了复习资料。"]
+	elif info.is_military:
+		pool = ["今天又晒了一天，黑了一个度。", "教官提前让休息了，全体欢呼。",
+			"站军姿站得腿发抖。", "晚上拉歌赢了隔壁连。", "有人中暑被扶下去了。",
+			"终于学会了正步走。"]
+	elif info.phase == "寒假":
+		pool = ["睡到自然醒。", "妈妈做了你爱吃的菜。", "又被亲戚问成绩了。",
+			"在家窝了一天没出门。", "和老同学微信聊了几句。", "帮妈妈去超市买了东西。"]
+	elif info.phase == "暑假":
+		pool = ["今天热得不想动。", "空调WiFi西瓜。", "刷了一下午手机，有点空虚。",
+			"和朋友约了打球。", "想了想下学期的事。", "晚上出去散了个步，风还挺舒服。"]
+	elif info.is_weekend:
+		pool = ["睡了个懒觉。", "和室友去校外吃了一顿。", "周末的校园很安静。",
+			"在宿舍躺了一整天。", "洗了堆积的衣服。", "看了两集剧。"]
+	else:
+		pool = ["今天的课有点无聊。", "食堂的新菜味道一般。", "快递到了。", "天气不错。",
+			"图书馆靠窗的位子被抢了。", "在便利店买了杯咖啡。", "今天作业有点多。",
+			"差点迟到。", "教室空调温度刚好，差点睡着。", "校园的猫又来了。",
+			"今天课上听懂了一个之前不明白的知识点。"]
+
+	if mental < 30:
+		pool.append("什么都不想做。")
+	if health < 25:
+		pool.append("感觉身体不太舒服。")
+	if money < 10:
+		pool.append("钱包快见底了...")
+	if gpa > 85:
+		pool.append("课上被老师点名表扬了。")
+	if social > 75:
+		pool.append("手机消息响个不停。")
+
+	if pool.size() == 0:
+		return ""
+	return pool[randi() % pool.size()]
+
+# ══════════════════════════════════════════════
+#              显示事件
+# ══════════════════════════════════════════════
+func _show_event(event_data: Dictionary):
+	used_event_ids.append(event_data["id"])
+	event_last_triggered[event_data["id"]] = day_index
+
+	var info = get_date_info()
+	_append("\n[color=#aaa][ %d月%d日 %s ][/color]\n" % [info.month, info.day, info.weekday_name])
+	_append("%s\n" % _replace_names(event_data["text"]))
+
+	_clear_choices()
+	next_btn.visible = false
+
+	var shown_count = 0
+	for choice in event_data["choices"]:
+		var can_show = true
+		for tag in choice.get("requires", []):
+			if tag not in tags:
+				can_show = false
+				break
+		if not can_show:
+			continue
+		var btn = Button.new()
+		btn.text = "  " + _replace_names(choice["text"])
+		_style_choice_btn(btn)
+		btn.pressed.connect(_on_choice.bind(choice, event_data))
+		choices_container.add_child(btn)
+		shown_count += 1
+
+	if shown_count == 0:
+		waiting_for_choice = false
+
+func _on_choice(choice: Dictionary, _event_data: Dictionary):
+	var effects = choice.get("effects", {})
+	var parts = []
+	for attr in effects:
+		var val = float(effects[attr])
+		_set_attr(attr, _get_attr(attr) + val)
+		var hex = attr_color_hex.get(attr, "#ffffff")
+		var cn = attr_names.get(attr, attr)
+		if val > 0:
+			parts.append("[color=%s]%s+%d[/color]" % [hex, cn, int(val)])
+		else:
+			parts.append("[color=%s]%s%d[/color]" % [hex, cn, int(val)])
+	_clamp_all()
+
+	for tag in choice.get("add_tags", []):
+		if tag not in tags:
+			tags.append(tag)
+	for tag in choice.get("remove_tags", []):
+		tags.erase(tag)
+
+	var result_text = choice.get("result", "")
+	if choice.get("_dynamic", false):
+		result_text = _get_dynamic_result()
+	result_text = _replace_names(result_text)
+
+	if result_text != "":
+		_append("[color=#ccc]%s[/color]\n" % result_text)
+	if parts.size() > 0:
+		_append("[color=#888](%s)[/color]\n" % " ".join(parts))
+
+	_clear_choices()
+	update_ui()
+	_check_dropout()
+
+	if not game_over:
+		waiting_for_choice = false
+		time_running = true
+		_update_time_display()
+
+# ══════════════════════════════════════════════
+#              时间控制
+# ══════════════════════════════════════════════
+func toggle_pause():
+	if game_over or not game_started or waiting_for_choice:
+		return
+	time_running = !time_running
+	_update_time_display()
+
+func set_speed(spd: float):
+	time_speed = spd
+	_update_time_display()
+
+func _update_time_display():
+	if pause_btn:
+		if waiting_for_choice:
+			pause_btn.text = "⏸ 等待选择"
+		elif time_running:
+			pause_btn.text = "⏸ 暂停"
+		else:
+			pause_btn.text = "▶ 继续"
+
+	if speed_label:
+		speed_label.text = " %dx " % int(time_speed)
+
+	if date_label and game_started:
+		var info = get_date_info()
+		date_label.text = "大%s %d月%d日 %s | %s" % [
+			_year_cn(info.year), info.month, info.day,
+			info.weekday_name, info.phase]
+
+	for i in speed_buttons.size():
+		if i < available_speeds.size():
+			if available_speeds[i] == time_speed:
+				speed_buttons[i].add_theme_color_override("font_color", Color(1, 0.9, 0.3))
+			else:
+				speed_buttons[i].add_theme_color_override("font_color", Color(0.75, 0.77, 0.82))
+
+	_update_status_bar_text()
+
+# ══════════════════════════════════════════════
+#            属性工具
+# ══════════════════════════════════════════════
+func _get_attr(attr_name: String) -> float:
+	match attr_name:
+		"gpa": return gpa
+		"social": return social
+		"ability": return ability
+		"money": return money
+		"mental": return mental
+		"health": return health
+	return 0.0
+
+func _set_attr(attr_name: String, value: float):
+	match attr_name:
+		"gpa": gpa = value
+		"social": social = value
+		"ability": ability = value
+		"money": money = value
+		"mental": mental = value
+		"health": health = value
+
+func _clamp_all():
+	gpa = clampf(gpa, 0.0, 100.0)
+	social = clampf(social, 0.0, 100.0)
+	ability = clampf(ability, 0.0, 100.0)
+	money = clampf(money, 0.0, 100.0)
+	mental = clampf(mental, 0.0, 100.0)
+	health = clampf(health, 0.0, 100.0)
+
+# ══════════════════════════════════════════════
+#               退学检测
+# ══════════════════════════════════════════════
+func _check_dropout():
+	if game_over:
+		return
+	if gpa <= 5:
+		game_over = true
+		time_running = false
+		_append("\n[color=#e64d56]━━━━━━━━━━━━━━━━━━━━━\n")
+		_append("  %s因为挂科太多被学校劝退了...\n" % player_name)
+		_append("━━━━━━━━━━━━━━━━━━━━━[/color]\n")
+		_do_save()
+		_show_end_btn()
+	elif mental <= 5:
+		game_over = true
+		time_running = false
+		_append("\n[color=#b380ff]━━━━━━━━━━━━━━━━━━━━━\n")
+		_append("  %s的心理状态已经无法继续...\n" % player_name)
+		_append("  选择了休学回家休养。\n")
+		_append("━━━━━━━━━━━━━━━━━━━━━[/color]\n")
+		_do_save()
+		_show_end_btn()
+
+func _get_dynamic_result() -> String:
+	if "postgrad_committed" in tags:
+		if gpa >= 75:
+			tags.append("postgrad_success")
+			gpa += 10; mental += 20
+			return "过线了！！%s激动得差点把手机扔出去。" % player_name
+		else:
+			mental -= 20
+			return "差了几分...%s盯着屏幕很久。但人生还有很多路。" % player_name
+	return ""
+
+# ══════════════════════════════════════════════
+#                开场
+# ══════════════════════════════════════════════
+func _show_opening():
+	event_text.clear()
+	text_line_count = 0
+	_append("[color=#6ec6ff]══════ 大学四年 ══════[/color]\n\n")
+	_append("%s看着屏幕上的分数，陷入了思考。\n\n" % player_name)
+	_append("这个分数可以上——\n")
+
+	_clear_choices()
+	next_btn.visible = false
+	time_control_bar.visible = false
+
+	var tier_choices = [
+		{"text": "985重点大学 — 分数刚好压线", "tier": "985"},
+		{"text": "普通一本大学 — 选个好专业没问题", "tier": "normal"},
+		{"text": "二本院校 — 但你选了自己喜欢的城市", "tier": "low"},
+	]
+	for c in tier_choices:
+		var btn = Button.new()
+		btn.text = "  " + c.text
+		_style_choice_btn(btn)
+		btn.pressed.connect(_on_tier_selected.bind(c.tier))
+		choices_container.add_child(btn)
+
+func _on_tier_selected(tier: String):
+	university_tier = tier
+	tags.append("tier_" + tier)
+	update_ui()
+	_update_time_display()
+	AudioManager.play("game")
+
+	match tier:
+		"985":
+			gpa = 65.0; social = 35.0; ability = 25.0
+			money = 40.0; mental = 60.0; health = 75.0
+			_append("\n[color=#6ec6ff]%s踏入了985大学的校门。[/color]\n" % player_name)
+			_append("周围都是各省的尖子生，既兴奋又有些紧张。\n")
+		"normal":
+			gpa = 70.0; social = 45.0; ability = 20.0
+			money = 50.0; mental = 70.0; health = 80.0
+			_append("\n[color=#6ec6ff]%s来到了一所普通一本大学。[/color]\n" % player_name)
+			_append("校园绿树成荫，一切都是新鲜的。\n")
+		"low":
+			gpa = 75.0; social = 50.0; ability = 15.0
+			money = 55.0; mental = 75.0; health = 85.0
+			_append("\n[color=#6ec6ff]%s到了一座自己喜欢的城市读二本。[/color]\n" % player_name)
+			_append("学校不算出名，但这座城市让你充满期待。\n")
+
+	game_started = true
+	_clear_choices()
+	time_control_bar.visible = true
+	next_btn.visible = false
+
+	_append("\n[color=#888]点击上方 ▶ 开始 来开始大学生活。[/color]\n")
+	_append("[color=#888]遇到事件时时间会自动暂停，等你做出选择。[/color]\n\n")
+	update_ui()
+	_update_time_display()
+
+# ══════════════════════════════════════════════
+#                毕业结局
+# ══════════════════════════════════════════════
+func _show_graduation():
+	game_over = true
+	time_running = false
+	_append("\n[color=#6ec6ff]━━━━━━━━━━━━━━━━━━━━━━━━━[/color]\n")
+	_append("[color=#6ec6ff]  毕 业 季[/color]\n")
+	_append("[color=#6ec6ff]━━━━━━━━━━━━━━━━━━━━━━━━━[/color]\n\n")
+	_append("四年时光转瞬即逝。\n")
+	_append("%s穿上学士服，站在校门口拍了最后一张照片。\n\n" % player_name)
+
+	var ending = _determine_ending()
+	_append("[color=#6ec6ff]【%s】[/color]\n" % ending.title)
+	_append("%s\n\n" % ending.desc)
+
+	_append("[color=#888]━━━ 最终属性 ━━━[/color]\n")
+	_append("[color=#4db8e6]GPA: %.0f[/color]  " % gpa)
+	_append("[color=#ff9933]社交: %.0f[/color]  " % social)
+	_append("[color=#99e64d]能力: %.0f[/color]\n" % ability)
+	_append("[color=#e6d94d]金钱: %.0f[/color]  " % money)
+	_append("[color=#b380ff]心理: %.0f[/color]  " % mental)
+	_append("[color=#e64d56]健康: %.0f[/color]\n\n" % health)
+
+	if tags.size() > 0:
+		var display = []
+		for tag in tags:
+			display.append(_translate_tag(tag))
+		_append("[color=#888]标签: %s[/color]\n" % ", ".join(display))
+
+	_do_save()
+	_show_end_btn()
+	update_ui()
+
+func _determine_ending() -> Dictionary:
+	if gpa >= 85 and "tier_985" in tags:
+		return {"title": "学术之星", "desc": "凭借优异的成绩，%s成功保研到了本校最好的实验室。" % player_name}
+	if "postgrad_success" in tags:
+		return {"title": "考研上岸", "desc": "%s通过自己的努力考上了理想的研究生院校。" % player_name}
+	if gpa >= 80 and ability >= 60:
+		return {"title": "全面发展", "desc": "学业和实践都出色，多家企业向%s抛出橄榄枝。" % player_name}
+	if ability >= 75 and social >= 50:
+		return {"title": "offer收割机", "desc": "秋招斩获多家知名企业的offer。"}
+	if "started_business" in tags and ability >= 60:
+		return {"title": "创业先锋", "desc": "大学期间的创业项目逐渐成型，%s决定全身心投入。" % player_name}
+	if "want_stable" in tags and gpa >= 60:
+		return {"title": "上岸青年", "desc": "成功考上了公务员，稳定的生活让家人安心。"}
+	if "want_abroad" in tags and gpa >= 70:
+		return {"title": "留学深造", "desc": "拿到了国外大学的录取通知书，新的篇章开始了。"}
+	if mental < 40:
+		return {"title": "迷茫中前行", "desc": "还不太清楚自己想要什么。没关系，慢慢来。"}
+	if gpa >= 60:
+		return {"title": "平凡但真实", "desc": "顺利毕业，找到了还不错的工作。这就是大多数人的青春。"}
+	return {"title": "另一种可能", "desc": "毕业证到手，长舒一口气。未来还很长，一切来得及。"}
+
+# ══════════════════════════════════════════════
+#          存档相关
+# ══════════════════════════════════════════════
+func _do_save():
+	var data = _serialize_state()
+	SaveManager.save_game(save_slot, data)
+
+func _do_auto_save():
+	if day_index - last_auto_save_day >= auto_save_interval:
+		last_auto_save_day = day_index
+		_do_save()
+
+func _serialize_state() -> Dictionary:
+	var info = get_date_info()
+	return {
+		"player_name": player_name, "player_gender": player_gender,
+		"university_tier": university_tier,
+		"gpa": gpa, "social": social, "ability": ability,
+		"money": money, "mental": mental, "health": health,
+		"day_index": day_index, "tags": tags.duplicate(),
+		"used_event_ids": used_event_ids.duplicate(),
+		"event_last_triggered": event_last_triggered.duplicate(),
+		"last_phase": last_phase, "last_display_day": last_display_day,
+		"last_auto_save_day": last_auto_save_day,
+		"current_year": info.year, "current_phase": info.phase,
+		"name_pool": NamePool.serialize(),
+		"relationships": RelationshipManager.serialize(),
+		"wechat": WechatSystem.serialize(),
+	}
+
+func _load_from_save(data: Dictionary):
+	player_name = data.get("player_name", "你")
+	player_gender = data.get("player_gender", "male")
+	university_tier = data.get("university_tier", "normal")
+	gpa = data.get("gpa", 70.0); social = data.get("social", 40.0)
+	ability = data.get("ability", 20.0); money = data.get("money", 50.0)
+	mental = data.get("mental", 70.0); health = data.get("health", 80.0)
+	day_index = data.get("day_index", 0)
+	tags = data.get("tags", []); used_event_ids = data.get("used_event_ids", [])
+	event_last_triggered = data.get("event_last_triggered", {})
+	last_phase = data.get("last_phase", "")
+	last_display_day = data.get("last_display_day", -1)
+	last_auto_save_day = data.get("last_auto_save_day", 0)
+	if data.has("name_pool"):
+		NamePool.deserialize(data["name_pool"])
+	if data.has("relationships"):                        # ← 加这两行
+		RelationshipManager.deserialize(data["relationships"])
+	if data.has("wechat"):                              # ← 加这两行
+		WechatSystem.deserialize(data["wechat"])
+
+	game_started = true; game_over = false
+	time_control_bar.visible = true; next_btn.visible = false
+	event_text.clear(); text_line_count = 0
+
+	var info = get_date_info()
+	_append("[color=#6ec6ff]══════ 大学四年 ══════[/color]\n\n")
+	_append("[color=#888]读取存档: %s · 大%s · %s · 第%d天[/color]\n\n" % [
+		player_name, _year_cn(info.year), info.phase, day_index + 1])
+	_append("[color=#888]点击 ▶ 开始 继续你的大学生活。[/color]\n\n")
+	update_ui()
+	_update_time_display()
+	AudioManager.play("game")
+
+func _go_to_menu():
+	_do_save()
+	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+
+# ══════════════════════════════════════════════
+#              结束按钮
+# ══════════════════════════════════════════════
+func _show_end_btn():
+	_clear_choices()
+	next_btn.visible = true
+	next_btn.text = "回到主菜单"
+	# 断开旧连接
+	for conn in next_btn.pressed.get_connections():
+		next_btn.pressed.disconnect(conn.callable)
+	next_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/MainMenu.tscn"))
+
+# ══════════════════════════════════════════════
+#              标签翻译
+# ══════════════════════════════════════════════
+func _translate_tag(tag: String) -> String:
+	var t = {
+		"tier_985": "985高校", "tier_normal": "普通一本", "tier_low": "二本院校",
+		"gamer_friend": "游戏好友", "studious_friend": "学霸朋友",
+		"debate_club": "辩论社", "tech_club": "技术社",
+		"student_union": "学生会", "no_club": "社团自由人",
+		"debate_winner": "辩论新星", "first_project": "首个项目",
+		"sponsor_experience": "拉赞助经验", "failed_exam": "挂科警告",
+		"part_time_exp": "兼职经验", "crush": "心动中",
+		"secret_crush": "暗恋中", "in_relationship": "恋爱中",
+		"broke_up": "分手过", "competition_exp": "竞赛经验",
+		"intern_y1": "大一实习", "drivers_license": "驾照",
+		"changed_major": "转过专业", "double_major": "双学位",
+		"want_postgrad": "备战考研", "want_job": "求职中",
+		"want_abroad": "准备留学", "want_stable": "备考公务员",
+		"postgrad_committed": "考研冲刺", "postgrad_success": "考研上岸",
+		"big_company_intern": "大厂实习", "startup_intern": "创业公司实习",
+		"started_business": "创业中", "mass_apply": "海投简历",
+	}
+	return t.get(tag, tag)
+
+# ══════════════════════════════════════════════
+#            UI 构建 - 状态面板
+# ══════════════════════════════════════════════
+func _create_status_ui():
+	# 顶部简化状态栏（仅一行摘要）
+	status_bar = Button.new()
+	status_bar.name = "StatusBar"
+	status_bar.custom_minimum_size = Vector2(0, 36)
+	status_bar.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	add_child(status_bar)
+	move_child(status_bar, 0)
+	status_bar.add_theme_font_size_override("font_size", 14)
+	status_bar.add_theme_color_override("font_color", colors.text)
+
+	var bar_style = StyleBoxFlat.new()
+	bar_style.bg_color = colors.panel
+	bar_style.set_corner_radius_all(8)
+	bar_style.content_margin_left = 12; bar_style.content_margin_right = 12
+	status_bar.add_theme_stylebox_override("normal", bar_style)
+	var bar_hover = bar_style.duplicate()
+	bar_hover.bg_color = colors.btn_hover
+	status_bar.add_theme_stylebox_override("hover", bar_hover)
+
+	# 不再需要展开面板，属性在右侧常驻
+	status_panel = PanelContainer.new()
+	status_panel.visible = false
+	add_child(status_panel)
+
+	# 占位，不再创建内部内容
+	time_label = Label.new()
+	time_label.visible = false
+	status_panel.add_child(time_label)
+
+# ══════════════════════════════════════════════
+#            UI 构建 - 时间控制栏
+# ══════════════════════════════════════════════
+func _create_time_controls():
+	time_control_bar = HBoxContainer.new()
+	time_control_bar.name = "TimeControlBar"
+	time_control_bar.add_theme_constant_override("separation", 6)
+	time_control_bar.custom_minimum_size = Vector2(0, 40)
+	time_control_bar.visible = false
+	add_child(time_control_bar)
+	move_child(time_control_bar, 2)
+
+	pause_btn = Button.new()
+	pause_btn.text = "▶ 开始"
+	pause_btn.custom_minimum_size = Vector2(100, 36)
+	_style_time_btn(pause_btn, Color(0.2, 0.45, 0.65))
+	pause_btn.pressed.connect(toggle_pause)
+	time_control_bar.add_child(pause_btn)
+
+	time_control_bar.add_child(VSeparator.new())
+
+	for spd in available_speeds:
+		var btn = Button.new()
+		btn.text = " %dx " % int(spd)
+		btn.custom_minimum_size = Vector2(50, 36)
+		_style_time_btn(btn, Color(0.18, 0.2, 0.26))
+		btn.pressed.connect(set_speed.bind(spd))
+		time_control_bar.add_child(btn)
+		speed_buttons.append(btn)
+
+	speed_label = Label.new()
+	speed_label.add_theme_color_override("font_color", colors.accent)
+	speed_label.add_theme_font_size_override("font_size", 14)
+	time_control_bar.add_child(speed_label)
+
+	# 手机按钮
+	var phone_btn = Button.new()
+	phone_btn.text = " 📱 "
+	phone_btn.custom_minimum_size = Vector2(50, 36)
+	_style_time_btn(phone_btn, Color(0.2, 0.3, 0.45))
+	phone_btn.pressed.connect(func(): PhoneSystem.toggle_phone())
+	time_control_bar.add_child(phone_btn)
+
+	date_label = Label.new()
+	date_label.add_theme_color_override("font_color", Color(0.7, 0.72, 0.78))
+	date_label.add_theme_font_size_override("font_size", 14)
+	date_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	date_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	time_control_bar.add_child(date_label)
+
+# ══════════════════════════════════════════════
+#            UI 构建 - 主区域
+# ══════════════════════════════════════════════
+func _setup_main_ui():
+	add_theme_constant_override("separation", 6)
+
+	# 创建主水平分栏
+	var main_hbox = HBoxContainer.new()
+	main_hbox.name = "MainHBox"
+	main_hbox.add_theme_constant_override("separation", 8)
+	main_hbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	add_child(main_hbox)
+
+	# ===== 左侧：事件区 =====
+	var left_panel = VBoxContainer.new()
+	left_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left_panel.size_flags_stretch_ratio = 3.0
+	main_hbox.add_child(left_panel)
+
+	# 把原来的 event_text 移到左侧
+	event_text.get_parent().remove_child(event_text)
+	event_text.bbcode_enabled = true
+	event_text.add_theme_color_override("default_color", colors.text)
+	event_text.add_theme_font_size_override("normal_font_size", 16)
+	event_text.custom_minimum_size = Vector2(0, 0)
+	event_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	event_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	event_text.scroll_following = true
+
+	var text_bg = StyleBoxFlat.new()
+	text_bg.bg_color = colors.panel_dark
+	text_bg.set_corner_radius_all(8)
+	text_bg.content_margin_left = 15; text_bg.content_margin_right = 15
+	text_bg.content_margin_top = 12; text_bg.content_margin_bottom = 12
+	event_text.add_theme_stylebox_override("normal", text_bg)
+	left_panel.add_child(event_text)
+
+	# 选项区移到左侧下方
+	choices_container.get_parent().remove_child(choices_container)
+	left_panel.add_child(choices_container)
+
+	# next按钮也移到左侧
+	next_btn.get_parent().remove_child(next_btn)
+	next_btn.visible = false
+	_style_main_btn(next_btn)
+	left_panel.add_child(next_btn)
+
+	# ===== 右侧：状态面板（常驻） =====
+	var right_panel = PanelContainer.new()
+	right_panel.name = "RightPanel"
+	right_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right_panel.size_flags_stretch_ratio = 1.2
+	right_panel.custom_minimum_size = Vector2(280, 0)
+
+	var right_style = StyleBoxFlat.new()
+	right_style.bg_color = Color(0.1, 0.11, 0.15, 1)
+	right_style.set_corner_radius_all(10)
+	right_style.content_margin_left = 14; right_style.content_margin_right = 14
+	right_style.content_margin_top = 12; right_style.content_margin_bottom = 12
+	right_style.border_width_left = 1
+	right_style.border_color = Color(0.18, 0.2, 0.26)
+	right_panel.add_theme_stylebox_override("panel", right_style)
+	main_hbox.add_child(right_panel)
+
+	var right_scroll = ScrollContainer.new()
+	right_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	right_panel.add_child(right_scroll)
+
+	var right_vbox = VBoxContainer.new()
+	right_vbox.name = "RightContent"
+	right_vbox.add_theme_constant_override("separation", 10)
+	right_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right_scroll.add_child(right_vbox)
+
+	# 角色名 + 日期
+	var info_header = Label.new()
+	info_header.name = "InfoHeader"
+	info_header.add_theme_font_size_override("font_size", 18)
+	info_header.add_theme_color_override("font_color", colors.accent)
+	right_vbox.add_child(info_header)
+
+	right_vbox.add_child(HSeparator.new())
+
+	# 属性条（常驻显示）
+	var attr_order = ["gpa", "social", "ability", "money", "mental", "health"]
+	for attr in attr_order:
+		var row = VBoxContainer.new()
+		row.add_theme_constant_override("separation", 2)
+		right_vbox.add_child(row)
+
+		var name_row = HBoxContainer.new()
+		row.add_child(name_row)
+
+		var name_lbl = Label.new()
+		name_lbl.text = attr_names[attr]
+		name_lbl.custom_minimum_size = Vector2(45, 0)
+		name_lbl.add_theme_color_override("font_color", attr_colors[attr])
+		name_lbl.add_theme_font_size_override("font_size", 15)
+		name_row.add_child(name_lbl)
+
+		var val_lbl = Label.new()
+		val_lbl.custom_minimum_size = Vector2(35, 0)
+		val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		val_lbl.add_theme_color_override("font_color", attr_colors[attr])
+		val_lbl.add_theme_font_size_override("font_size", 15)
+		val_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_row.add_child(val_lbl)
+		value_labels[attr] = val_lbl
+
+		var progress = ProgressBar.new()
+		progress.min_value = 0; progress.max_value = 100; progress.value = 50
+		progress.custom_minimum_size = Vector2(0, 14)
+		progress.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		progress.show_percentage = false
+
+		var bg_s = StyleBoxFlat.new()
+		bg_s.bg_color = Color(0.15, 0.16, 0.2)
+		bg_s.set_corner_radius_all(4)
+		progress.add_theme_stylebox_override("background", bg_s)
+
+		var fill_s = StyleBoxFlat.new()
+		fill_s.bg_color = attr_colors[attr]
+		fill_s.set_corner_radius_all(4)
+		progress.add_theme_stylebox_override("fill", fill_s)
+		row.add_child(progress)
+		progress_bars[attr] = progress
+
+	right_vbox.add_child(HSeparator.new())
+
+	# 标签区
+	tags_label = Label.new()
+	tags_label.add_theme_color_override("font_color", Color(0.6, 0.62, 0.68))
+	tags_label.add_theme_font_size_override("font_size", 13)
+	tags_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	right_vbox.add_child(tags_label)
+
+	# 保存右侧内容引用
+	set_meta("right_vbox", right_vbox)
+	set_meta("info_header", info_header)
+
+# ══════════════════════════════════════════════
+#            UI 更新
+# ══════════════════════════════════════════════
+func update_ui():
+	var values = {
+		"gpa": gpa, "social": social, "ability": ability,
+		"money": money, "mental": mental, "health": health,
+	}
+	for attr in values:
+		if progress_bars.has(attr):
+			progress_bars[attr].value = values[attr]
+		if value_labels.has(attr):
+			value_labels[attr].text = "%d" % int(values[attr])
+
+	# 更新右侧顶部信息
+	if game_started and has_meta("info_header"):
+		var info = get_date_info()
+		var header = get_meta("info_header") as Label
+		if header:
+			header.text = "%s · 大%s\n%d月%d日 %s\n%s | 第%d天" % [
+				player_name, _year_cn(info.year),
+				info.month, info.day, info.weekday_name,
+				info.phase, day_index + 1]
+
+	if tags_label:
+		if tags.size() > 0:
+			var display = []
+			for tag in tags:
+				display.append(_translate_tag(tag))
+			tags_label.text = "标签: " + " | ".join(display)
+		else:
+			tags_label.text = "暂无标签"
+
+	_update_status_bar_text()
+
+func _update_status_bar_text():
+	if not status_bar:
+		return
+	if not game_started:
+		status_bar.text = "  准备开始"
+		return
+	var info = get_date_info()
+	status_bar.text = "  %s | %d月%d日 %s | %s | GPA:%.0f 社交:%.0f 能力:%.0f 金钱:%.0f 心理:%.0f 健康:%.0f" % [
+		player_name, info.month, info.day, info.weekday_name, info.phase,
+		gpa, social, ability, money, mental, health]
+
+func _toggle_status():
+	pass  # 不再需要展开，右侧常驻
+
+# ══════════════════════════════════════════════
+#            UI 样式工具
+# ══════════════════════════════════════════════
+func _style_main_btn(btn: Button):
+	btn.add_theme_font_size_override("font_size", 20)
+	btn.add_theme_color_override("font_color", Color(1, 1, 1))
+	btn.custom_minimum_size = Vector2(0, 46)
+	var s = StyleBoxFlat.new()
+	s.bg_color = Color(0.2, 0.45, 0.7)
+	s.set_corner_radius_all(8)
+	btn.add_theme_stylebox_override("normal", s)
+	var h = s.duplicate(); h.bg_color = Color(0.25, 0.5, 0.8)
+	btn.add_theme_stylebox_override("hover", h)
+
+func _style_choice_btn(btn: Button):
+	btn.add_theme_font_size_override("font_size", 16)
+	btn.add_theme_color_override("font_color", Color(0.9, 0.92, 0.95))
+	btn.custom_minimum_size = Vector2(0, 38)
+	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	var s = StyleBoxFlat.new()
+	s.bg_color = colors.btn
+	s.set_corner_radius_all(6)
+	s.border_width_left = 3; s.border_color = colors.accent
+	s.content_margin_left = 15
+	btn.add_theme_stylebox_override("normal", s)
+	var h = s.duplicate()
+	h.bg_color = colors.btn_hover; h.border_color = Color(0.4, 0.8, 1.0)
+	btn.add_theme_stylebox_override("hover", h)
+
+func _style_time_btn(btn: Button, bg: Color = Color(0.18, 0.2, 0.26)):
+	btn.add_theme_font_size_override("font_size", 14)
+	btn.add_theme_color_override("font_color", Color(0.8, 0.82, 0.88))
+	var s = StyleBoxFlat.new()
+	s.bg_color = bg
+	s.set_corner_radius_all(5)
+	btn.add_theme_stylebox_override("normal", s)
+	var h = s.duplicate(); h.bg_color = bg.lightened(0.15)
+	btn.add_theme_stylebox_override("hover", h)
+
+# ══════════════════════════════════════════════
+#           文本工具
+# ══════════════════════════════════════════════
+func _append(text: String):
+	text_line_count += text.count("\n") + 1
+	if text_line_count > max_text_lines:
+		event_text.clear()
+		event_text.append_text("[color=#555]... 较早的内容已省略 ...[/color]\n\n")
+		text_line_count = 5
+	event_text.append_text(text)
+
+func _clear_choices():
+	for child in choices_container.get_children():
+		child.queue_free()
