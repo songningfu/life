@@ -331,11 +331,12 @@ func _show_load_page():
 		name_lbl.add_theme_color_override("font_color", colors.text)
 
 		var detail_lbl = card.get_node("CardHBox/InfoVBox/DetailLabel") as Label
-		detail_lbl.text = "%s · 大%s · %s · GPA:%.0f" % [
+		detail_lbl.text = "%s · 大%s · %s · 学习:%.1f · GPA:%.2f" % [
 			_tier_str(m.get("university_tier", "")),
 			_year_cn(m.get("year", 1)),
 			m.get("phase", ""),
-			m.get("gpa", 0),
+			m.get("study_points", 0.0),
+			m.get("gpa", 0.0),
 		]
 		detail_lbl.add_theme_font_size_override("font_size", 14)
 		detail_lbl.add_theme_color_override("font_color", colors.dim)

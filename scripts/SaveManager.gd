@@ -18,7 +18,7 @@ func _get_meta_path(slot: int) -> String:
 
 func save_game(slot: int, game_data: Dictionary) -> bool:
 	var save_data = {
-		"version": "5.0",
+		"version": "5.1",
 		"timestamp": Time.get_datetime_string_from_system(),
 		"game_data": game_data,
 	}
@@ -38,7 +38,9 @@ func save_game(slot: int, game_data: Dictionary) -> bool:
 		"university_tier": game_data.get("university_tier", ""),
 		"year": info.year,
 		"phase": info.phase,
-		"gpa": game_data.get("gpa", 0),
+		"gpa": game_data.get("gpa", 0.0),
+		"study_points": game_data.get("study_points", 0.0),
+		"living_money": game_data.get("living_money", 0),
 	}
 	var meta_file = FileAccess.open(_get_meta_path(slot), FileAccess.WRITE)
 	if meta_file:
@@ -60,7 +62,19 @@ func load_game(slot: int) -> Dictionary:
 		return {}
 	var data = json.data
 	if data is Dictionary and data.has("game_data"):
-		return data["game_data"]
+		var game_data = data["game_data"]
+		if game_data is Dictionary:
+			if game_data.has("money") and not game_data.has("living_money"):
+				game_data["living_money"] = int(float(game_data.get("money", 0.0)) * 30.0 + 500.0)
+				game_data["study_points"] = float(game_data.get("study_points", game_data.get("gpa", 65.0)))
+				game_data["gpa"] = 0.0
+				game_data["semester_records"] = []
+				game_data["academic_warning_count"] = 0
+			if game_data.has("semester_credits") and not game_data.has("semester_records"):
+				game_data["semester_records"] = game_data["semester_credits"]
+			if game_data.has("consecutive_low_gpa_semesters") and not game_data.has("academic_warning_count"):
+				game_data["academic_warning_count"] = game_data["consecutive_low_gpa_semesters"]
+			return game_data
 	return {}
 
 func delete_save(slot: int) -> bool:

@@ -1,14 +1,19 @@
 extends VBoxContainer
 # ══════════════════════════════════════════════
-#          大学四年人生模拟器 v5.0
-#         整合存档 + NPC姓名 + 角色
+#          大学四年人生模拟器 v5.1
+#         学业绩点 + 生活费双轨系统
 # ══════════════════════════════════════════════
 
 # ========== 角色属性 ==========
-var gpa: float = 70.0
+var study_points: float = 65.0
+var gpa: float = 0.0
+var semester_records: Array = []
+var academic_warning_count: int = 0
 var social: float = 40.0
 var ability: float = 20.0
-var money: float = 50.0
+var living_money: int = 2000
+var monthly_allowance: int = 1600
+var daily_base_expense: int = 35
 var mental: float = 70.0
 var health: float = 80.0
 
@@ -79,6 +84,8 @@ var max_text_lines: int = 300
 # ========== 自动存档 ==========
 var auto_save_interval: int = 30
 var last_auto_save_day: int = 0
+var last_settled_semester_key: String = ""
+var in_overdraft: bool = false
 
 # ========== 节点引用（直接绑定场景节点）==========
 @onready var event_text: RichTextLabel         = $MainHBox/LeftPanel/EventText
@@ -102,21 +109,22 @@ var value_labels: Dictionary = {}
 # ========== 颜色配置 ==========
 var attr_colors = {
 	"gpa": Color(0.3, 0.7, 0.9, 1),
+	"study_points": Color(0.3, 0.7, 0.9, 1),
 	"social": Color(1.0, 0.6, 0.3, 1),
 	"ability": Color(0.6, 0.9, 0.3, 1),
-	"money": Color(1.0, 0.85, 0.2, 1),
+	"living_money": Color(1.0, 0.85, 0.2, 1),
 	"mental": Color(0.8, 0.5, 1.0, 1),
 	"health": Color(0.9, 0.3, 0.35, 1),
 }
 
 var attr_names = {
-	"gpa": "GPA", "social": "社交", "ability": "能力",
-	"money": "金钱", "mental": "心理", "health": "健康",
+	"gpa": "学习", "study_points": "学习", "social": "社交", "ability": "能力",
+	"living_money": "生活费", "mental": "心理", "health": "健康",
 }
 
 var attr_color_hex = {
-	"gpa": "#4db8e6", "social": "#ff9933", "ability": "#99e64d",
-	"money": "#e6d94d", "mental": "#b380ff", "health": "#e64d56",
+	"gpa": "#4db8e6", "study_points": "#4db8e6", "social": "#ff9933", "ability": "#99e64d",
+	"living_money": "#e6d94d", "mental": "#b380ff", "health": "#e64d56",
 }
 
 var colors = {
@@ -130,6 +138,7 @@ var colors = {
 }
 
 var all_events: Array = []
+var flavor_texts: Array = []
 var last_phase: String = ""
 
 # ══════════════════════════════════════════════
@@ -139,6 +148,7 @@ func _ready():
 	add_to_group("game")
 	set_process_input(true)
 	_load_all_events()
+	_load_flavor_texts()
 	_bind_scene_nodes()
 	_apply_styles()
 
@@ -174,19 +184,15 @@ func _bind_scene_nodes():
 	]
 
 	progress_bars = {
-		"gpa": $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaBar,
 		"social": $MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialBar,
 		"ability": $MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityBar,
-		"money": $MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyBar,
 		"mental": $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalBar,
 		"health": $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthBar,
 	}
 
 	value_labels = {
-		"gpa": $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow/GpaValue,
 		"social": $MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow/SocialValue,
 		"ability": $MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow/AbilityValue,
-		"money": $MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow/MoneyValue,
 		"mental": $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow/MentalValue,
 		"health": $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow/HealthValue,
 	}
@@ -383,13 +389,38 @@ func _load_all_events():
 		push_error("JSON 解析错误：%s" % json.get_error_message())
 		all_events = []
 
+func _load_flavor_texts():
+	var file = FileAccess.open("res://data/flavor_texts.json", FileAccess.READ)
+	if file == null:
+		push_warning("无法打开 flavor_texts.json")
+		flavor_texts = []
+		return
+	var json_text = file.get_as_text()
+	file.close()
+	var json = JSON.new()
+	if json.parse(json_text) == OK:
+		var data = json.data
+		if data is Dictionary:
+			flavor_texts = data.get("flavor_texts", [])
+		elif data is Array:
+			flavor_texts = data
+		else:
+			flavor_texts = []
+	else:
+		push_error("flavor_texts.json 解析错误：%s" % json.get_error_message())
+		flavor_texts = []
+
 # ══════════════════════════════════════════════
 #              日历系统
 # ══════════════════════════════════════════════
 func get_date_info() -> Dictionary:
-	var year = day_index / 365
-	var day_in_year = day_index % 365
-	var weekday = day_index % 7
+	return _get_date_info_by_index(day_index)
+
+func _get_date_info_by_index(target_day_index: int) -> Dictionary:
+	var safe_day_index = max(target_day_index, 0)
+	var year = safe_day_index / 365
+	var day_in_year = safe_day_index % 365
+	var weekday = safe_day_index % 7
 
 	var phase_name = ""
 	var semester = 1
@@ -410,7 +441,7 @@ func get_date_info() -> Dictionary:
 	var md = _index_to_month_day(day_in_year)
 
 	return {
-		"day_index": day_index, "year": year + 1, "semester": semester,
+		"day_index": safe_day_index, "year": year + 1, "semester": semester,
 		"day_in_year": day_in_year, "week": day_in_year / 7 + 1,
 		"weekday": weekday,
 		"weekday_name": ["周一","周二","周三","周四","周五","周六","周日"][weekday],
@@ -446,11 +477,22 @@ func _advance_one_day():
 		return
 
 	var info = get_date_info()
+	var prev_info = _get_date_info_by_index(day_index - 1)
 	_check_phase_change(info)
 	_apply_daily_changes(info)
+	_apply_daily_expense(info)
+	if info.day == 1:
+		living_money += monthly_allowance
+		_append("[color=#99e64d]本月生活费到账：+¥%s[/color]\n" % _format_money(monthly_allowance))
+	_check_financial_status()
+	_maybe_settle_semester(prev_info, info)
 
-	var event_data = _check_daily_event(info)
-	if event_data != null:
+	var event_data = null
+	if living_money < 200:
+		event_data = _find_event_by_id("daily_money_low")
+	if event_data == null or (event_data is Dictionary and event_data.is_empty()):
+		event_data = _check_daily_event(info)
+	if event_data != null and not (event_data is Dictionary and event_data.is_empty()):
 		waiting_for_choice = true
 		_show_event(event_data)
 	else:
@@ -460,8 +502,8 @@ func _advance_one_day():
 	update_ui()
 	_check_dropout()
 	# 微信消息检查
-	var stats = {"gpa": gpa, "social": social, "ability": ability,
-		"money": money, "mental": mental, "health": health}
+	var stats = {"gpa": study_points, "social": social, "ability": ability,
+		"money": living_money, "mental": mental, "health": health}
 	WechatSystem.check_daily_messages(day_index, tags, stats)
 	_do_auto_save()
 
@@ -470,6 +512,64 @@ func _check_phase_change(info: Dictionary):
 		last_phase = info.phase
 		_append("\n[color=#6ec6ff]━━━ 大%s · %s ━━━[/color]\n" % [_year_cn(info.year), info.phase])
 
+func _maybe_settle_semester(prev_info: Dictionary, info: Dictionary):
+	if not prev_info.get("is_exam", false):
+		return
+	if info.get("is_exam", false):
+		return
+	var key = "%d_%d" % [prev_info.year, prev_info.semester]
+	if key == last_settled_semester_key:
+		return
+	last_settled_semester_key = key
+	_settle_semester_gpa(prev_info)
+
+func _settle_semester_gpa(info: Dictionary):
+	var semester_gpa = _map_study_to_semester_gpa(study_points)
+	semester_records.append({
+		"label": "大%s%s" % [_year_cn(info.year), "上" if int(info.semester) == 1 else "下"],
+		"semester_gpa": snappedf(semester_gpa, 0.01),
+	})
+	_update_total_gpa()
+
+	if semester_gpa < 1.0:
+		academic_warning_count += 1
+		if academic_warning_count == 1:
+			_append("\n[color=#ffb366]【学业警告】本学期绩点 %.2f，已触发学业警告。[/color]\n" % semester_gpa)
+		elif academic_warning_count == 2:
+			_append("\n[color=#ff8a8a]【严重警告】连续两学期绩点过低，再下学期未改善将劝退。[/color]\n")
+	else:
+		academic_warning_count = 0
+
+	var old_sp = study_points
+	study_points = study_points + (65.0 - study_points) * 0.3
+	_append("[color=#6ec6ff]学期结算：学习点 %.1f → 学期GPA %.2f，累计GPA %.2f。[/color]\n" % [old_sp, semester_gpa, gpa])
+	_append("[color=#888]新学期开启，学习点向 65 回归，当前 %.1f。[/color]\n" % study_points)
+	_clamp_all()
+
+func _update_total_gpa():
+	if semester_records.is_empty():
+		gpa = 0.0
+		return
+	var sum = 0.0
+	for record in semester_records:
+		sum += float(record.get("semester_gpa", 0.0))
+	gpa = sum / float(semester_records.size())
+	gpa = clampf(snappedf(gpa, 0.01), 0.0, 4.0)
+
+func _map_study_to_semester_gpa(sp: float) -> float:
+	var s = clampf(sp, 0.0, 100.0)
+	if s >= 90.0:
+		return 3.8 + (s - 90.0) / 10.0 * 0.2
+	if s >= 80.0:
+		return 3.4 + (s - 80.0) / 10.0 * 0.4
+	if s >= 70.0:
+		return 2.8 + (s - 70.0) / 10.0 * 0.6
+	if s >= 60.0:
+		return 2.0 + (s - 60.0) / 10.0 * 0.8
+	if s >= 50.0:
+		return 1.0 + (s - 50.0) / 10.0 * 1.0
+	return s / 50.0 * 1.0
+
 # ══════════════════════════════════════════════
 #            每日自然属性变化
 # ══════════════════════════════════════════════
@@ -477,11 +577,11 @@ func _apply_daily_changes(info: Dictionary):
 	if info.is_exam:
 		mental -= randf_range(0.2, 0.6)
 		health -= randf_range(0.1, 0.3)
-		gpa += randf_range(0.05, 0.2)
+		study_points += randf_range(0.05, 0.2)
 	elif info.is_review:
 		mental -= randf_range(0.1, 0.3)
 		health -= randf_range(0.0, 0.15)
-		gpa += randf_range(0.03, 0.1)
+		study_points += randf_range(0.03, 0.1)
 	elif info.is_military:
 		health += randf_range(0.05, 0.2)
 		mental -= randf_range(0.1, 0.3)
@@ -489,14 +589,51 @@ func _apply_daily_changes(info: Dictionary):
 	elif info.is_holiday:
 		health += randf_range(0.05, 0.25)
 		mental += randf_range(0.05, 0.2)
-		money -= randf_range(0.02, 0.1)
 	elif info.is_weekend:
 		mental += randf_range(0.0, 0.15)
 		health += randf_range(0.0, 0.1)
 	else:
-		gpa += randf_range(0.01, 0.04)
+		study_points += randf_range(0.01, 0.04)
 		mental -= randf_range(0.0, 0.08)
-	money -= randf_range(0.02, 0.08)
+	_clamp_all()
+
+func _apply_daily_expense(info: Dictionary):
+	var expense = daily_base_expense
+	if info.is_exam:
+		expense = _tier_exam_expense()
+	elif info.is_holiday:
+		if "holiday_travel" in tags:
+			expense = _tier_holiday_outside_expense()
+		else:
+			expense = 10
+	living_money -= expense
+
+func _tier_exam_expense() -> int:
+	match university_tier:
+		"985": return 30
+		"normal": return 25
+		"low": return 20
+	return int(round(daily_base_expense * 0.7))
+
+func _tier_holiday_outside_expense() -> int:
+	match university_tier:
+		"985": return 50
+		"normal": return 45
+		"low": return 40
+	return int(round(daily_base_expense * 1.3))
+
+func _check_financial_status():
+	if living_money <= 0:
+		if not in_overdraft:
+			_append("[color=#ff8a8a]生活费透支了，你不得不开始借钱周转。[/color]\n")
+		in_overdraft = true
+		mental -= 2.0
+	elif living_money < 200:
+		if randi() % 4 == 0:
+			_append("[color=#ffb366]余额见底，今天你尽量省着花。[/color]\n")
+		in_overdraft = false
+	else:
+		in_overdraft = false
 	_clamp_all()
 
 # ══════════════════════════════════════════════
@@ -553,12 +690,17 @@ func _passes_basic_filters(e: Dictionary, info: Dictionary) -> bool:
 			return false
 	var conditions = e.get("conditions", {})
 	for attr in conditions:
-		var val = _get_attr(attr)
 		var cond = conditions[attr]
-		if cond.has("min") and val < float(cond["min"]):
-			return false
-		if cond.has("max") and val > float(cond["max"]):
-			return false
+		var min_v = cond.get("min", null)
+		var max_v = cond.get("max", null)
+		if min_v != null:
+			var check_val_min = _get_condition_check_value(attr, float(min_v))
+			if check_val_min < _normalize_condition_threshold(attr, float(min_v)):
+				return false
+		if max_v != null:
+			var check_val_max = _get_condition_check_value(attr, float(max_v))
+			if check_val_max > _normalize_condition_threshold(attr, float(max_v)):
+				return false
 	return true
 
 func _check_story_timing(e: Dictionary, info: Dictionary) -> bool:
@@ -606,6 +748,12 @@ func _weighted_random(events: Array) -> Dictionary:
 			return e
 	return events[0]
 
+func _find_event_by_id(target_id: String) -> Dictionary:
+	for e in all_events:
+		if str(e.get("id", "")) == target_id:
+			return e
+	return {}
+
 # ══════════════════════════════════════════════
 #              日常短句
 # ══════════════════════════════════════════════
@@ -623,47 +771,109 @@ func _maybe_show_flavor(info: Dictionary):
 
 func _get_flavor_text(info: Dictionary) -> String:
 	var pool: Array = []
-	if info.is_exam:
-		pool = ["图书馆满员了，走廊里都是背书的人。", "又背了一天，脑子嗡嗡的。",
-			"室友凌晨还在刷题。", "考完一门，不敢对答案。", "食堂排队时还在默念公式。",
-			"复印店排起了长队。", "咖啡喝了三杯。"]
-	elif info.is_review:
-		pool = ["开始翻学期初的笔记，字迹都认不出来了。", "图书馆的位子越来越难抢了。",
-			"{roommate_gamer}说要卖游戏装备认真复习。", "整理了一天笔记。",
-			"和同学交换了复习资料。"]
-	elif info.is_military:
-		pool = ["今天又晒了一天，黑了一个度。", "教官提前让休息了，全体欢呼。",
-			"站军姿站得腿发抖。", "晚上拉歌赢了隔壁连。", "有人中暑被扶下去了。",
-			"终于学会了正步走。"]
-	elif info.phase == "寒假":
-		pool = ["睡到自然醒。", "妈妈做了你爱吃的菜。", "又被亲戚问成绩了。",
-			"在家窝了一天没出门。", "和老同学微信聊了几句。", "帮妈妈去超市买了东西。"]
-	elif info.phase == "暑假":
-		pool = ["今天热得不想动。", "空调WiFi西瓜。", "刷了一下午手机，有点空虚。",
-			"和朋友约了打球。", "想了想下学期的事。", "晚上出去散了个步，风还挺舒服。"]
-	elif info.is_weekend:
-		pool = ["睡了个懒觉。", "和室友去校外吃了一顿。", "周末的校园很安静。",
-			"在宿舍躺了一整天。", "洗了堆积的衣服。", "看了两集剧。"]
-	else:
-		pool = ["今天的课有点无聊。", "食堂的新菜味道一般。", "快递到了。", "天气不错。",
-			"图书馆靠窗的位子被抢了。", "在便利店买了杯咖啡。", "今天作业有点多。",
-			"差点迟到。", "教室空调温度刚好，差点睡着。", "校园的猫又来了。",
-			"今天课上听懂了一个之前不明白的知识点。"]
 
-	if mental < 30:
-		pool.append("什么都不想做。")
-	if health < 25:
-		pool.append("感觉身体不太舒服。")
-	if money < 10:
-		pool.append("钱包快见底了...")
-	if gpa > 85:
-		pool.append("课上被老师点名表扬了。")
-	if social > 75:
-		pool.append("手机消息响个不停。")
+	var phase_key = _phase_key_for_flavor(info)
+	for item in flavor_texts:
+		if not (item is Dictionary):
+			continue
+		if not _matches_flavor_item(item, info, phase_key):
+			continue
+		var t = str(item.get("text", ""))
+		if t != "":
+			pool.append(t)
+
+	if pool.size() == 0:
+		if info.is_exam:
+			pool = ["图书馆满员了，走廊里都是背书的人。", "又背了一天，脑子嗡嗡的。",
+				"室友凌晨还在刷题。", "考完一门，不敢对答案。", "食堂排队时还在默念公式。",
+				"复印店排起了长队。", "咖啡喝了三杯。"]
+		elif info.is_review:
+			pool = ["开始翻学期初的笔记，字迹都认不出来了。", "图书馆的位子越来越难抢了。",
+				"{roommate_gamer}说要卖游戏装备认真复习。", "整理了一天笔记。",
+				"和同学交换了复习资料。"]
+		elif info.is_military:
+			pool = ["今天又晒了一天，黑了一个度。", "教官提前让休息了，全体欢呼。",
+				"站军姿站得腿发抖。", "晚上拉歌赢了隔壁连。", "有人中暑被扶下去了。",
+				"终于学会了正步走。"]
+		elif info.phase == "寒假":
+			pool = ["睡到自然醒。", "妈妈做了你爱吃的菜。", "又被亲戚问成绩了。",
+				"在家窝了一天没出门。", "和老同学微信聊了几句。", "帮妈妈去超市买了东西。"]
+		elif info.phase == "暑假":
+			pool = ["今天热得不想动。", "空调WiFi西瓜。", "刷了一下午手机，有点空虚。",
+				"和朋友约了打球。", "想了想下学期的事。", "晚上出去散了个步，风还挺舒服。"]
+		elif info.is_weekend:
+			pool = ["睡了个懒觉。", "和室友去校外吃了一顿。", "周末的校园很安静。",
+				"在宿舍躺了一整天。", "洗了堆积的衣服。", "看了两集剧。"]
+		else:
+			pool = ["今天的课有点无聊。", "食堂的新菜味道一般。", "快递到了。", "天气不错。",
+				"图书馆靠窗的位子被抢了。", "在便利店买了杯咖啡。", "今天作业有点多。",
+				"差点迟到。", "教室空调温度刚好，差点睡着。", "校园的猫又来了。",
+				"今天课上听懂了一个之前不明白的知识点。"]
+
+		if mental < 30:
+			pool.append("什么都不想做。")
+		if health < 25:
+			pool.append("感觉身体不太舒服。")
+		if living_money < 450:
+			pool.append("打开付款码前，你下意识先算了算余额。")
+		if study_points > 85:
+			pool.append("课上被老师点名表扬了。")
+		if social > 75:
+			pool.append("手机消息响个不停。")
 
 	if pool.size() == 0:
 		return ""
 	return pool[randi() % pool.size()]
+
+func _phase_key_for_flavor(info: Dictionary) -> String:
+	if info.is_military:
+		return "military"
+	if info.is_exam:
+		return "exam"
+	if info.is_review:
+		return "review"
+	if info.phase == "寒假":
+		return "holiday_winter"
+	if info.phase == "暑假":
+		return "holiday_summer"
+	if info.is_weekend:
+		return "weekend"
+	return "daily"
+
+func _matches_flavor_item(item: Dictionary, info: Dictionary, phase_key: String) -> bool:
+	var phases = item.get("phases", [])
+	if phases is Array and phases.size() > 0 and phase_key not in phases:
+		return false
+
+	for tag in item.get("requires", []):
+		if tag not in tags:
+			return false
+	for tag in item.get("excludes", []):
+		if tag in tags:
+			return false
+
+	var conditions = item.get("conditions", {})
+	for attr in conditions:
+		var cond = conditions[attr]
+		var min_v = cond.get("min", null)
+		var max_v = cond.get("max", null)
+		if min_v != null:
+			var check_val_min = _get_condition_check_value(attr, float(min_v))
+			if check_val_min < _normalize_condition_threshold(attr, float(min_v)):
+				return false
+		if max_v != null:
+			var check_val_max = _get_condition_check_value(attr, float(max_v))
+			if check_val_max > _normalize_condition_threshold(attr, float(max_v)):
+				return false
+
+	if item.has("is_weekend") and bool(item["is_weekend"]) != info.is_weekend:
+		return false
+	if item.has("is_holiday") and bool(item["is_holiday"]) != info.is_holiday:
+		return false
+	if item.has("is_exam") and bool(item["is_exam"]) != info.is_exam:
+		return false
+
+	return true
 
 # ══════════════════════════════════════════════
 #              显示事件
@@ -700,16 +910,15 @@ func _show_event(event_data: Dictionary):
 
 func _on_choice(choice: Dictionary, _event_data: Dictionary):
 	var effects = choice.get("effects", {})
-	var parts = []
 	for attr in effects:
 		var val = float(effects[attr])
-		_set_attr(attr, _get_attr(attr) + val)
-		var hex = attr_color_hex.get(attr, "#ffffff")
-		var cn = attr_names.get(attr, attr)
-		if val > 0:
-			parts.append("[color=%s]%s+%d[/color]" % [hex, cn, int(val)])
-		else:
-			parts.append("[color=%s]%s%d[/color]" % [hex, cn, int(val)])
+		match attr:
+			"money":
+				living_money += _convert_money_effect(int(val))
+			"living_money":
+				living_money += int(round(val))
+			_:
+				_set_attr(attr, _get_attr(attr) + val)
 	_clamp_all()
 
 	for tag in choice.get("add_tags", []):
@@ -723,10 +932,18 @@ func _on_choice(choice: Dictionary, _event_data: Dictionary):
 		result_text = _get_dynamic_result()
 	result_text = _replace_names(result_text)
 
+	var effect_hint = choice.get("effect_hint", "")
+	if effect_hint == "":
+		effect_hint = _format_effect_hint(
+			effects,
+			choice.get("add_tags", []),
+			choice.get("remove_tags", [])
+		)
+
 	if result_text != "":
 		_append("[color=#ccc]%s[/color]\n" % result_text)
-	if parts.size() > 0:
-		_append("[color=#888](%s)[/color]\n" % " ".join(parts))
+	if effect_hint != "":
+		_append("[color=#888](%s)[/color]\n" % effect_hint)
 
 	_clear_choices()
 	update_ui()
@@ -780,32 +997,105 @@ func _update_time_display():
 # ══════════════════════════════════════════════
 #            属性工具
 # ══════════════════════════════════════════════
+func _get_condition_check_value(attr_name: String, threshold: float) -> float:
+	if attr_name == "gpa":
+		return _get_gpa_check_value(threshold)
+	return _get_attr(attr_name)
+
+func _normalize_condition_threshold(attr_name: String, threshold: float) -> float:
+	if (attr_name == "money" or attr_name == "living_money") and threshold <= 100.0:
+		return threshold * 30.0
+	return threshold
+
+func _get_gpa_check_value(threshold: float) -> float:
+	if threshold > 4.0:
+		return study_points
+	return gpa
+
 func _get_attr(attr_name: String) -> float:
 	match attr_name:
-		"gpa": return gpa
+		"gpa", "study_points": return study_points
 		"social": return social
 		"ability": return ability
-		"money": return money
+		"money", "living_money": return float(living_money)
 		"mental": return mental
 		"health": return health
 	return 0.0
 
 func _set_attr(attr_name: String, value: float):
 	match attr_name:
-		"gpa": gpa = value
+		"gpa", "study_points": study_points = value
 		"social": social = value
 		"ability": ability = value
-		"money": money = value
+		"money": living_money = int(round(value))
+		"living_money": living_money = int(round(value))
 		"mental": mental = value
 		"health": health = value
 
 func _clamp_all():
-	gpa = clampf(gpa, 0.0, 100.0)
+	study_points = clampf(study_points, 0.0, 100.0)
+	gpa = clampf(gpa, 0.0, 4.0)
 	social = clampf(social, 0.0, 100.0)
 	ability = clampf(ability, 0.0, 100.0)
-	money = clampf(money, 0.0, 100.0)
+	living_money = maxi(-999999, living_money)
 	mental = clampf(mental, 0.0, 100.0)
 	health = clampf(health, 0.0, 100.0)
+
+func _convert_money_effect(raw: int) -> int:
+	var abs_val = absi(raw)
+	var sign = 1 if raw >= 0 else -1
+	var mapping = {
+		1: 25, 2: 50, 3: 80, 4: 120, 5: 150,
+		8: 250, 10: 400, 15: 800, 20: 1500,
+	}
+	if mapping.has(abs_val):
+		return sign * int(mapping[abs_val])
+	return sign * abs_val * 30
+
+func _format_money(amount: int) -> String:
+	var s = str(absi(amount))
+	var out = ""
+	while s.length() > 3:
+		out = "," + s.substr(s.length() - 3, 3) + out
+		s = s.substr(0, s.length() - 3)
+	out = s + out
+	if amount < 0:
+		return "-" + out
+	return out
+
+func _format_effect_hint(effects: Dictionary, add_tags: Array, remove_tags: Array) -> String:
+	var parts: Array = []
+	for attr in effects:
+		var val = float(effects[attr])
+		if is_zero_approx(val):
+			continue
+		if attr == "money":
+			var converted = _convert_money_effect(int(val))
+			var sign1 = "+" if converted > 0 else "-"
+			parts.append("[color=#e6d94d]¥%s%s[/color]" % [sign1, _format_money(absi(converted))])
+			continue
+		if attr == "living_money":
+			var raw_money = int(round(val))
+			var sign2 = "+" if raw_money > 0 else "-"
+			parts.append("[color=#e6d94d]¥%s%s[/color]" % [sign2, _format_money(absi(raw_money))])
+			continue
+		if attr == "gpa" or attr == "study_points":
+			parts.append("[color=#4db8e6]学力 %s%d[/color]" % ["+" if val > 0 else "-", int(abs(val))])
+			continue
+		var hex = attr_color_hex.get(attr, "#ffffff")
+		var cn = attr_names.get(attr, attr)
+		var abs_val = int(abs(val))
+		if val > 0:
+			parts.append("[color=%s]%s +%d[/color]" % [hex, cn, abs_val])
+		else:
+			parts.append("[color=%s]%s -%d[/color]" % [hex, cn, abs_val])
+
+	for tag in add_tags:
+		parts.append("[color=#7dcfff]🏷️ 获得：%s[/color]" % _translate_tag(str(tag)))
+	for tag in remove_tags:
+		parts.append("[color=#999999]🏷️ 移除：%s[/color]" % _translate_tag(str(tag)))
+
+	return "  ".join(parts)
 
 # ══════════════════════════════════════════════
 #               退学检测
@@ -813,11 +1103,11 @@ func _clamp_all():
 func _check_dropout():
 	if game_over:
 		return
-	if gpa <= 5:
+	if academic_warning_count >= 3:
 		game_over = true
 		time_running = false
 		_append("\n[color=#e64d56]━━━━━━━━━━━━━━━━━━━━━\n")
-		_append("  %s因为挂科太多被学校劝退了...\n" % player_name)
+		_append("  %s连续三学期绩点过低，被学校劝退了...\n" % player_name)
 		_append("━━━━━━━━━━━━━━━━━━━━━[/color]\n")
 		_do_save()
 		_show_end_btn()
@@ -833,9 +1123,9 @@ func _check_dropout():
 
 func _get_dynamic_result() -> String:
 	if "postgrad_committed" in tags:
-		if gpa >= 75:
+		if study_points >= 75:
 			tags.append("postgrad_success")
-			gpa += 10; mental += 20
+			study_points += 10; mental += 20
 			return "过线了！！%s激动得差点把手机扔出去。" % player_name
 		else:
 			mental -= 20
@@ -877,21 +1167,28 @@ func _on_tier_selected(tier: String):
 
 	match tier:
 		"985":
-			gpa = 65.0; social = 35.0; ability = 25.0
-			money = 40.0; mental = 60.0; health = 75.0
+			study_points = 75.0; gpa = 0.0
+			social = 35.0; ability = 25.0
+			living_money = 2500; monthly_allowance = 2000; daily_base_expense = 40
+			mental = 60.0; health = 75.0
 			_append("\n[color=#6ec6ff]%s踏入了985大学的校门。[/color]\n" % player_name)
 			_append("周围都是各省的尖子生，既兴奋又有些紧张。\n")
 		"normal":
-			gpa = 70.0; social = 45.0; ability = 20.0
-			money = 50.0; mental = 70.0; health = 80.0
+			study_points = 65.0; gpa = 0.0
+			social = 45.0; ability = 20.0
+			living_money = 2000; monthly_allowance = 1600; daily_base_expense = 35
+			mental = 70.0; health = 80.0
 			_append("\n[color=#6ec6ff]%s来到了一所普通一本大学。[/color]\n" % player_name)
 			_append("校园绿树成荫，一切都是新鲜的。\n")
 		"low":
-			gpa = 75.0; social = 50.0; ability = 15.0
-			money = 55.0; mental = 75.0; health = 85.0
+			study_points = 58.0; gpa = 0.0
+			social = 50.0; ability = 15.0
+			living_money = 1500; monthly_allowance = 1300; daily_base_expense = 30
+			mental = 75.0; health = 85.0
 			_append("\n[color=#6ec6ff]%s到了一座自己喜欢的城市读二本。[/color]\n" % player_name)
 			_append("学校不算出名，但这座城市让你充满期待。\n")
 
+	_clamp_all()
 	game_started = true
 	_clear_choices()
 	time_control_bar.visible = true
@@ -919,10 +1216,11 @@ func _show_graduation():
 	_append("%s\n\n" % ending.desc)
 
 	_append("[color=#888]━━━ 最终属性 ━━━[/color]\n")
-	_append("[color=#4db8e6]GPA: %.0f[/color]  " % gpa)
+	var final_gpa_text = "—" if semester_records.is_empty() else "%.2f" % gpa
+	_append("[color=#4db8e6]学习: %.1f  GPA: %s[/color]  " % [study_points, final_gpa_text])
 	_append("[color=#ff9933]社交: %.0f[/color]  " % social)
 	_append("[color=#99e64d]能力: %.0f[/color]\n" % ability)
-	_append("[color=#e6d94d]金钱: %.0f[/color]  " % money)
+	_append("[color=#e6d94d]生活费: ¥%s[/color]  " % _format_money(living_money))
 	_append("[color=#b380ff]心理: %.0f[/color]  " % mental)
 	_append("[color=#e64d56]健康: %.0f[/color]\n\n" % health)
 
@@ -937,23 +1235,23 @@ func _show_graduation():
 	update_ui()
 
 func _determine_ending() -> Dictionary:
-	if gpa >= 85 and "tier_985" in tags:
+	if gpa >= 3.8 and "tier_985" in tags:
 		return {"title": "学术之星", "desc": "凭借优异的成绩，%s成功保研到了本校最好的实验室。" % player_name}
 	if "postgrad_success" in tags:
 		return {"title": "考研上岸", "desc": "%s通过自己的努力考上了理想的研究生院校。" % player_name}
-	if gpa >= 80 and ability >= 60:
+	if gpa >= 3.5 and ability >= 60:
 		return {"title": "全面发展", "desc": "学业和实践都出色，多家企业向%s抛出橄榄枝。" % player_name}
 	if ability >= 75 and social >= 50:
 		return {"title": "offer收割机", "desc": "秋招斩获多家知名企业的offer。"}
 	if "started_business" in tags and ability >= 60:
 		return {"title": "创业先锋", "desc": "大学期间的创业项目逐渐成型，%s决定全身心投入。" % player_name}
-	if "want_stable" in tags and gpa >= 60:
+	if "want_stable" in tags and gpa >= 2.0:
 		return {"title": "上岸青年", "desc": "成功考上了公务员，稳定的生活让家人安心。"}
-	if "want_abroad" in tags and gpa >= 70:
+	if "want_abroad" in tags and gpa >= 2.8:
 		return {"title": "留学深造", "desc": "拿到了国外大学的录取通知书，新的篇章开始了。"}
 	if mental < 40:
 		return {"title": "迷茫中前行", "desc": "还不太清楚自己想要什么。没关系，慢慢来。"}
-	if gpa >= 60:
+	if gpa >= 2.0:
 		return {"title": "平凡但真实", "desc": "顺利毕业，找到了还不错的工作。这就是大多数人的青春。"}
 	return {"title": "另一种可能", "desc": "毕业证到手，长舒一口气。未来还很长，一切来得及。"}
 
@@ -974,8 +1272,14 @@ func _serialize_state() -> Dictionary:
 	return {
 		"player_name": player_name, "player_gender": player_gender,
 		"university_tier": university_tier,
-		"gpa": gpa, "social": social, "ability": ability,
-		"money": money, "mental": mental, "health": health,
+		"study_points": study_points, "gpa": gpa, "social": social, "ability": ability,
+		"living_money": living_money,
+		"monthly_allowance": monthly_allowance,
+		"daily_base_expense": daily_base_expense,
+		"mental": mental, "health": health,
+		"semester_records": semester_records.duplicate(true),
+		"academic_warning_count": academic_warning_count,
+		"last_settled_semester_key": last_settled_semester_key,
 		"day_index": day_index, "tags": tags.duplicate(),
 		"used_event_ids": used_event_ids.duplicate(),
 		"event_last_triggered": event_last_triggered.duplicate(),
@@ -991,22 +1295,49 @@ func _load_from_save(data: Dictionary):
 	player_name = data.get("player_name", "你")
 	player_gender = data.get("player_gender", "male")
 	university_tier = data.get("university_tier", "normal")
-	gpa = data.get("gpa", 70.0); social = data.get("social", 40.0)
-	ability = data.get("ability", 20.0); money = data.get("money", 50.0)
-	mental = data.get("mental", 70.0); health = data.get("health", 80.0)
+	study_points = data.get("study_points", data.get("gpa", 65.0))
+	gpa = data.get("gpa", 0.0)
+	if gpa > 4.0:
+		study_points = gpa
+		gpa = 0.0
+	social = data.get("social", 40.0)
+	ability = data.get("ability", 20.0)
+	living_money = int(data.get("living_money", int(data.get("money", 50.0) * 30 + 500)))
+	monthly_allowance = int(data.get("monthly_allowance", 1600))
+	daily_base_expense = int(data.get("daily_base_expense", 35))
+	mental = data.get("mental", 70.0)
+	health = data.get("health", 80.0)
+	semester_records = data.get("semester_records", data.get("semester_credits", [])).duplicate(true)
+	academic_warning_count = int(data.get("academic_warning_count", data.get("consecutive_low_gpa_semesters", 0)))
+	if not data.has("monthly_allowance") or not data.has("daily_base_expense"):
+		match university_tier:
+			"985":
+				monthly_allowance = 2000
+				daily_base_expense = 40
+			"low":
+				monthly_allowance = 1300
+				daily_base_expense = 30
+			_:
+				monthly_allowance = 1600
+				daily_base_expense = 35
+	last_settled_semester_key = data.get("last_settled_semester_key", "")
+	if semester_records.size() > 0:
+		_update_total_gpa()
 	day_index = data.get("day_index", 0)
-	tags = data.get("tags", []); used_event_ids = data.get("used_event_ids", [])
+	tags = data.get("tags", [])
+	used_event_ids = data.get("used_event_ids", [])
 	event_last_triggered = data.get("event_last_triggered", {})
 	last_phase = data.get("last_phase", "")
 	last_display_day = data.get("last_display_day", -1)
 	last_auto_save_day = data.get("last_auto_save_day", 0)
 	if data.has("name_pool"):
 		NamePool.deserialize(data["name_pool"])
-	if data.has("relationships"):                        # ← 加这两行
+	if data.has("relationships"):
 		RelationshipManager.deserialize(data["relationships"])
-	if data.has("wechat"):                              # ← 加这两行
+	if data.has("wechat"):
 		WechatSystem.deserialize(data["wechat"])
 
+	_clamp_all()
 	game_started = true; game_over = false
 	time_control_bar.visible = true; next_btn.visible = false
 	event_text.clear(); text_line_count = 0
@@ -1065,14 +1396,33 @@ func _translate_tag(tag: String) -> String:
 # ══════════════════════════════════════════════
 func update_ui():
 	var values = {
-		"gpa": gpa, "social": social, "ability": ability,
-		"money": money, "mental": mental, "health": health,
+		"social": social, "ability": ability,
+		"mental": mental, "health": health,
 	}
 	for attr in values:
 		if progress_bars.has(attr):
 			progress_bars[attr].value = values[attr]
 		if value_labels.has(attr):
 			value_labels[attr].text = "%d" % int(values[attr])
+
+	if has_node("MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow/GpaValue"):
+		var gpa_val = $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow/GpaValue as Label
+		var gpa_sub = $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaSubValue as Label
+		if semester_records.is_empty():
+			gpa_val.text = "— / 4.00"
+		else:
+			gpa_val.text = "%.2f / 4.00" % gpa
+		gpa_sub.text = "本学期学力: %d/100" % int(round(study_points))
+
+	if has_node("MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow/MoneyValue"):
+		var money_val = $MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow/MoneyValue as Label
+		money_val.text = "¥%s" % _format_money(living_money)
+		if living_money < 200:
+			money_val.add_theme_color_override("font_color", Color(0.95, 0.35, 0.35))
+		elif living_money <= 500:
+			money_val.add_theme_color_override("font_color", Color(1.0, 0.7, 0.3))
+		else:
+			money_val.add_theme_color_override("font_color", Color(1, 0.85, 0.2, 1))
 
 	# 更新右侧顶部信息
 	if game_started and info_header:
@@ -1100,9 +1450,10 @@ func _update_status_bar_text():
 		status_bar.text = "  准备开始"
 		return
 	var info = get_date_info()
-	status_bar.text = "  %s | %d月%d日 %s | %s | GPA:%.0f 社交:%.0f 能力:%.0f 金钱:%.0f 心理:%.0f 健康:%.0f" % [
+	var gpa_text = "—" if semester_records.is_empty() else "%.2f" % gpa
+	status_bar.text = "  %s | %d月%d日 %s | %s | GPA:%s 学力:%.0f 社交:%.0f 能力:%.0f 生活费:¥%s 心理:%.0f 健康:%.0f" % [
 		player_name, info.month, info.day, info.weekday_name, info.phase,
-		gpa, social, ability, money, mental, health]
+		gpa_text, study_points, social, ability, _format_money(living_money), mental, health]
 
 # ══════════════════════════════════════════════
 #            UI 样式工具
