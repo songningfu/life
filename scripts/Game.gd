@@ -22,6 +22,33 @@ var player_name: String = "你"
 var player_gender: String = "male"
 var save_slot: int = 0
 
+# ========== 家庭背景 ==========
+var selected_background: String = "normal"
+
+# 家庭背景定义（与MainMenu一致）
+const BACKGROUNDS = {
+	"normal": {
+		"name": "普通家庭",
+		"effects": {},
+	},
+	"business": {
+		"name": "经商家庭",
+		"effects": {"living_money_bonus": 500, "monthly_bonus": 400, "social": 8, "mental": -10},
+	},
+	"teacher": {
+		"name": "教师家庭",
+		"effects": {"study_points": 8, "mental": -8, "social": -5},
+	},
+	"rural": {
+		"name": "农村家庭",
+		"effects": {"living_money_bonus": -400, "monthly_bonus": -300, "health": 8, "ability": 8},
+	},
+	"single_parent": {
+		"name": "单亲家庭",
+		"effects": {"ability": 10, "mental": -12, "living_money_bonus": -200, "monthly_bonus": -200},
+	},
+}
+
 # ========== NPC 角色定义 ==========
 const NPC_ROLES = {
 	"roommate_gamer": "male",
@@ -162,6 +189,9 @@ func _ready():
 			player_name = init_data.get("player_name", "你")
 			player_gender = init_data.get("player_gender", "male")
 			save_slot = init_data.get("save_slot", 0)
+			selected_background = init_data.get("background", "normal")
+			if init_data.has("talents"):
+				TalentSystem.set_talents(init_data.get("talents", []))
 			_init_npc_names()
 			RelationshipManager.init_all_npcs()
 			WechatSystem.init_conversations()
@@ -171,6 +201,7 @@ func _ready():
 			save_slot = init_data.get("save_slot", 0)
 	else:
 		player_name = "测试"
+		selected_background = "normal"
 		NamePool.init_new_game()
 		_init_npc_names()
 		RelationshipManager.init_all_npcs()
@@ -574,17 +605,25 @@ func _map_study_to_semester_gpa(sp: float) -> float:
 #            每日自然属性变化
 # ══════════════════════════════════════════════
 func _apply_daily_changes(info: Dictionary):
+	var study_mult = TalentSystem.get_study_multiplier()
+	var health_loss_mult = TalentSystem.get_health_loss_multiplier()
+	var mental_loss_mult = TalentSystem.get_mental_loss_multiplier()
+	var mental_bonus = TalentSystem.get_daily_mental_bonus()
+	var exam_penalty = TalentSystem.get_exam_mental_penalty()
+
 	if info.is_exam:
-		mental -= randf_range(0.2, 0.6)
-		health -= randf_range(0.1, 0.3)
-		study_points += randf_range(0.05, 0.2)
+		mental -= randf_range(0.2, 0.6) * mental_loss_mult
+		health -= randf_range(0.1, 0.3) * health_loss_mult
+		study_points += randf_range(0.05, 0.2) * study_mult
+		mental -= exam_penalty
 	elif info.is_review:
-		mental -= randf_range(0.1, 0.3)
-		health -= randf_range(0.0, 0.15)
-		study_points += randf_range(0.03, 0.1)
+		mental -= randf_range(0.1, 0.3) * mental_loss_mult
+		health -= randf_range(0.0, 0.15) * health_loss_mult
+		study_points += randf_range(0.03, 0.1) * study_mult
+		mental -= exam_penalty
 	elif info.is_military:
 		health += randf_range(0.05, 0.2)
-		mental -= randf_range(0.1, 0.3)
+		mental -= randf_range(0.1, 0.3) * mental_loss_mult
 		social += randf_range(0.05, 0.15)
 	elif info.is_holiday:
 		health += randf_range(0.05, 0.25)
@@ -593,8 +632,14 @@ func _apply_daily_changes(info: Dictionary):
 		mental += randf_range(0.0, 0.15)
 		health += randf_range(0.0, 0.1)
 	else:
-		study_points += randf_range(0.01, 0.04)
-		mental -= randf_range(0.0, 0.08)
+		study_points += randf_range(0.01, 0.04) * study_mult
+		mental -= randf_range(0.0, 0.08) * mental_loss_mult
+
+	mental += mental_bonus
+
+	var mental_floor = TalentSystem.get_mental_floor()
+	if mental < mental_floor:
+		mental = mental_floor
 	_clamp_all()
 
 func _apply_daily_expense(info: Dictionary):
@@ -606,6 +651,7 @@ func _apply_daily_expense(info: Dictionary):
 			expense = _tier_holiday_outside_expense()
 		else:
 			expense = 10
+	expense = int(round(float(expense) * TalentSystem.get_expense_multiplier()))
 	living_money -= expense
 
 func _tier_exam_expense() -> int:
@@ -652,13 +698,19 @@ func _check_daily_event(info: Dictionary):
 				story_candidates.append(e)
 		else:
 			if _check_day_conditions(e, info):
-				daily_candidates.append(e)
+				if e.get("id", "") == "daily_oversleep":
+					var modified = e.duplicate()
+					modified["weight"] = int(float(e.get("weight", 3)) * TalentSystem.get_oversleep_weight_multiplier())
+					daily_candidates.append(modified)
+				else:
+					daily_candidates.append(e)
 
 	if story_candidates.size() > 0:
 		var chance = 0.15
 		for e in story_candidates:
 			chance += float(e.get("weight", 5)) * 0.02
 		chance = clampf(chance, 0.1, 0.6)
+		chance += TalentSystem.get_positive_event_bonus() * 0.1
 		if randf() < chance:
 			return _weighted_random(story_candidates)
 
@@ -667,6 +719,7 @@ func _check_daily_event(info: Dictionary):
 		for e in daily_candidates:
 			chance += float(e.get("weight", 3)) * 0.01
 		chance = clampf(chance, 0.03, 0.25)
+		chance += TalentSystem.get_negative_event_bonus() * 0.08
 		if randf() < chance:
 			return _weighted_random(daily_candidates)
 
@@ -912,6 +965,18 @@ func _on_choice(choice: Dictionary, _event_data: Dictionary):
 	var effects = choice.get("effects", {})
 	for attr in effects:
 		var val = float(effects[attr])
+		if val > 0:
+			match attr:
+				"social":
+					val *= TalentSystem.get_social_multiplier()
+				"ability":
+					val *= TalentSystem.get_ability_multiplier()
+		elif val < 0:
+			match attr:
+				"health":
+					val *= TalentSystem.get_health_loss_multiplier()
+				"mental":
+					val *= TalentSystem.get_mental_loss_multiplier()
 		match attr:
 			"money":
 				living_money += _convert_money_effect(int(val))
@@ -920,6 +985,10 @@ func _on_choice(choice: Dictionary, _event_data: Dictionary):
 			_:
 				_set_attr(attr, _get_attr(attr) + val)
 	_clamp_all()
+
+	var mental_floor = TalentSystem.get_mental_floor()
+	if mental < mental_floor:
+		mental = mental_floor
 
 	for tag in choice.get("add_tags", []):
 		if tag not in tags:
@@ -1161,6 +1230,11 @@ func _show_opening():
 func _on_tier_selected(tier: String):
 	university_tier = tier
 	tags.append("tier_" + tier)
+	tags.append("bg_" + selected_background)
+
+	for t in TalentSystem.get_talents():
+		tags.append("talent_" + t["id"])
+
 	update_ui()
 	_update_time_display()
 	AudioManager.play("game")
@@ -1188,6 +1262,9 @@ func _on_tier_selected(tier: String):
 			_append("\n[color=#6ec6ff]%s到了一座自己喜欢的城市读二本。[/color]\n" % player_name)
 			_append("学校不算出名，但这座城市让你充满期待。\n")
 
+	_apply_background_effects()
+	_show_talent_summary()
+
 	_clamp_all()
 	game_started = true
 	_clear_choices()
@@ -1198,6 +1275,43 @@ func _on_tier_selected(tier: String):
 	_append("[color=#888]遇到事件时时间会自动暂停，等你做出选择。[/color]\n\n")
 	update_ui()
 	_update_time_display()
+
+func _apply_background_effects():
+	if selected_background not in BACKGROUNDS:
+		return
+
+	var bg = BACKGROUNDS[selected_background]
+	var effects = bg.get("effects", {})
+	var bg_name = bg.get("name", "普通家庭")
+
+	_append("\n[color=#e6d94d]【家庭背景：%s】[/color]\n" % bg_name)
+
+	if effects.has("living_money_bonus"):
+		living_money += int(effects["living_money_bonus"])
+	if effects.has("monthly_bonus"):
+		monthly_allowance += int(effects["monthly_bonus"])
+	if effects.has("study_points"):
+		study_points += float(effects["study_points"])
+	if effects.has("social"):
+		social += float(effects["social"])
+	if effects.has("ability"):
+		ability += float(effects["ability"])
+	if effects.has("mental"):
+		mental += float(effects["mental"])
+	if effects.has("health"):
+		health += float(effects["health"])
+
+func _show_talent_summary():
+	var talents = TalentSystem.get_talents()
+	if talents.size() == 0:
+		return
+
+	_append("\n[color=#f0c040]【与生俱来的天赋】[/color]\n")
+	for t in talents:
+		var color = t.get("color", "#ffffff")
+		var type_str = "增益" if t["type"] == "good" else "减益"
+		_append("%s [color=%s]%s[/color] [color=#666][%s][/color] — %s\n" % [
+			t["icon"], color, t["name"], type_str, t["desc"]])
 
 # ══════════════════════════════════════════════
 #                毕业结局
@@ -1272,6 +1386,7 @@ func _serialize_state() -> Dictionary:
 	return {
 		"player_name": player_name, "player_gender": player_gender,
 		"university_tier": university_tier,
+		"selected_background": selected_background,
 		"study_points": study_points, "gpa": gpa, "social": social, "ability": ability,
 		"living_money": living_money,
 		"monthly_allowance": monthly_allowance,
@@ -1289,6 +1404,7 @@ func _serialize_state() -> Dictionary:
 		"name_pool": NamePool.serialize(),
 		"relationships": RelationshipManager.serialize(),
 		"wechat": WechatSystem.serialize(),
+		"talents": TalentSystem.serialize(),
 	}
 
 func _load_from_save(data: Dictionary):
@@ -1336,6 +1452,9 @@ func _load_from_save(data: Dictionary):
 		RelationshipManager.deserialize(data["relationships"])
 	if data.has("wechat"):
 		WechatSystem.deserialize(data["wechat"])
+	selected_background = data.get("selected_background", "normal")
+	if data.has("talents"):
+		TalentSystem.deserialize(data["talents"])
 
 	_clamp_all()
 	game_started = true; game_over = false
