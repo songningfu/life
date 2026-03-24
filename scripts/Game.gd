@@ -72,7 +72,6 @@ var event_last_triggered: Dictionary = {}
 var game_started: bool = false
 var game_over: bool = false
 var university_tier: String = ""
-var status_expanded: bool = false
 var last_display_day: int = -1
 var text_line_count: int = 0
 var max_text_lines: int = 300
@@ -81,23 +80,24 @@ var max_text_lines: int = 300
 var auto_save_interval: int = 30
 var last_auto_save_day: int = 0
 
-# ========== 节点引用 ==========
-@onready var event_text = $RichTextLabel
-@onready var choices_container = $ChoicesContainer
-@onready var next_btn = $NextButton
+# ========== 节点引用（直接绑定场景节点）==========
+@onready var event_text: RichTextLabel         = $MainHBox/LeftPanel/EventText
+@onready var choices_container: VBoxContainer  = $MainHBox/LeftPanel/ChoicesContainer
+@onready var next_btn: Button                  = $MainHBox/LeftPanel/NextButton
+@onready var status_bar: Button                = $StatusBar
+@onready var time_control_bar: HBoxContainer   = $TimeControlBar
+@onready var pause_btn: Button                 = $TimeControlBar/PauseBtn
+@onready var speed_label: Label                = $TimeControlBar/SpeedLabel
+@onready var date_label: Label                 = $TimeControlBar/DateLabel
+@onready var tags_label: Label                 = $MainHBox/RightPanel/RightScroll/RightContent/TagsLabel
+@onready var info_header: Label                = $MainHBox/RightPanel/RightScroll/RightContent/InfoHeader
 
-# ========== 动态UI引用 ==========
-var status_bar: Button
-var status_panel: PanelContainer
+# 速度按钮（场景中固定3个）
+var speed_buttons: Array = []
+
+# 属性进度条和数值标签（从场景节点填充）
 var progress_bars: Dictionary = {}
 var value_labels: Dictionary = {}
-var tags_label: Label
-var time_label: Label
-var time_control_bar: HBoxContainer
-var pause_btn: Button
-var speed_label: Label
-var date_label: Label
-var speed_buttons: Array = []
 
 # ========== 颜色配置 ==========
 var attr_colors = {
@@ -138,10 +138,9 @@ var last_phase: String = ""
 func _ready():
 	add_to_group("game")
 	set_process_input(true)
-	_create_status_ui()
-	_create_time_controls()
-	_setup_main_ui()
 	_load_all_events()
+	_bind_scene_nodes()
+	_apply_styles()
 
 	var init_data = null
 	if SaveManager.has_meta("pending_game_init"):
@@ -166,6 +165,53 @@ func _ready():
 		_init_npc_names()
 		RelationshipManager.init_all_npcs()
 		_show_opening()
+
+func _bind_scene_nodes():
+	speed_buttons = [
+		$TimeControlBar/Speed1xBtn,
+		$TimeControlBar/Speed2xBtn,
+		$TimeControlBar/Speed4xBtn,
+	]
+
+	progress_bars = {
+		"gpa": $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaBar,
+		"social": $MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialBar,
+		"ability": $MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityBar,
+		"money": $MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyBar,
+		"mental": $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalBar,
+		"health": $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthBar,
+	}
+
+	value_labels = {
+		"gpa": $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow/GpaValue,
+		"social": $MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow/SocialValue,
+		"ability": $MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow/AbilityValue,
+		"money": $MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow/MoneyValue,
+		"mental": $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow/MentalValue,
+		"health": $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow/HealthValue,
+	}
+
+	pause_btn.pressed.connect(toggle_pause)
+	(speed_buttons[0] as Button).pressed.connect(set_speed.bind(1.0))
+	(speed_buttons[1] as Button).pressed.connect(set_speed.bind(2.0))
+	(speed_buttons[2] as Button).pressed.connect(set_speed.bind(4.0))
+	$TimeControlBar/PhoneBtn.pressed.connect(func(): PhoneSystem.toggle_phone())
+
+func _apply_styles():
+	add_theme_constant_override("separation", 6)
+
+	_style_main_btn(next_btn)
+
+	for attr in progress_bars:
+		var bar = progress_bars[attr] as ProgressBar
+		var bg_s = StyleBoxFlat.new()
+		bg_s.bg_color = Color(0.15, 0.16, 0.2)
+		bg_s.set_corner_radius_all(4)
+		bar.add_theme_stylebox_override("background", bg_s)
+		var fill_s = StyleBoxFlat.new()
+		fill_s.bg_color = attr_colors[attr]
+		fill_s.set_corner_radius_all(4)
+		bar.add_theme_stylebox_override("fill", fill_s)
 
 func _init_npc_names():
 	for role_id in NPC_ROLES:
@@ -304,7 +350,7 @@ func _show_esc_menu():
 	menu_btn.pressed.connect(func():
 		_do_save()
 		menu_layer.queue_free()
-		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 	)
 	vbox.add_child(menu_btn)
 
@@ -976,7 +1022,7 @@ func _load_from_save(data: Dictionary):
 
 func _go_to_menu():
 	_do_save()
-	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 # ══════════════════════════════════════════════
 #              结束按钮
@@ -988,7 +1034,7 @@ func _show_end_btn():
 	# 断开旧连接
 	for conn in next_btn.pressed.get_connections():
 		next_btn.pressed.disconnect(conn.callable)
-	next_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/MainMenu.tscn"))
+	next_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
 
 # ══════════════════════════════════════════════
 #              标签翻译
@@ -1015,229 +1061,6 @@ func _translate_tag(tag: String) -> String:
 	return t.get(tag, tag)
 
 # ══════════════════════════════════════════════
-#            UI 构建 - 状态面板
-# ══════════════════════════════════════════════
-func _create_status_ui():
-	# 顶部简化状态栏（仅一行摘要）
-	status_bar = Button.new()
-	status_bar.name = "StatusBar"
-	status_bar.custom_minimum_size = Vector2(0, 36)
-	status_bar.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	add_child(status_bar)
-	move_child(status_bar, 0)
-	status_bar.add_theme_font_size_override("font_size", 14)
-	status_bar.add_theme_color_override("font_color", colors.text)
-
-	var bar_style = StyleBoxFlat.new()
-	bar_style.bg_color = colors.panel
-	bar_style.set_corner_radius_all(8)
-	bar_style.content_margin_left = 12; bar_style.content_margin_right = 12
-	status_bar.add_theme_stylebox_override("normal", bar_style)
-	var bar_hover = bar_style.duplicate()
-	bar_hover.bg_color = colors.btn_hover
-	status_bar.add_theme_stylebox_override("hover", bar_hover)
-
-	# 不再需要展开面板，属性在右侧常驻
-	status_panel = PanelContainer.new()
-	status_panel.visible = false
-	add_child(status_panel)
-
-	# 占位，不再创建内部内容
-	time_label = Label.new()
-	time_label.visible = false
-	status_panel.add_child(time_label)
-
-# ══════════════════════════════════════════════
-#            UI 构建 - 时间控制栏
-# ══════════════════════════════════════════════
-func _create_time_controls():
-	time_control_bar = HBoxContainer.new()
-	time_control_bar.name = "TimeControlBar"
-	time_control_bar.add_theme_constant_override("separation", 6)
-	time_control_bar.custom_minimum_size = Vector2(0, 40)
-	time_control_bar.visible = false
-	add_child(time_control_bar)
-	move_child(time_control_bar, 2)
-
-	pause_btn = Button.new()
-	pause_btn.text = "▶ 开始"
-	pause_btn.custom_minimum_size = Vector2(100, 36)
-	_style_time_btn(pause_btn, Color(0.2, 0.45, 0.65))
-	pause_btn.pressed.connect(toggle_pause)
-	time_control_bar.add_child(pause_btn)
-
-	time_control_bar.add_child(VSeparator.new())
-
-	for spd in available_speeds:
-		var btn = Button.new()
-		btn.text = " %dx " % int(spd)
-		btn.custom_minimum_size = Vector2(50, 36)
-		_style_time_btn(btn, Color(0.18, 0.2, 0.26))
-		btn.pressed.connect(set_speed.bind(spd))
-		time_control_bar.add_child(btn)
-		speed_buttons.append(btn)
-
-	speed_label = Label.new()
-	speed_label.add_theme_color_override("font_color", colors.accent)
-	speed_label.add_theme_font_size_override("font_size", 14)
-	time_control_bar.add_child(speed_label)
-
-	# 手机按钮
-	var phone_btn = Button.new()
-	phone_btn.text = " 📱 "
-	phone_btn.custom_minimum_size = Vector2(50, 36)
-	_style_time_btn(phone_btn, Color(0.2, 0.3, 0.45))
-	phone_btn.pressed.connect(func(): PhoneSystem.toggle_phone())
-	time_control_bar.add_child(phone_btn)
-
-	date_label = Label.new()
-	date_label.add_theme_color_override("font_color", Color(0.7, 0.72, 0.78))
-	date_label.add_theme_font_size_override("font_size", 14)
-	date_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	date_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	time_control_bar.add_child(date_label)
-
-# ══════════════════════════════════════════════
-#            UI 构建 - 主区域
-# ══════════════════════════════════════════════
-func _setup_main_ui():
-	add_theme_constant_override("separation", 6)
-
-	# 创建主水平分栏
-	var main_hbox = HBoxContainer.new()
-	main_hbox.name = "MainHBox"
-	main_hbox.add_theme_constant_override("separation", 8)
-	main_hbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	add_child(main_hbox)
-
-	# ===== 左侧：事件区 =====
-	var left_panel = VBoxContainer.new()
-	left_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	left_panel.size_flags_stretch_ratio = 3.0
-	main_hbox.add_child(left_panel)
-
-	# 把原来的 event_text 移到左侧
-	event_text.get_parent().remove_child(event_text)
-	event_text.bbcode_enabled = true
-	event_text.add_theme_color_override("default_color", colors.text)
-	event_text.add_theme_font_size_override("normal_font_size", 16)
-	event_text.custom_minimum_size = Vector2(0, 0)
-	event_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	event_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	event_text.scroll_following = true
-
-	var text_bg = StyleBoxFlat.new()
-	text_bg.bg_color = colors.panel_dark
-	text_bg.set_corner_radius_all(8)
-	text_bg.content_margin_left = 15; text_bg.content_margin_right = 15
-	text_bg.content_margin_top = 12; text_bg.content_margin_bottom = 12
-	event_text.add_theme_stylebox_override("normal", text_bg)
-	left_panel.add_child(event_text)
-
-	# 选项区移到左侧下方
-	choices_container.get_parent().remove_child(choices_container)
-	left_panel.add_child(choices_container)
-
-	# next按钮也移到左侧
-	next_btn.get_parent().remove_child(next_btn)
-	next_btn.visible = false
-	_style_main_btn(next_btn)
-	left_panel.add_child(next_btn)
-
-	# ===== 右侧：状态面板（常驻） =====
-	var right_panel = PanelContainer.new()
-	right_panel.name = "RightPanel"
-	right_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right_panel.size_flags_stretch_ratio = 1.2
-	right_panel.custom_minimum_size = Vector2(280, 0)
-
-	var right_style = StyleBoxFlat.new()
-	right_style.bg_color = Color(0.1, 0.11, 0.15, 1)
-	right_style.set_corner_radius_all(10)
-	right_style.content_margin_left = 14; right_style.content_margin_right = 14
-	right_style.content_margin_top = 12; right_style.content_margin_bottom = 12
-	right_style.border_width_left = 1
-	right_style.border_color = Color(0.18, 0.2, 0.26)
-	right_panel.add_theme_stylebox_override("panel", right_style)
-	main_hbox.add_child(right_panel)
-
-	var right_scroll = ScrollContainer.new()
-	right_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	right_panel.add_child(right_scroll)
-
-	var right_vbox = VBoxContainer.new()
-	right_vbox.name = "RightContent"
-	right_vbox.add_theme_constant_override("separation", 10)
-	right_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right_scroll.add_child(right_vbox)
-
-	# 角色名 + 日期
-	var info_header = Label.new()
-	info_header.name = "InfoHeader"
-	info_header.add_theme_font_size_override("font_size", 18)
-	info_header.add_theme_color_override("font_color", colors.accent)
-	right_vbox.add_child(info_header)
-
-	right_vbox.add_child(HSeparator.new())
-
-	# 属性条（常驻显示）
-	var attr_order = ["gpa", "social", "ability", "money", "mental", "health"]
-	for attr in attr_order:
-		var row = VBoxContainer.new()
-		row.add_theme_constant_override("separation", 2)
-		right_vbox.add_child(row)
-
-		var name_row = HBoxContainer.new()
-		row.add_child(name_row)
-
-		var name_lbl = Label.new()
-		name_lbl.text = attr_names[attr]
-		name_lbl.custom_minimum_size = Vector2(45, 0)
-		name_lbl.add_theme_color_override("font_color", attr_colors[attr])
-		name_lbl.add_theme_font_size_override("font_size", 15)
-		name_row.add_child(name_lbl)
-
-		var val_lbl = Label.new()
-		val_lbl.custom_minimum_size = Vector2(35, 0)
-		val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		val_lbl.add_theme_color_override("font_color", attr_colors[attr])
-		val_lbl.add_theme_font_size_override("font_size", 15)
-		val_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		name_row.add_child(val_lbl)
-		value_labels[attr] = val_lbl
-
-		var progress = ProgressBar.new()
-		progress.min_value = 0; progress.max_value = 100; progress.value = 50
-		progress.custom_minimum_size = Vector2(0, 14)
-		progress.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		progress.show_percentage = false
-
-		var bg_s = StyleBoxFlat.new()
-		bg_s.bg_color = Color(0.15, 0.16, 0.2)
-		bg_s.set_corner_radius_all(4)
-		progress.add_theme_stylebox_override("background", bg_s)
-
-		var fill_s = StyleBoxFlat.new()
-		fill_s.bg_color = attr_colors[attr]
-		fill_s.set_corner_radius_all(4)
-		progress.add_theme_stylebox_override("fill", fill_s)
-		row.add_child(progress)
-		progress_bars[attr] = progress
-
-	right_vbox.add_child(HSeparator.new())
-
-	# 标签区
-	tags_label = Label.new()
-	tags_label.add_theme_color_override("font_color", Color(0.6, 0.62, 0.68))
-	tags_label.add_theme_font_size_override("font_size", 13)
-	tags_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	right_vbox.add_child(tags_label)
-
-	# 保存右侧内容引用
-	set_meta("right_vbox", right_vbox)
-	set_meta("info_header", info_header)
-
-# ══════════════════════════════════════════════
 #            UI 更新
 # ══════════════════════════════════════════════
 func update_ui():
@@ -1252,14 +1075,12 @@ func update_ui():
 			value_labels[attr].text = "%d" % int(values[attr])
 
 	# 更新右侧顶部信息
-	if game_started and has_meta("info_header"):
+	if game_started and info_header:
 		var info = get_date_info()
-		var header = get_meta("info_header") as Label
-		if header:
-			header.text = "%s · 大%s\n%d月%d日 %s\n%s | 第%d天" % [
-				player_name, _year_cn(info.year),
-				info.month, info.day, info.weekday_name,
-				info.phase, day_index + 1]
+		info_header.text = "%s · 大%s\n%d月%d日 %s\n%s | 第%d天" % [
+			player_name, _year_cn(info.year),
+			info.month, info.day, info.weekday_name,
+			info.phase, day_index + 1]
 
 	if tags_label:
 		if tags.size() > 0:
@@ -1282,9 +1103,6 @@ func _update_status_bar_text():
 	status_bar.text = "  %s | %d月%d日 %s | %s | GPA:%.0f 社交:%.0f 能力:%.0f 金钱:%.0f 心理:%.0f 健康:%.0f" % [
 		player_name, info.month, info.day, info.weekday_name, info.phase,
 		gpa, social, ability, money, mental, health]
-
-func _toggle_status():
-	pass  # 不再需要展开，右侧常驻
 
 # ══════════════════════════════════════════════
 #            UI 样式工具
@@ -1313,16 +1131,6 @@ func _style_choice_btn(btn: Button):
 	btn.add_theme_stylebox_override("normal", s)
 	var h = s.duplicate()
 	h.bg_color = colors.btn_hover; h.border_color = Color(0.4, 0.8, 1.0)
-	btn.add_theme_stylebox_override("hover", h)
-
-func _style_time_btn(btn: Button, bg: Color = Color(0.18, 0.2, 0.26)):
-	btn.add_theme_font_size_override("font_size", 14)
-	btn.add_theme_color_override("font_color", Color(0.8, 0.82, 0.88))
-	var s = StyleBoxFlat.new()
-	s.bg_color = bg
-	s.set_corner_radius_all(5)
-	btn.add_theme_stylebox_override("normal", s)
-	var h = s.duplicate(); h.bg_color = bg.lightened(0.15)
 	btn.add_theme_stylebox_override("hover", h)
 
 # ══════════════════════════════════════════════

@@ -1,22 +1,416 @@
-[gd_scene format=3 uid="uid://cj6f7vu70deon"]
+[gd_scene load_steps=12 format=3 uid="uid://cj6f7vu70deon"]
 
 [ext_resource type="Script" uid="uid://bs4uhhtvcp7vj" path="res://scripts/Game.gd" id="1_ibkli"]
 
-[node name="VBoxContainer" type="VBoxContainer" unique_id=242561084]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_normal"]
+bg_color = Color(0.13, 0.14, 0.18, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_right = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_hover"]
+bg_color = Color(0.25, 0.28, 0.35, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_right = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_event_text"]
+bg_color = Color(0.1, 0.11, 0.15, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 15.0
+content_margin_top = 12.0
+content_margin_right = 15.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_right_panel"]
+bg_color = Color(0.1, 0.11, 0.15, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+border_width_left = 1
+border_color = Color(0.18, 0.2, 0.26, 1)
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_normal"]
+bg_color = Color(0.2, 0.45, 0.65, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_hover"]
+bg_color = Color(0.32, 0.52, 0.72, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_speed_normal"]
+bg_color = Color(0.18, 0.2, 0.26, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_speed_hover"]
+bg_color = Color(0.3, 0.32, 0.38, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_phone_normal"]
+bg_color = Color(0.2, 0.3, 0.45, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_phone_hover"]
+bg_color = Color(0.32, 0.4, 0.53, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="GameRoot" type="VBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ibkli")
+theme_override_constants/separation = 6
 
-[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=1786217271]
-custom_minimum_size = Vector2(0, 4000)
+[node name="StatusBar" type="Button" parent="." unique_id=3735128064]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+alignment = 0
+text = "准备开始"
+theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_status_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_status_hover")
+
+[node name="TimeControlBar" type="HBoxContainer" parent="." unique_id=2147483647]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 6
+
+[node name="PauseBtn" type="Button" parent="TimeControlBar"]
+custom_minimum_size = Vector2(100, 36)
+layout_mode = 2
+text = "▶ 开始"
+theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_pause_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_pause_hover")
+
+[node name="VSeparator" type="VSeparator" parent="TimeControlBar"]
 layout_mode = 2
 
-[node name="ChoicesContainer" type="VBoxContainer" parent="." unique_id=1222359295]
+[node name="Speed1xBtn" type="Button" parent="TimeControlBar"]
+custom_minimum_size = Vector2(50, 36)
 layout_mode = 2
+text = " 1x "
+theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
 
-[node name="NextButton" type="Button" parent="." unique_id=809245152]
+[node name="Speed2xBtn" type="Button" parent="TimeControlBar"]
+custom_minimum_size = Vector2(50, 36)
 layout_mode = 2
+text = " 2x "
+theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
+
+[node name="Speed4xBtn" type="Button" parent="TimeControlBar"]
+custom_minimum_size = Vector2(50, 36)
+layout_mode = 2
+text = " 4x "
+theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
+
+[node name="SpeedLabel" type="Label" parent="TimeControlBar"]
+layout_mode = 2
+text = " 1x "
+theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="PhoneBtn" type="Button" parent="TimeControlBar"]
+custom_minimum_size = Vector2(50, 36)
+layout_mode = 2
+text = " 📱 "
+theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_phone_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_phone_hover")
+
+[node name="DateLabel" type="Label" parent="TimeControlBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "大一 9月1日 周一 | 开学季"
+theme_override_colors/font_color = Color(0.7, 0.72, 0.78, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="MainHBox" type="HBoxContainer" parent="." unique_id=1073741823]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="EventText" type="RichTextLabel" parent="MainHBox/LeftPanel" unique_id=1786217271]
+bbcode_enabled = true
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_horizontal = 3
+scroll_following = true
+theme_override_colors/default_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_font_sizes/normal_font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_event_text")
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="MainHBox/LeftPanel" unique_id=1222359295]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NextButton" type="Button" parent="MainHBox/LeftPanel" unique_id=809245152]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 46)
 text = "下一年"
+visible = false
+
+[node name="RightPanel" type="PanelContainer" parent="MainHBox"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.2
+theme_override_styles/panel = SubResource("StyleBoxFlat_right_panel")
+
+[node name="RightScroll" type="ScrollContainer" parent="MainHBox/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightContent" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="InfoHeader" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+text = "玩家名 · 大一
+9月1日 周一
+开学季 | 第1天"
+theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="HSeparator1" type="HSeparator" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+
+[node name="GpaRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="GpaNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow"]
+layout_mode = 2
+
+[node name="GpaName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "GPA"
+
+[node name="GpaValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "70"
+theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="GpaBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+value = 70.0
+show_percentage = false
+
+[node name="SocialRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SocialNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow"]
+layout_mode = 2
+
+[node name="SocialName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "社交"
+
+[node name="SocialValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "40"
+theme_override_colors/font_color = Color(1, 0.6, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="SocialBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+value = 40.0
+show_percentage = false
+
+[node name="AbilityRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AbilityNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow"]
+layout_mode = 2
+
+[node name="AbilityName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "能力"
+
+[node name="AbilityValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "20"
+theme_override_colors/font_color = Color(0.6, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="AbilityBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+value = 20.0
+show_percentage = false
+
+[node name="MoneyRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="MoneyNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow"]
+layout_mode = 2
+
+[node name="MoneyName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "金钱"
+
+[node name="MoneyValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "50"
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="MoneyBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+value = 50.0
+show_percentage = false
+
+[node name="MentalRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="MentalNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow"]
+layout_mode = 2
+
+[node name="MentalName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "心理"
+
+[node name="MentalValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "70"
+theme_override_colors/font_color = Color(0.8, 0.5, 1, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="MentalBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+value = 70.0
+show_percentage = false
+
+[node name="HealthRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HealthNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow"]
+layout_mode = 2
+
+[node name="HealthName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "健康"
+
+[node name="HealthValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+text = "80"
+theme_override_colors/font_color = Color(0.9, 0.3, 0.35, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="HealthBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+value = 80.0
+show_percentage = false
+
+[node name="HSeparator2" type="HSeparator" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+
+[node name="TagsLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent"]
+layout_mode = 2
+text = "暂无标签"
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.62, 0.68, 1)
+theme_override_font_sizes/font_size = 13

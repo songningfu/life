@@ -4,7 +4,288 @@
 
 [node name="MainMenu" type="Control" unique_id=487303925]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_l6cm7")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.065, 0.09, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainVBox" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+custom_minimum_size = Vector2(500, 0)
+theme_override_constants/separation = 0
+
+[node name="SpacerTop" type="Control" parent="Center/MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+
+[node name="Title" type="RichTextLabel" parent="Center/MainVBox"]
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+custom_minimum_size = Vector2(500, 80)
+theme_override_font_sizes/normal_font_size = 42
+text = "[center][color=#4db8e6]大 学 四 年[/color][/center]"
+
+[node name="Subtitle" type="Label" parent="Center/MainVBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "你的选择，书写你的青春"
+theme_override_colors/font_color = Color(0.45, 0.47, 0.52, 1)
+theme_override_font_sizes/font_size = 16
+
+[node name="SpacerMid" type="Control" parent="Center/MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
+
+[node name="BtnCenter" type="CenterContainer" parent="Center/MainVBox"]
+layout_mode = 2
+
+[node name="BtnVBox" type="VBoxContainer" parent="Center/MainVBox/BtnCenter"]
+layout_mode = 2
+custom_minimum_size = Vector2(300, 0)
+theme_override_constants/separation = 14
+
+[node name="NewBtn" type="Button" parent="Center/MainVBox/BtnCenter/BtnVBox"]
+layout_mode = 2
+text = "新的开始"
+
+[node name="ContinueBtn" type="Button" parent="Center/MainVBox/BtnCenter/BtnVBox"]
+layout_mode = 2
+text = "继续旅程"
+
+[node name="QuitBtn" type="Button" parent="Center/MainVBox/BtnCenter/BtnVBox"]
+layout_mode = 2
+text = "离开"
+
+[node name="SpacerBottom" type="Control" parent="Center/MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+
+[node name="VersionLabel" type="Label" parent="Center/MainVBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "v5.0"
+theme_override_colors/font_color = Color(0.3, 0.32, 0.36, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="Overlay" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.6)
+
+[node name="SavePanel" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SaveVBox" type="VBoxContainer" parent="SavePanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SaveHeader" type="Label" parent="SavePanel/SaveVBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "选择存档位"
+
+[node name="SaveSep" type="HSeparator" parent="SavePanel/SaveVBox"]
+layout_mode = 2
+
+[node name="SaveSlotsContainer" type="VBoxContainer" parent="SavePanel/SaveVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SaveSpacer" type="Control" parent="SavePanel/SaveVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 5)
+
+[node name="SaveBackBtn" type="Button" parent="SavePanel/SaveVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 38)
+text = "返  回"
+
+[node name="CharPanel" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CharVBox" type="VBoxContainer" parent="CharPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="CharHeader" type="Label" parent="CharPanel/CharVBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "创建角色"
+
+[node name="NameSection" type="VBoxContainer" parent="CharPanel/CharVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameHint" type="Label" parent="CharPanel/CharVBox/NameSection"]
+layout_mode = 2
+text = "你的名字"
+
+[node name="NameInput" type="LineEdit" parent="CharPanel/CharVBox/NameSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+placeholder_text = "请输入你的姓名..."
+
+[node name="GenderSection" type="VBoxContainer" parent="CharPanel/CharVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GenderHint" type="Label" parent="CharPanel/CharVBox/GenderSection"]
+layout_mode = 2
+text = "性别"
+
+[node name="GenderHBox" type="HBoxContainer" parent="CharPanel/CharVBox/GenderSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MaleBtn" type="Button" parent="CharPanel/CharVBox/GenderSection/GenderHBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 44)
+text = "  ♂ 男  "
+
+[node name="FemaleBtn" type="Button" parent="CharPanel/CharVBox/GenderSection/GenderHBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 44)
+text = "  ♀ 女  "
+
+[node name="CharSpacer" type="Control" parent="CharPanel/CharVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 5)
+
+[node name="StartBtn" type="Button" parent="CharPanel/CharVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+text = "开始大学生活"
+
+[node name="CharBackBtn" type="Button" parent="CharPanel/CharVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 36)
+text = "返  回"
+
+[node name="LoadPage" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.065, 0.09, 1)
+
+[node name="Center" type="CenterContainer" parent="LoadPage"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainBox" type="VBoxContainer" parent="LoadPage/Center"]
+layout_mode = 2
+custom_minimum_size = Vector2(520, 0)
+theme_override_constants/separation = 20
+
+[node name="Header" type="Label" parent="LoadPage/Center/MainBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "选择存档"
+
+[node name="Subtitle" type="Label" parent="LoadPage/Center/MainBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "选择一个存档继续你的大学生活"
+
+[node name="Sep" type="HSeparator" parent="LoadPage/Center/MainBox"]
+layout_mode = 2
+
+[node name="CardList" type="VBoxContainer" parent="LoadPage/Center/MainBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Spacer" type="Control" parent="LoadPage/Center/MainBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 10)
+
+[node name="BackBtn" type="Button" parent="LoadPage/Center/MainBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = "← 返回主菜单"
+
+[node name="LoadCardTemplate" type="PanelContainer" parent="LoadPage"]
+visible = false
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 0
+
+[node name="CardHBox" type="HBoxContainer" parent="LoadPage/LoadCardTemplate"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="InfoVBox" type="VBoxContainer" parent="LoadPage/LoadCardTemplate/CardHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="LoadPage/LoadCardTemplate/CardHBox/InfoVBox"]
+layout_mode = 2
+text = "存档 1 — 玩家名"
+
+[node name="DetailLabel" type="Label" parent="LoadPage/LoadCardTemplate/CardHBox/InfoVBox"]
+layout_mode = 2
+text = "普通一本 · 大一 · 开学季 · GPA:70"
+
+[node name="TimeLabel" type="Label" parent="LoadPage/LoadCardTemplate/CardHBox/InfoVBox"]
+layout_mode = 2
+text = "2026-03-24 12:00"
+
+[node name="LoadBtn" type="Button" parent="LoadPage/LoadCardTemplate/CardHBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 50)
+text = "读 取"
+
+[node name="DeleteBtn" type="Button" parent="LoadPage/LoadCardTemplate/CardHBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 50)
+text = "删除"

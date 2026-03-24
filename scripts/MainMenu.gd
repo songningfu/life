@@ -15,18 +15,20 @@ var colors = {
 	"btn_hover": Color(0.2, 0.23, 0.3, 1),
 }
 
-var overlay: ColorRect
+@onready var overlay: ColorRect = $Overlay
+@onready var continue_btn: Button = $Center/MainVBox/BtnCenter/BtnVBox/ContinueBtn
+@onready var new_btn: Button = $Center/MainVBox/BtnCenter/BtnVBox/NewBtn
+@onready var quit_btn: Button = $Center/MainVBox/BtnCenter/BtnVBox/QuitBtn
+
 var save_panel: PanelContainer
 var save_slots_container: VBoxContainer
 var char_panel: PanelContainer
 var char_name_input: LineEdit
 var gender_male_btn: Button
 var gender_female_btn: Button
-var continue_btn: Button
 
 var selected_gender: String = "male"
 var selected_slot: int = -1
-var is_loading: bool = false
 var player_name: String = ""
 
 # 沉浸式开场
@@ -36,9 +38,14 @@ var intro_phase: int = 0
 var intro_active: bool = false
 var intro_texts: Array = []
 
+@onready var load_page: ColorRect = $LoadPage
+@onready var load_card_list: VBoxContainer = $LoadPage/Center/MainBox/CardList
+@onready var load_back_btn: Button = $LoadPage/Center/MainBox/BackBtn
+@onready var load_card_template: PanelContainer = $LoadPage/LoadCardTemplate
+
 func _ready():
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_build_ui()
+	_init_main_scene_bindings()
 	# 确保所有面板初始状态关闭
 	overlay.visible = false
 	save_panel.visible = false
@@ -51,73 +58,21 @@ func _ready():
 # ══════════════════════════════════════════════
 #              构建 UI
 # ══════════════════════════════════════════════
-func _build_ui():
-	# 背景
-	var bg = ColorRect.new()
-	bg.color = colors.bg
-	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
-
-	# 遮罩
-	overlay = ColorRect.new()
-	overlay.color = Color(0, 0, 0, 0.6)
-	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	overlay.visible = false
-	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	overlay.gui_input.connect(_on_overlay_input)
-
-	# 中心内容
-	var center = CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-
-	var main_vbox = VBoxContainer.new()
-	main_vbox.add_theme_constant_override("separation", 0)
-	main_vbox.custom_minimum_size = Vector2(500, 0)
-	center.add_child(main_vbox)
-
-	# 上方留白
-	var spacer_top = Control.new()
-	spacer_top.custom_minimum_size = Vector2(0, 40)
-	main_vbox.add_child(spacer_top)
-
-	# 标题
-	var title = RichTextLabel.new()
-	title.bbcode_enabled = true
-	title.fit_content = true
-	title.custom_minimum_size = Vector2(500, 80)
-	title.add_theme_font_size_override("normal_font_size", 42)
-	title.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+func _init_main_scene_bindings():
+	# 标题文本（由场景提供节点，脚本补充富文本）
+	var title = $Center/MainVBox/Title as RichTextLabel
+	title.clear()
 	title.append_text("[center][color=#4db8e6]大 学 四 年[/color][/center]")
-	main_vbox.add_child(title)
 
-	# 副标题
-	var subtitle = Label.new()
-	subtitle.text = "你的选择，书写你的青春"
-	subtitle.add_theme_color_override("font_color", colors.dim)
-	subtitle.add_theme_font_size_override("font_size", 16)
-	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	main_vbox.add_child(subtitle)
-
-	var spacer_mid = Control.new()
-	spacer_mid.custom_minimum_size = Vector2(0, 50)
-	main_vbox.add_child(spacer_mid)
-
-	# 按钮区
-	var btn_vbox = VBoxContainer.new()
-	btn_vbox.add_theme_constant_override("separation", 14)
-	btn_vbox.custom_minimum_size = Vector2(300, 0)
-	var btn_center = CenterContainer.new()
-	btn_center.add_child(btn_vbox)
-	main_vbox.add_child(btn_center)
-
-	var new_btn = _make_menu_btn("新的开始", colors.accent)
+	# 主菜单按钮样式与事件（节点来自场景）
+	_style_menu_btn(new_btn, colors.accent)
 	new_btn.pressed.connect(_on_new_game)
-	btn_vbox.add_child(new_btn)
 
-	continue_btn = _make_menu_btn("继续旅程", colors.text)
+	_style_menu_btn(continue_btn, colors.text)
 	continue_btn.pressed.connect(_on_continue)
-	btn_vbox.add_child(continue_btn)
+
+	_style_menu_btn(quit_btn, colors.dim)
+	quit_btn.pressed.connect(func(): get_tree().quit())
 
 	var has_any = false
 	for i in range(SaveManager.MAX_SLOTS):
@@ -127,44 +82,26 @@ func _build_ui():
 	if not has_any:
 		continue_btn.modulate = Color(1, 1, 1, 0.4)
 
-	var quit_btn = _make_menu_btn("离开", colors.dim)
-	quit_btn.pressed.connect(func(): get_tree().quit())
-	btn_vbox.add_child(quit_btn)
+	overlay.gui_input.connect(_on_overlay_input)
 
-	# 版本号
-	var spacer_btm = Control.new()
-	spacer_btm.custom_minimum_size = Vector2(0, 40)
-	main_vbox.add_child(spacer_btm)
+	# 存档面板（场景节点）
+	_bind_save_panel()
 
-	var ver = Label.new()
-	ver.text = "v5.0"
-	ver.add_theme_color_override("font_color", Color(0.3, 0.32, 0.36))
-	ver.add_theme_font_size_override("font_size", 13)
-	ver.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	main_vbox.add_child(ver)
-
-	# 添加遮罩
-	add_child(overlay)
-
-	# 存档面板
-	_build_save_panel()
-	add_child(save_panel)
-
-	# 角色创建面板
-	_build_char_panel()
-	add_child(char_panel)
+	# 角色创建面板（场景节点）
+	_bind_char_panel()
 
 	# 开场覆盖层
 	_build_intro_overlay()
 
+	# 读档页（场景节点）
+	_bind_load_page()
+
 # ══════════════════════════════════════════════
 #            存档面板
 # ══════════════════════════════════════════════
-func _build_save_panel():
-	save_panel = PanelContainer.new()
-	save_panel.visible = false
-	save_panel.custom_minimum_size = Vector2(460, 0)
-	save_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+func _bind_save_panel():
+	save_panel = $SavePanel
+	save_slots_container = $SavePanel/SaveVBox/SaveSlotsContainer
 
 	var s = StyleBoxFlat.new()
 	s.bg_color = colors.panel
@@ -176,33 +113,14 @@ func _build_save_panel():
 	s.content_margin_top = 20; s.content_margin_bottom = 20
 	save_panel.add_theme_stylebox_override("panel", s)
 
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 12)
-	save_panel.add_child(vbox)
-
-	var header = Label.new()
-	header.text = "选择存档位"
+	var header = $SavePanel/SaveVBox/SaveHeader as Label
 	header.add_theme_color_override("font_color", colors.accent)
 	header.add_theme_font_size_override("font_size", 22)
-	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(header)
 
-	vbox.add_child(HSeparator.new())
-
-	save_slots_container = VBoxContainer.new()
-	save_slots_container.add_theme_constant_override("separation", 10)
-	vbox.add_child(save_slots_container)
-
-	var spacer = Control.new()
-	spacer.custom_minimum_size = Vector2(0, 5)
-	vbox.add_child(spacer)
-
-	var back = Button.new()
-	back.text = "返  回"
-	back.custom_minimum_size = Vector2(0, 38)
+	var back = $SavePanel/SaveVBox/SaveBackBtn as Button
 	_style_panel_btn(back, Color(0.25, 0.26, 0.32))
-	back.pressed.connect(_close_panels)
-	vbox.add_child(back)
+	if not back.pressed.is_connected(_close_panels):
+		back.pressed.connect(_close_panels)
 
 func _refresh_save_slots():
 	for child in save_slots_container.get_children():
@@ -231,11 +149,7 @@ func _make_slot_widget(info: Dictionary) -> HBoxContainer:
 		_style_panel_btn(btn, Color(0.15, 0.2, 0.28))
 	else:
 		btn.text = "  存档 %d  |  空" % slot_num
-		if is_loading:
-			_style_panel_btn(btn, Color(0.12, 0.13, 0.16))
-			btn.modulate = Color(1, 1, 1, 0.4)
-		else:
-			_style_panel_btn(btn, Color(0.13, 0.17, 0.22))
+		_style_panel_btn(btn, Color(0.13, 0.17, 0.22))
 
 	btn.pressed.connect(_on_slot_picked.bind(info.slot, info.exists))
 	hbox.add_child(btn)
@@ -254,11 +168,11 @@ func _make_slot_widget(info: Dictionary) -> HBoxContainer:
 # ══════════════════════════════════════════════
 #            角色创建面板
 # ══════════════════════════════════════════════
-func _build_char_panel():
-	char_panel = PanelContainer.new()
-	char_panel.visible = false
-	char_panel.custom_minimum_size = Vector2(420, 0)
-	char_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+func _bind_char_panel():
+	char_panel = $CharPanel
+	char_name_input = $CharPanel/CharVBox/NameSection/NameInput
+	gender_male_btn = $CharPanel/CharVBox/GenderSection/GenderHBox/MaleBtn
+	gender_female_btn = $CharPanel/CharVBox/GenderSection/GenderHBox/FemaleBtn
 
 	var s = StyleBoxFlat.new()
 	s.bg_color = colors.panel
@@ -270,31 +184,13 @@ func _build_char_panel():
 	s.content_margin_top = 24; s.content_margin_bottom = 24
 	char_panel.add_theme_stylebox_override("panel", s)
 
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 16)
-	char_panel.add_child(vbox)
+	($CharPanel/CharVBox/CharHeader as Label).add_theme_color_override("font_color", colors.accent)
+	($CharPanel/CharVBox/CharHeader as Label).add_theme_font_size_override("font_size", 24)
+	($CharPanel/CharVBox/NameSection/NameHint as Label).add_theme_color_override("font_color", colors.dim)
+	($CharPanel/CharVBox/NameSection/NameHint as Label).add_theme_font_size_override("font_size", 15)
+	($CharPanel/CharVBox/GenderSection/GenderHint as Label).add_theme_color_override("font_color", colors.dim)
+	($CharPanel/CharVBox/GenderSection/GenderHint as Label).add_theme_font_size_override("font_size", 15)
 
-	var header = Label.new()
-	header.text = "创建角色"
-	header.add_theme_color_override("font_color", colors.accent)
-	header.add_theme_font_size_override("font_size", 24)
-	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(header)
-
-	# 姓名
-	var name_sec = VBoxContainer.new()
-	name_sec.add_theme_constant_override("separation", 6)
-	vbox.add_child(name_sec)
-
-	var name_hint = Label.new()
-	name_hint.text = "你的名字"
-	name_hint.add_theme_color_override("font_color", colors.dim)
-	name_hint.add_theme_font_size_override("font_size", 15)
-	name_sec.add_child(name_hint)
-
-	char_name_input = LineEdit.new()
-	char_name_input.placeholder_text = "请输入你的姓名..."
-	char_name_input.custom_minimum_size = Vector2(0, 40)
 	char_name_input.add_theme_font_size_override("font_size", 18)
 	char_name_input.add_theme_color_override("font_color", colors.text)
 	char_name_input.max_length = 8
@@ -309,56 +205,25 @@ func _build_char_panel():
 	var input_f = input_s.duplicate()
 	input_f.border_color = Color(0.4, 0.85, 1.0)
 	char_name_input.add_theme_stylebox_override("focus", input_f)
-	name_sec.add_child(char_name_input)
 
-	# 性别
-	var gender_sec = VBoxContainer.new()
-	gender_sec.add_theme_constant_override("separation", 8)
-	vbox.add_child(gender_sec)
+	if not gender_male_btn.pressed.is_connected(_on_male):
+		gender_male_btn.pressed.connect(_on_male)
+	if not gender_female_btn.pressed.is_connected(_on_female):
+		gender_female_btn.pressed.connect(_on_female)
 
-	var gender_hint = Label.new()
-	gender_hint.text = "性别"
-	gender_hint.add_theme_color_override("font_color", colors.dim)
-	gender_hint.add_theme_font_size_override("font_size", 15)
-	gender_sec.add_child(gender_hint)
-
-	var ghbox = HBoxContainer.new()
-	ghbox.add_theme_constant_override("separation", 12)
-	gender_sec.add_child(ghbox)
-
-	gender_male_btn = Button.new()
-	gender_male_btn.text = "  ♂ 男  "
-	gender_male_btn.custom_minimum_size = Vector2(140, 44)
-	gender_male_btn.pressed.connect(_on_male)
-	ghbox.add_child(gender_male_btn)
-
-	gender_female_btn = Button.new()
-	gender_female_btn.text = "  ♀ 女  "
-	gender_female_btn.custom_minimum_size = Vector2(140, 44)
-	gender_female_btn.pressed.connect(_on_female)
-	ghbox.add_child(gender_female_btn)
-
-	_update_gender_ui()
-
-	var sep = Control.new()
-	sep.custom_minimum_size = Vector2(0, 5)
-	vbox.add_child(sep)
-
-	var start_btn = Button.new()
-	start_btn.text = "开始大学生活"
-	start_btn.custom_minimum_size = Vector2(0, 48)
+	var start_btn = $CharPanel/CharVBox/StartBtn as Button
 	_style_panel_btn(start_btn, Color(0.2, 0.45, 0.65))
 	start_btn.add_theme_color_override("font_color", Color(1, 1, 1))
 	start_btn.add_theme_font_size_override("font_size", 18)
-	start_btn.pressed.connect(_on_start_game)
-	vbox.add_child(start_btn)
+	if not start_btn.pressed.is_connected(_on_start_game):
+		start_btn.pressed.connect(_on_start_game)
 
-	var back = Button.new()
-	back.text = "返  回"
-	back.custom_minimum_size = Vector2(0, 36)
+	var back = $CharPanel/CharVBox/CharBackBtn as Button
 	_style_panel_btn(back, Color(0.2, 0.21, 0.26))
-	back.pressed.connect(_close_panels)
-	vbox.add_child(back)
+	if not back.pressed.is_connected(_close_panels):
+		back.pressed.connect(_close_panels)
+
+	_update_gender_ui()
 
 # ══════════════════════════════════════════════
 #            沉浸式开场
@@ -396,11 +261,27 @@ func _build_intro_overlay():
 
 	intro_overlay.gui_input.connect(_on_intro_input)
 
+func _bind_load_page():
+	load_page.visible = false
+
+	var header = $LoadPage/Center/MainBox/Header as Label
+	header.add_theme_font_size_override("font_size", 28)
+	header.add_theme_color_override("font_color", colors.accent)
+
+	var subtitle = $LoadPage/Center/MainBox/Subtitle as Label
+	subtitle.add_theme_font_size_override("font_size", 15)
+	subtitle.add_theme_color_override("font_color", colors.dim)
+
+	_style_panel_btn(load_back_btn, Color(0.18, 0.2, 0.26))
+	load_back_btn.add_theme_color_override("font_color", colors.dim)
+	load_back_btn.add_theme_font_size_override("font_size", 16)
+	if not load_back_btn.pressed.is_connected(_on_load_page_back):
+		load_back_btn.pressed.connect(_on_load_page_back)
+
 # ══════════════════════════════════════════════
 #              事件处理
 # ══════════════════════════════════════════════
 func _on_new_game():
-	is_loading = false
 	overlay.visible = true
 	save_panel.visible = true
 	char_panel.visible = false
@@ -417,49 +298,24 @@ func _on_continue():
 	_show_load_page()
 	
 func _show_load_page():
-	# 隐藏主菜单所有内容
 	for child in get_children():
-		if child != intro_overlay:
+		if child != intro_overlay and child != load_page and child != load_card_template:
 			child.visible = false
 
-	var load_page = ColorRect.new()
-	load_page.name = "LoadPage"
-	load_page.color = colors.bg
-	load_page.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(load_page)
+	load_page.visible = true
+	load_card_template.visible = false
 
-	var center = CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	load_page.add_child(center)
-
-	var main_box = VBoxContainer.new()
-	main_box.add_theme_constant_override("separation", 20)
-	main_box.custom_minimum_size = Vector2(520, 0)
-	center.add_child(main_box)
-
-	var header = Label.new()
-	header.text = "选择存档"
-	header.add_theme_font_size_override("font_size", 28)
-	header.add_theme_color_override("font_color", colors.accent)
-	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	main_box.add_child(header)
-
-	var subtitle = Label.new()
-	subtitle.text = "选择一个存档继续你的大学生活"
-	subtitle.add_theme_font_size_override("font_size", 15)
-	subtitle.add_theme_color_override("font_color", colors.dim)
-	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	main_box.add_child(subtitle)
-
-	main_box.add_child(HSeparator.new())
+	for child in load_card_list.get_children():
+		child.queue_free()
 
 	for i in range(SaveManager.MAX_SLOTS):
 		if not SaveManager.has_save(i):
 			continue
 		var m = SaveManager.get_save_meta(i)
 
-		var card = PanelContainer.new()
-		card.custom_minimum_size = Vector2(0, 90)
+		var card = load_card_template.duplicate()
+		card.visible = true
+
 		var card_style = StyleBoxFlat.new()
 		card_style.bg_color = Color(0.12, 0.14, 0.2, 1)
 		card_style.set_corner_radius_all(10)
@@ -468,24 +324,13 @@ func _show_load_page():
 		card_style.content_margin_left = 20; card_style.content_margin_right = 20
 		card_style.content_margin_top = 14; card_style.content_margin_bottom = 14
 		card.add_theme_stylebox_override("panel", card_style)
-		main_box.add_child(card)
 
-		var hbox = HBoxContainer.new()
-		hbox.add_theme_constant_override("separation", 16)
-		card.add_child(hbox)
-
-		var info_vbox = VBoxContainer.new()
-		info_vbox.add_theme_constant_override("separation", 6)
-		info_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		hbox.add_child(info_vbox)
-
-		var name_lbl = Label.new()
+		var name_lbl = card.get_node("CardHBox/InfoVBox/NameLabel") as Label
 		name_lbl.text = "存档 %d  —  %s" % [i + 1, m.get("player_name", "未知")]
 		name_lbl.add_theme_font_size_override("font_size", 20)
 		name_lbl.add_theme_color_override("font_color", colors.text)
-		info_vbox.add_child(name_lbl)
 
-		var detail_lbl = Label.new()
+		var detail_lbl = card.get_node("CardHBox/InfoVBox/DetailLabel") as Label
 		detail_lbl.text = "%s · 大%s · %s · GPA:%.0f" % [
 			_tier_str(m.get("university_tier", "")),
 			_year_cn(m.get("year", 1)),
@@ -494,18 +339,14 @@ func _show_load_page():
 		]
 		detail_lbl.add_theme_font_size_override("font_size", 14)
 		detail_lbl.add_theme_color_override("font_color", colors.dim)
-		info_vbox.add_child(detail_lbl)
 
-		var time_lbl = Label.new()
+		var time_lbl = card.get_node("CardHBox/InfoVBox/TimeLabel") as Label
 		time_lbl.text = m.get("timestamp", "")
 		time_lbl.add_theme_font_size_override("font_size", 12)
 		time_lbl.add_theme_color_override("font_color", Color(0.35, 0.37, 0.42))
-		info_vbox.add_child(time_lbl)
 
 		var slot = i
-		var load_btn = Button.new()
-		load_btn.text = "读 取"
-		load_btn.custom_minimum_size = Vector2(80, 50)
+		var load_btn = card.get_node("CardHBox/LoadBtn") as Button
 		_style_panel_btn(load_btn, Color(0.2, 0.45, 0.65))
 		load_btn.add_theme_color_override("font_color", Color(1, 1, 1))
 		load_btn.add_theme_font_size_override("font_size", 16)
@@ -517,46 +358,22 @@ func _show_load_page():
 				})
 				get_tree().change_scene_to_file("res://scenes/Game.tscn")
 		)
-		hbox.add_child(load_btn)
 
-		var del_btn = Button.new()
-		del_btn.text = "删除"
-		del_btn.custom_minimum_size = Vector2(60, 50)
+		var del_btn = card.get_node("CardHBox/DeleteBtn") as Button
 		_style_panel_btn(del_btn, Color(0.35, 0.15, 0.15))
 		del_btn.add_theme_color_override("font_color", Color(0.9, 0.5, 0.5))
 		del_btn.pressed.connect(func():
 			SaveManager.delete_save(slot)
-			load_page.queue_free()
-			var still_has = false
-			for j in range(SaveManager.MAX_SLOTS):
-				if SaveManager.has_save(j):
-					still_has = true
-					break
-			if still_has:
-				_show_load_page()
-			else:
-				_back_from_load_page(null)
+			_show_load_page()
 		)
-		hbox.add_child(del_btn)
 
-	var spacer = Control.new()
-	spacer.custom_minimum_size = Vector2(0, 10)
-	main_box.add_child(spacer)
+		load_card_list.add_child(card)
 
-	var back_btn = Button.new()
-	back_btn.text = "← 返回主菜单"
-	back_btn.custom_minimum_size = Vector2(0, 44)
-	_style_panel_btn(back_btn, Color(0.18, 0.2, 0.26))
-	back_btn.add_theme_color_override("font_color", colors.dim)
-	back_btn.add_theme_font_size_override("font_size", 16)
-	back_btn.pressed.connect(func():
-		_back_from_load_page(load_page)
-	)
-	main_box.add_child(back_btn)
-	
-func _back_from_load_page(load_page_node):
-	if load_page_node:
-		load_page_node.queue_free()
+func _on_load_page_back():
+	_back_from_load_page()
+
+func _back_from_load_page():
+	load_page.visible = false
 	# 恢复主菜单显示
 	for child in get_children():
 		child.visible = true
@@ -574,13 +391,6 @@ func _back_from_load_page(load_page_node):
 			break
 	continue_btn.modulate = Color(1, 1, 1, 1) if has_any else Color(1, 1, 1, 0.4)
 
-func _back_to_main_menu(load_page_node):
-	load_page_node.queue_free()
-	for child in get_children():
-		child.visible = true
-	if intro_overlay:
-		intro_overlay.visible = false
-
 func _on_overlay_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed:
 		_close_panels()
@@ -592,22 +402,12 @@ func _close_panels():
 
 func _on_slot_picked(slot: int, exists: bool):
 	selected_slot = slot
-	if is_loading:
-		if exists:
-			var data = SaveManager.load_game(slot)
-			if not data.is_empty():
-				SaveManager.set_meta("pending_game_init", {
-					"save_slot": slot, "is_new_game": false, "save_data": data,
-				})
-				_close_panels()
-				get_tree().change_scene_to_file("res://scenes/Game.tscn")
-	else:
-		save_panel.visible = false
-		char_panel.visible = true
-		char_name_input.text = ""
-		char_name_input.grab_focus()
-		selected_gender = "male"
-		_update_gender_ui()
+	save_panel.visible = false
+	char_panel.visible = true
+	char_name_input.text = ""
+	char_name_input.grab_focus()
+	selected_gender = "male"
+	_update_gender_ui()
 
 func _on_delete_slot(slot: int):
 	SaveManager.delete_save(slot)
@@ -740,9 +540,7 @@ func _animate_entrance():
 # ══════════════════════════════════════════════
 #              样式工具
 # ══════════════════════════════════════════════
-func _make_menu_btn(text: String, color: Color) -> Button:
-	var btn = Button.new()
-	btn.text = text
+func _style_menu_btn(btn: Button, color: Color):
 	btn.custom_minimum_size = Vector2(280, 52)
 	btn.add_theme_font_size_override("font_size", 20)
 	btn.add_theme_color_override("font_color", color)
@@ -754,9 +552,9 @@ func _make_menu_btn(text: String, color: Color) -> Button:
 	s.content_margin_left = 20
 	btn.add_theme_stylebox_override("normal", s)
 	var h = s.duplicate()
-	h.bg_color = colors.btn_hover; h.border_color = color
+	h.bg_color = colors.btn_hover
+	h.border_color = color
 	btn.add_theme_stylebox_override("hover", h)
-	return btn
 
 func _style_panel_btn(btn: Button, bg: Color):
 	btn.add_theme_font_size_override("font_size", 15)
