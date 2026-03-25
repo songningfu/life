@@ -160,18 +160,18 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 150
-theme_override_constants/margin_top = 36
+theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 150
-theme_override_constants/margin_bottom = 36
+theme_override_constants/margin_bottom = 76
 
 [node name="VBox" type="VBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer" unique_id=247518735]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 20
+theme_override_constants/separation = 14
 
 [node name="Spacer1" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1940393474]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 
 [node name="Title" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1642634167]
@@ -185,15 +185,15 @@ text = "你来自什么样的家庭？这会影响你的起点"
 horizontal_alignment = 1
 
 [node name="Spacer2" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=749544819]
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
 [node name="BackgroundList" type="VBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1191050778]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
 [node name="Spacer3" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1310182450]
-custom_minimum_size = Vector2(0, 30)
+custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 
 [node name="NavButtons" type="HBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=593233452]
@@ -212,7 +212,7 @@ layout_mode = 2
 text = "下一步 →"
 
 [node name="Spacer4" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=151831365]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 
 [node name="Page4_Talent" type="CenterContainer" parent="PageContainer" unique_id=735025957]
@@ -232,18 +232,18 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 150
-theme_override_constants/margin_top = 36
+theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 150
-theme_override_constants/margin_bottom = 36
+theme_override_constants/margin_bottom = 76
 
 [node name="VBox" type="VBoxContainer" parent="PageContainer/Page4_Talent/ScrollContainer" unique_id=553165855]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 20
+theme_override_constants/separation = 14
 
 [node name="Spacer1" type="Control" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=504870897]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 
 [node name="Title" type="Label" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=1440052370]
@@ -257,15 +257,15 @@ text = "每个人生来不同，抽取你的三个天赋"
 horizontal_alignment = 1
 
 [node name="Spacer2" type="Control" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=1496172217]
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 
 [node name="TalentList" type="VBoxContainer" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=415035349]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="Spacer3" type="Control" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=147924666]
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 
 [node name="RollBtn" type="Button" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=1071612967]
@@ -278,7 +278,7 @@ layout_mode = 2
 horizontal_alignment = 1
 
 [node name="Spacer4" type="Control" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=646895607]
-custom_minimum_size = Vector2(0, 30)
+custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 
 [node name="NavButtons" type="HBoxContainer" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=1806256919]
@@ -297,7 +297,7 @@ layout_mode = 2
 text = "开始大学生活 →"
 
 [node name="Spacer5" type="Control" parent="PageContainer/Page4_Talent/ScrollContainer/VBox" unique_id=1253277271]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 
 [node name="ProgressIndicator" type="HBoxContainer" parent="." unique_id=686761401]

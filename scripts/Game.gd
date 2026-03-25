@@ -104,6 +104,12 @@ var event_last_triggered: Dictionary = {}
 var game_started: bool = false
 var game_over: bool = false
 var university_tier: String = ""
+var university_name: String = ""
+var major_id: String = ""
+var major_name: String = ""
+var major_required_credits: int = 150
+var major_exam_difficulty: float = 1.0
+var earned_credits: int = 0
 var last_display_day: int = -1
 var text_line_count: int = 0
 var max_text_lines: int = 300
@@ -190,22 +196,33 @@ func _ready():
 			player_gender = init_data.get("player_gender", "male")
 			save_slot = init_data.get("save_slot", 0)
 			selected_background = init_data.get("background", "normal")
+			university_tier = init_data.get("university_tier", "normal")
+			university_name = init_data.get("university_name", "江城理工大学")
+			_apply_major_profile(init_data.get("major_profile", {}), init_data.get("major_id", "undeclared"))
 			if init_data.has("talents"):
 				TalentSystem.set_talents(init_data.get("talents", []))
 			_init_npc_names()
 			RelationshipManager.init_all_npcs()
 			WechatSystem.init_conversations()
-			_show_opening()
+			_start_new_game()
 		else:
 			_load_from_save(init_data.get("save_data", {}))
 			save_slot = init_data.get("save_slot", 0)
 	else:
 		player_name = "测试"
 		selected_background = "normal"
+		university_tier = "normal"
+		university_name = "江城理工大学"
+		_apply_major_profile({
+			"id": "computer_science",
+			"name": "计算机科学与技术",
+			"required_credits": 165,
+			"exam_difficulty": 1.18,
+		}, "computer_science")
 		NamePool.init_new_game()
 		_init_npc_names()
 		RelationshipManager.init_all_npcs()
-		_show_opening()
+		_start_new_game()
 
 func _bind_scene_nodes():
 	speed_buttons = [
@@ -555,10 +572,14 @@ func _maybe_settle_semester(prev_info: Dictionary, info: Dictionary):
 	_settle_semester_gpa(prev_info)
 
 func _settle_semester_gpa(info: Dictionary):
-	var semester_gpa = _map_study_to_semester_gpa(study_points)
+	var effective_study = _get_major_adjusted_study_points(study_points)
+	var semester_gpa = _map_study_to_semester_gpa(effective_study)
+	var credits_earned_this_term = _calculate_semester_credits(semester_gpa)
+	earned_credits += credits_earned_this_term
 	semester_records.append({
 		"label": "大%s%s" % [_year_cn(info.year), "上" if int(info.semester) == 1 else "下"],
 		"semester_gpa": snappedf(semester_gpa, 0.01),
+		"credits_earned": credits_earned_this_term,
 	})
 	_update_total_gpa()
 
@@ -573,7 +594,8 @@ func _settle_semester_gpa(info: Dictionary):
 
 	var old_sp = study_points
 	study_points = study_points + (65.0 - study_points) * 0.3
-	_append("[color=#6ec6ff]学期结算：学习点 %.1f → 学期GPA %.2f，累计GPA %.2f。[/color]\n" % [old_sp, semester_gpa, gpa])
+	_append("[color=#6ec6ff]学期结算：学习点 %.1f → 专业折算 %.1f → 学期GPA %.2f，累计GPA %.2f。[/color]\n" % [old_sp, effective_study, semester_gpa, gpa])
+	_append("[color=#8fd3ff]本学期修得学分：%d，当前累计 %d / %d。[/color]\n" % [credits_earned_this_term, earned_credits, major_required_credits])
 	_append("[color=#888]新学期开启，学习点向 65 回归，当前 %.1f。[/color]\n" % study_points)
 	_clamp_all()
 
@@ -600,6 +622,29 @@ func _map_study_to_semester_gpa(sp: float) -> float:
 	if s >= 50.0:
 		return 1.0 + (s - 50.0) / 10.0 * 1.0
 	return s / 50.0 * 1.0
+
+func _get_major_adjusted_study_points(sp: float) -> float:
+	if major_exam_difficulty <= 0.0:
+		return clampf(sp, 0.0, 100.0)
+	var adjusted = 65.0 + (sp - 65.0) / major_exam_difficulty
+	return clampf(adjusted, 0.0, 100.0)
+
+func _calculate_semester_credits(semester_gpa: float) -> int:
+	var remaining = max(major_required_credits - earned_credits, 0)
+	if remaining <= 0:
+		return 0
+	var semester_target = int(ceil(float(major_required_credits) / 8.0))
+	var ratio = 0.3
+	if semester_gpa >= 3.5:
+		ratio = 1.0
+	elif semester_gpa >= 2.8:
+		ratio = 0.95
+	elif semester_gpa >= 2.0:
+		ratio = 0.85
+	elif semester_gpa >= 1.0:
+		ratio = 0.6
+	var gained = int(round(float(semester_target) * ratio))
+	return mini(remaining, gained)
 
 # ══════════════════════════════════════════════
 #            每日自然属性变化
@@ -1204,33 +1249,25 @@ func _get_dynamic_result() -> String:
 # ══════════════════════════════════════════════
 #                开场
 # ══════════════════════════════════════════════
-func _show_opening():
+func _apply_major_profile(profile: Dictionary, fallback_id: String = "undeclared"):
+	major_id = str(profile.get("id", fallback_id))
+	major_name = str(profile.get("name", "未定专业"))
+	major_required_credits = int(profile.get("required_credits", 150))
+	major_exam_difficulty = float(profile.get("exam_difficulty", 1.0))
+
+func _start_new_game():
 	event_text.clear()
 	text_line_count = 0
 	_append("[color=#6ec6ff]══════ 大学四年 ══════[/color]\n\n")
-	_append("%s看着屏幕上的分数，陷入了思考。\n\n" % player_name)
-	_append("这个分数可以上——\n")
-
 	_clear_choices()
 	next_btn.visible = false
 	time_control_bar.visible = false
 
-	var tier_choices = [
-		{"text": "985重点大学 — 分数刚好压线", "tier": "985"},
-		{"text": "普通一本大学 — 选个好专业没问题", "tier": "normal"},
-		{"text": "二本院校 — 但你选了自己喜欢的城市", "tier": "low"},
-	]
-	for c in tier_choices:
-		var btn = Button.new()
-		btn.text = "  " + c.text
-		_style_choice_btn(btn)
-		btn.pressed.connect(_on_tier_selected.bind(c.tier))
-		choices_container.add_child(btn)
-
-func _on_tier_selected(tier: String):
-	university_tier = tier
-	tags.append("tier_" + tier)
+	if "tier_" + university_tier not in tags:
+		tags.append("tier_" + university_tier)
 	tags.append("bg_" + selected_background)
+	if major_id != "":
+		tags.append("major_" + major_id)
 
 	for t in TalentSystem.get_talents():
 		tags.append("talent_" + t["id"])
@@ -1239,31 +1276,37 @@ func _on_tier_selected(tier: String):
 	_update_time_display()
 	AudioManager.play("game")
 
-	match tier:
+	match university_tier:
 		"985":
 			study_points = 75.0; gpa = 0.0
 			social = 35.0; ability = 25.0
 			living_money = 2500; monthly_allowance = 2000; daily_base_expense = 40
 			mental = 60.0; health = 75.0
-			_append("\n[color=#6ec6ff]%s踏入了985大学的校门。[/color]\n" % player_name)
+			_append("%s收到了[color=#6ec6ff]%s[/color]的录取通知书。\n" % [player_name, university_name])
+			_append("[color=#6ec6ff]院校层级：985高校[/color]\n")
 			_append("周围都是各省的尖子生，既兴奋又有些紧张。\n")
 		"normal":
 			study_points = 65.0; gpa = 0.0
 			social = 45.0; ability = 20.0
 			living_money = 2000; monthly_allowance = 1600; daily_base_expense = 35
 			mental = 70.0; health = 80.0
-			_append("\n[color=#6ec6ff]%s来到了一所普通一本大学。[/color]\n" % player_name)
+			_append("%s来到了[color=#6ec6ff]%s[/color]。\n" % [player_name, university_name])
+			_append("[color=#6ec6ff]院校层级：普通一本[/color]\n")
 			_append("校园绿树成荫，一切都是新鲜的。\n")
 		"low":
 			study_points = 58.0; gpa = 0.0
 			social = 50.0; ability = 15.0
 			living_money = 1500; monthly_allowance = 1300; daily_base_expense = 30
 			mental = 75.0; health = 85.0
-			_append("\n[color=#6ec6ff]%s到了一座自己喜欢的城市读二本。[/color]\n" % player_name)
+			_append("%s去了[color=#6ec6ff]%s[/color]读书。\n" % [player_name, university_name])
+			_append("[color=#6ec6ff]院校层级：二本院校[/color]\n")
 			_append("学校不算出名，但这座城市让你充满期待。\n")
+		_:
+			_append("%s的人生新阶段开始了。\n" % player_name)
 
 	_apply_background_effects()
 	_show_talent_summary()
+	_show_major_summary()
 
 	_clamp_all()
 	game_started = true
@@ -1306,12 +1349,38 @@ func _show_talent_summary():
 	if talents.size() == 0:
 		return
 
-	_append("\n[color=#f0c040]【与生俱来的天赋】[/color]\n")
+	_append("\n[color=#8fd3ff]【与生俱来的天赋】[/color]\n")
 	for t in talents:
-		var color = t.get("color", "#ffffff")
+		var color = "#8fd3ff" if t["type"] == "good" else "#c7d6e6"
 		var type_str = "增益" if t["type"] == "good" else "减益"
-		_append("%s [color=%s]%s[/color] [color=#666][%s][/color] — %s\n" % [
-			t["icon"], color, t["name"], type_str, t["desc"]])
+		_append("[color=%s]%s[/color] [color=#7f8b99][%s][/color] — %s\n" % [
+			color, t["name"], type_str, t["desc"]])
+
+func _show_major_summary():
+	if major_name == "":
+		return
+	_append("\n[color=#8fd3ff]【专业设定】[/color]\n")
+	_append("[color=#8fd3ff]%s[/color] · 学分要求 %d · %s\n" % [
+		major_name, major_required_credits, _major_difficulty_label()])
+	_append("[color=#7f8b99]专业越难，学期成绩折算越吃力，毕业所需学分也更高。[/color]\n")
+
+func _major_difficulty_label() -> String:
+	if major_exam_difficulty >= 1.25:
+		return "考试强度很高"
+	if major_exam_difficulty >= 1.15:
+		return "考试强度偏高"
+	if major_exam_difficulty >= 1.05:
+		return "考试强度中等"
+	return "考试强度较平稳"
+
+func _default_university_name_from_tier(tier: String) -> String:
+	match tier:
+		"985":
+			return "东岚大学"
+		"low":
+			return "临海学院"
+		_:
+			return "江城理工大学"
 
 # ══════════════════════════════════════════════
 #                毕业结局
@@ -1324,6 +1393,8 @@ func _show_graduation():
 	_append("[color=#6ec6ff]━━━━━━━━━━━━━━━━━━━━━━━━━[/color]\n\n")
 	_append("四年时光转瞬即逝。\n")
 	_append("%s穿上学士服，站在校门口拍了最后一张照片。\n\n" % player_name)
+	_append("[color=#8fd3ff]%s · %s[/color]\n" % [university_name, major_name])
+	_append("[color=#8fd3ff]学分进度：%d / %d[/color]\n\n" % [earned_credits, major_required_credits])
 
 	var ending = _determine_ending()
 	_append("[color=#6ec6ff]【%s】[/color]\n" % ending.title)
@@ -1349,6 +1420,9 @@ func _show_graduation():
 	update_ui()
 
 func _determine_ending() -> Dictionary:
+	if earned_credits < major_required_credits:
+		var missing = major_required_credits - earned_credits
+		return {"title": "延期毕业", "desc": "离毕业线还差 %d 学分。%s只能先补修课程，把毕业时间往后推了推。" % [missing, player_name]}
 	if gpa >= 3.8 and "tier_985" in tags:
 		return {"title": "学术之星", "desc": "凭借优异的成绩，%s成功保研到了本校最好的实验室。" % player_name}
 	if "postgrad_success" in tags:
@@ -1386,12 +1460,18 @@ func _serialize_state() -> Dictionary:
 	return {
 		"player_name": player_name, "player_gender": player_gender,
 		"university_tier": university_tier,
+		"university_name": university_name,
+		"major_id": major_id,
+		"major_name": major_name,
+		"major_required_credits": major_required_credits,
+		"major_exam_difficulty": major_exam_difficulty,
 		"selected_background": selected_background,
 		"study_points": study_points, "gpa": gpa, "social": social, "ability": ability,
 		"living_money": living_money,
 		"monthly_allowance": monthly_allowance,
 		"daily_base_expense": daily_base_expense,
 		"mental": mental, "health": health,
+		"earned_credits": earned_credits,
 		"semester_records": semester_records.duplicate(true),
 		"academic_warning_count": academic_warning_count,
 		"last_settled_semester_key": last_settled_semester_key,
@@ -1411,6 +1491,11 @@ func _load_from_save(data: Dictionary):
 	player_name = data.get("player_name", "你")
 	player_gender = data.get("player_gender", "male")
 	university_tier = data.get("university_tier", "normal")
+	university_name = data.get("university_name", _default_university_name_from_tier(university_tier))
+	major_id = data.get("major_id", "undeclared")
+	major_name = data.get("major_name", "未定专业")
+	major_required_credits = int(data.get("major_required_credits", 150))
+	major_exam_difficulty = float(data.get("major_exam_difficulty", 1.0))
 	study_points = data.get("study_points", data.get("gpa", 65.0))
 	gpa = data.get("gpa", 0.0)
 	if gpa > 4.0:
@@ -1423,7 +1508,10 @@ func _load_from_save(data: Dictionary):
 	daily_base_expense = int(data.get("daily_base_expense", 35))
 	mental = data.get("mental", 70.0)
 	health = data.get("health", 80.0)
+	earned_credits = int(data.get("earned_credits", 0))
 	semester_records = data.get("semester_records", data.get("semester_credits", [])).duplicate(true)
+	if not data.has("earned_credits") and semester_records.size() > 0:
+		earned_credits = int(round(float(major_required_credits) * clampf(float(semester_records.size()) / 8.0, 0.0, 1.0)))
 	academic_warning_count = int(data.get("academic_warning_count", data.get("consecutive_low_gpa_semesters", 0)))
 	if not data.has("monthly_allowance") or not data.has("daily_base_expense"):
 		match university_tier:
@@ -1465,6 +1553,8 @@ func _load_from_save(data: Dictionary):
 	_append("[color=#6ec6ff]══════ 大学四年 ══════[/color]\n\n")
 	_append("[color=#888]读取存档: %s · 大%s · %s · 第%d天[/color]\n\n" % [
 		player_name, _year_cn(info.year), info.phase, day_index + 1])
+	_append("[color=#8fd3ff]%s · %s · 学分 %d / %d[/color]\n\n" % [
+		university_name, major_name, earned_credits, major_required_credits])
 	_append("[color=#888]点击 ▶ 开始 继续你的大学生活。[/color]\n\n")
 	update_ui()
 	_update_time_display()
@@ -1490,6 +1580,8 @@ func _show_end_btn():
 #              标签翻译
 # ══════════════════════════════════════════════
 func _translate_tag(tag: String) -> String:
+	if tag.begins_with("major_"):
+		return major_name if major_name != "" else "所学专业"
 	var t = {
 		"tier_985": "985高校", "tier_normal": "普通一本", "tier_low": "二本院校",
 		"gamer_friend": "游戏好友", "studious_friend": "学霸朋友",

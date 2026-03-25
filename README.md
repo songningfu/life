@@ -524,6 +524,9 @@ Game (scenes/Game.tscn + Game.gd)
 
 ```text
 life/
+├── docs/
+│   ├── 项目结构.md
+│   └── 更新日志.md
 ├── scenes/
 │   ├── Game.tscn
 │   └── main_menu.tscn
@@ -542,9 +545,16 @@ life/
 ├── audio/
 │   ├── menu_bgm.mp3
 │   └── game_bgm.mp3
+├── EventEditorTool/
+│   ├── scenes/
+│   ├── scripts/
+│   ├── docs/
+│   └── README.md
+├── icons/
+├── images/
 ├── project.godot
 ├── README.md
-└── 更新日志.md
+└── icon.svg
 ```
 
 ---

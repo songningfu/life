@@ -39,11 +39,25 @@ var player_name: String = ""
 var selected_background: String = "normal"
 var bg_buttons: Dictionary = {}
 
+# 院校与专业
+var selected_university_tier: String = "985"
+var selected_university_name: String = "东岚大学"
+var university_buttons: Dictionary = {}
+var selected_major_id: String = "computer_science"
+var selected_major_profile: Dictionary = {}
+var major_buttons: Dictionary = {}
+
 # 天赋
 var current_rolled_talents: Array = []
 var talent_display_container: VBoxContainer
 var talent_roll_btn: Button
 var talent_confirm_label: Label
+var char_setup_pages: Array = []
+var char_setup_page_index: int = 0
+var char_prev_btn: Button
+var char_next_btn: Button
+var char_start_btn: Button
+var char_page_label: Label
 
 # 沉浸式开场
 var intro_overlay: ColorRect
@@ -93,6 +107,49 @@ const BACKGROUNDS = {
 		"effects": {"ability": 10, "mental": -12, "living_money_bonus": -200, "monthly_bonus": -200},
 	},
 }
+
+const UNIVERSITY_OPTIONS = [
+	{
+		"id": "985",
+		"tier": "985",
+		"name": "东岚大学",
+		"desc": "老牌研究型名校，学业压力大，资源也最集中。",
+	},
+	{
+		"id": "normal",
+		"tier": "normal",
+		"name": "江城理工大学",
+		"desc": "综合实力稳定，就业导向清晰，校园生活比较均衡。",
+	},
+	{
+		"id": "low",
+		"tier": "low",
+		"name": "临海学院",
+		"desc": "城市氛围轻松，平台普通一些，但机会要靠自己争取。",
+	},
+]
+
+const MAJOR_OPTIONS = [
+	{"id": "clinical_medicine", "name": "临床医学", "required_credits": 200, "exam_difficulty": 1.35, "desc": "学制长、课程密、实习重，典型难毕业专业。"},
+	{"id": "architecture", "name": "建筑学", "required_credits": 185, "exam_difficulty": 1.28, "desc": "课程之外还有大量设计作业和熬图。"},
+	{"id": "law", "name": "法学", "required_credits": 170, "exam_difficulty": 1.22, "desc": "记忆量大、案例多，对持续投入要求高。"},
+	{"id": "mathematics", "name": "数学与应用数学", "required_credits": 162, "exam_difficulty": 1.20, "desc": "基础课硬核，抽象课程多，容错率不高。"},
+	{"id": "electronic_info", "name": "电子信息工程", "required_credits": 168, "exam_difficulty": 1.20, "desc": "数理基础和实验课都不轻松。"},
+	{"id": "computer_science", "name": "计算机科学与技术", "required_credits": 165, "exam_difficulty": 1.18, "desc": "核心课密集，项目和考试双线并行。"},
+	{"id": "mechanical_engineering", "name": "机械工程", "required_credits": 168, "exam_difficulty": 1.17, "desc": "理论与实践都要兼顾，课程负担偏重。"},
+	{"id": "automation", "name": "自动化", "required_credits": 166, "exam_difficulty": 1.16, "desc": "控制、数电、模电等课程组合比较吃基础。"},
+	{"id": "civil_engineering", "name": "土木工程", "required_credits": 165, "exam_difficulty": 1.14, "desc": "专业课和制图计算都比较讲究。"},
+	{"id": "pharmacy", "name": "药学", "required_credits": 162, "exam_difficulty": 1.10, "desc": "记忆和实验都不少，稳定偏难。"},
+	{"id": "finance", "name": "金融学", "required_credits": 158, "exam_difficulty": 1.08, "desc": "课程难度中上，但整体节奏可控。"},
+	{"id": "psychology", "name": "心理学", "required_credits": 155, "exam_difficulty": 1.06, "desc": "统计、实验和理论课都要兼顾。"},
+	{"id": "nursing", "name": "护理学", "required_credits": 160, "exam_difficulty": 1.05, "desc": "课程和实践安排都比较满。"},
+	{"id": "accounting", "name": "会计学", "required_credits": 156, "exam_difficulty": 1.04, "desc": "偏稳定，细致度要求高。"},
+	{"id": "english", "name": "英语", "required_credits": 150, "exam_difficulty": 1.00, "desc": "整体中等，重在日常积累。"},
+	{"id": "international_trade", "name": "国际经济与贸易", "required_credits": 150, "exam_difficulty": 0.98, "desc": "课程分布较均衡，毕业压力适中。"},
+	{"id": "journalism", "name": "新闻学", "required_credits": 148, "exam_difficulty": 0.97, "desc": "专业课压力不算最大，但实践会占时间。"},
+	{"id": "chinese_literature", "name": "汉语言文学", "required_credits": 150, "exam_difficulty": 0.96, "desc": "阅读写作多，考试强度相对友好。"},
+	{"id": "marketing", "name": "市场营销", "required_credits": 145, "exam_difficulty": 0.92, "desc": "整体偏灵活，属于相对好毕业的一类。"},
+]
 
 func _ready():
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -186,11 +243,16 @@ func _make_slot_widget(info: Dictionary) -> HBoxContainer:
 	var slot_num = info.slot + 1
 	if info.exists:
 		var m = info.meta
-		btn.text = "  存档 %d  |  %s  %s  大%s  %s\n  %s" % [
+		var school_line = m.get("university_name", "")
+		var major_line = m.get("major_name", "")
+		var detail = school_line
+		if major_line != "":
+			detail += " · " + major_line
+		btn.text = "  存档 %d  |  %s  %s  大%s  %s\n  %s\n  %s" % [
 			slot_num, m.get("player_name", "?"),
 			_tier_str(m.get("university_tier", "")),
 			_year_cn(m.get("year", 1)),
-			m.get("phase", ""), m.get("timestamp", "")
+			m.get("phase", ""), detail, m.get("timestamp", "")
 		]
 		_style_panel_btn(btn, Color(0.15, 0.2, 0.28))
 	else:
@@ -224,25 +286,17 @@ func _build_char_page():
 	char_page.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(char_page)
 
-	var scroll = ScrollContainer.new()
-	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	char_page.add_child(scroll)
-
-	var outer_center = HBoxContainer.new()
-	outer_center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	outer_center.alignment = BoxContainer.ALIGNMENT_CENTER
-	scroll.add_child(outer_center)
+	var frame = MarginContainer.new()
+	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	frame.add_theme_constant_override("margin_left", 90)
+	frame.add_theme_constant_override("margin_right", 90)
+	frame.add_theme_constant_override("margin_top", 32)
+	frame.add_theme_constant_override("margin_bottom", 32)
+	char_page.add_child(frame)
 
 	var main_vbox = VBoxContainer.new()
-	main_vbox.custom_minimum_size = Vector2(520, 0)
-	main_vbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	main_vbox.add_theme_constant_override("separation", 24)
-	outer_center.add_child(main_vbox)
-
-	var top_spacer = Control.new()
-	top_spacer.custom_minimum_size = Vector2(0, 30)
-	main_vbox.add_child(top_spacer)
+	main_vbox.add_theme_constant_override("separation", 20)
+	frame.add_child(main_vbox)
 
 	var title = Label.new()
 	title.text = "创建你的角色"
@@ -251,8 +305,61 @@ func _build_char_page():
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	main_vbox.add_child(title)
 
+	char_page_label = Label.new()
+	char_page_label.add_theme_font_size_override("font_size", 14)
+	char_page_label.add_theme_color_override("font_color", colors.dim)
+	char_page_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	main_vbox.add_child(char_page_label)
+
+	var pages_holder = Control.new()
+	pages_holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	main_vbox.add_child(pages_holder)
+
+	char_setup_pages.clear()
+
+	var page_name = VBoxContainer.new()
+	page_name.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	page_name.add_theme_constant_override("separation", 16)
+	pages_holder.add_child(page_name)
+	char_setup_pages.append(page_name)
+
+	var page_gender = VBoxContainer.new()
+	page_gender.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	page_gender.add_theme_constant_override("separation", 16)
+	page_gender.visible = false
+	pages_holder.add_child(page_gender)
+	char_setup_pages.append(page_gender)
+
+	var page_background = VBoxContainer.new()
+	page_background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	page_background.add_theme_constant_override("separation", 16)
+	page_background.visible = false
+	pages_holder.add_child(page_background)
+	char_setup_pages.append(page_background)
+
+	var page_university = VBoxContainer.new()
+	page_university.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	page_university.add_theme_constant_override("separation", 16)
+	page_university.visible = false
+	pages_holder.add_child(page_university)
+	char_setup_pages.append(page_university)
+
+	var page_major = VBoxContainer.new()
+	page_major.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	page_major.add_theme_constant_override("separation", 16)
+	page_major.visible = false
+	pages_holder.add_child(page_major)
+	char_setup_pages.append(page_major)
+
+	var page_talent = VBoxContainer.new()
+	page_talent.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	page_talent.add_theme_constant_override("separation", 16)
+	page_talent.visible = false
+	pages_holder.add_child(page_talent)
+	char_setup_pages.append(page_talent)
+
 	var name_section = _make_section("姓名")
-	main_vbox.add_child(name_section.container)
+	page_name.add_child(name_section.container)
 
 	char_name_input = LineEdit.new()
 	char_name_input.placeholder_text = "输入你的名字（1~8字）"
@@ -275,10 +382,11 @@ func _build_char_page():
 	name_section.content.add_child(char_name_input)
 
 	var gender_section = _make_section("性别")
-	main_vbox.add_child(gender_section.container)
+	page_gender.add_child(gender_section.container)
 
 	var gender_hbox = HBoxContainer.new()
 	gender_hbox.add_theme_constant_override("separation", 12)
+	gender_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	gender_section.content.add_child(gender_hbox)
 
 	gender_male_btn = Button.new()
@@ -296,7 +404,7 @@ func _build_char_page():
 	_update_gender_ui()
 
 	var bg_section = _make_section("家庭背景")
-	main_vbox.add_child(bg_section.container)
+	page_background.add_child(bg_section.container)
 
 	var bg_desc_label = Label.new()
 	bg_desc_label.text = "你来自什么样的家庭？这会影响你的起点。"
@@ -316,8 +424,50 @@ func _build_char_page():
 
 	_update_bg_selection()
 
+	var university_section = _make_section("院校选择")
+	page_university.add_child(university_section.container)
+
+	var university_desc = Label.new()
+	university_desc.text = "先确定院校层级和学校风格，正式进入游戏后不再重复询问。"
+	university_desc.add_theme_font_size_override("font_size", 14)
+	university_desc.add_theme_color_override("font_color", colors.dim)
+	university_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	university_section.content.add_child(university_desc)
+
+	var university_list = VBoxContainer.new()
+	university_list.add_theme_constant_override("separation", 8)
+	university_section.content.add_child(university_list)
+
+	university_buttons.clear()
+	for option in UNIVERSITY_OPTIONS:
+		var card = _make_university_card(option)
+		university_list.add_child(card)
+
+	_update_university_selection()
+
+	var major_section = _make_section("专业选择")
+	page_major.add_child(major_section.container)
+
+	var major_desc = Label.new()
+	major_desc.text = "专业当前会影响毕业所需学分和考试难度。越硬核的专业，毕业会越吃力。"
+	major_desc.add_theme_font_size_override("font_size", 14)
+	major_desc.add_theme_color_override("font_color", colors.dim)
+	major_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	major_section.content.add_child(major_desc)
+
+	var major_list = VBoxContainer.new()
+	major_list.add_theme_constant_override("separation", 8)
+	major_section.content.add_child(major_list)
+
+	major_buttons.clear()
+	for major in MAJOR_OPTIONS:
+		var major_card = _make_major_card(major)
+		major_list.add_child(major_card)
+
+	_update_major_selection()
+
 	var talent_section = _make_section("天赋抽取")
-	main_vbox.add_child(talent_section.container)
+	page_talent.add_child(talent_section.container)
 
 	var talent_desc = Label.new()
 	talent_desc.text = "每个人生来不同。抽取你的三个天赋，好运还是厄运？"
@@ -359,18 +509,33 @@ func _build_char_page():
 	back_btn.pressed.connect(_close_char_page)
 	bottom_hbox.add_child(back_btn)
 
-	var start_btn = Button.new()
-	start_btn.text = "开始旅程"
-	start_btn.custom_minimum_size = Vector2(200, 48)
-	_style_panel_btn(start_btn, Color(0.2, 0.45, 0.65))
-	start_btn.add_theme_color_override("font_color", Color(1, 1, 1))
-	start_btn.add_theme_font_size_override("font_size", 18)
-	start_btn.pressed.connect(_on_start_game)
-	bottom_hbox.add_child(start_btn)
+	char_prev_btn = Button.new()
+	char_prev_btn.text = "← 上一步"
+	char_prev_btn.custom_minimum_size = Vector2(140, 48)
+	_style_panel_btn(char_prev_btn, Color(0.18, 0.19, 0.24))
+	char_prev_btn.add_theme_font_size_override("font_size", 18)
+	char_prev_btn.pressed.connect(_go_char_prev_page)
+	bottom_hbox.add_child(char_prev_btn)
 
-	var bottom_spacer = Control.new()
-	bottom_spacer.custom_minimum_size = Vector2(0, 40)
-	main_vbox.add_child(bottom_spacer)
+	char_next_btn = Button.new()
+	char_next_btn.text = "下一步 →"
+	char_next_btn.custom_minimum_size = Vector2(160, 48)
+	_style_panel_btn(char_next_btn, Color(0.2, 0.45, 0.65))
+	char_next_btn.add_theme_color_override("font_color", Color(1, 1, 1))
+	char_next_btn.add_theme_font_size_override("font_size", 18)
+	char_next_btn.pressed.connect(_go_char_next_page)
+	bottom_hbox.add_child(char_next_btn)
+
+	char_start_btn = Button.new()
+	char_start_btn.text = "开始旅程"
+	char_start_btn.custom_minimum_size = Vector2(200, 48)
+	_style_panel_btn(char_start_btn, Color(0.2, 0.45, 0.65))
+	char_start_btn.add_theme_color_override("font_color", Color(1, 1, 1))
+	char_start_btn.add_theme_font_size_override("font_size", 18)
+	char_start_btn.pressed.connect(_on_start_game)
+	bottom_hbox.add_child(char_start_btn)
+
+	_set_char_setup_page(0)
 
 func _make_section(title_text: String) -> Dictionary:
 	var container = VBoxContainer.new()
@@ -410,6 +575,30 @@ func _make_bg_card(bg_id: String, bg: Dictionary) -> Button:
 	bg_buttons[bg_id] = btn
 	return btn
 
+func _make_university_card(option: Dictionary) -> Button:
+	var btn = Button.new()
+	btn.text = "  %s  ·  %s\n  %s" % [_tier_str(option.get("tier", "")), option.get("name", ""), option.get("desc", "")]
+	btn.custom_minimum_size = Vector2(0, 86)
+	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	btn.add_theme_font_size_override("font_size", 15)
+	btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_style_panel_btn(btn, Color(0.12, 0.14, 0.2))
+	btn.pressed.connect(_on_university_selected.bind(option.get("tier", ""), option.get("name", "")))
+	university_buttons[option.get("tier", "")] = btn
+	return btn
+
+func _make_major_card(major: Dictionary) -> Button:
+	var btn = Button.new()
+	btn.text = "  %s\n  %s" % [major.get("name", ""), _major_summary(major)]
+	btn.custom_minimum_size = Vector2(0, 82)
+	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	btn.add_theme_font_size_override("font_size", 14)
+	btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_style_panel_btn(btn, Color(0.12, 0.14, 0.2))
+	btn.pressed.connect(_on_major_selected.bind(major.get("id", "")))
+	major_buttons[major.get("id", "")] = btn
+	return btn
+
 func _on_bg_selected(bg_id: String):
 	selected_background = bg_id
 	_update_bg_selection()
@@ -429,6 +618,67 @@ func _update_bg_selection():
 		else:
 			_style_panel_btn(btn, Color(0.12, 0.14, 0.2))
 			btn.add_theme_color_override("font_color", Color(0.7, 0.72, 0.76))
+
+func _on_university_selected(tier: String, school_name: String):
+	selected_university_tier = tier
+	selected_university_name = school_name
+	_update_university_selection()
+
+func _update_university_selection():
+	for tier in university_buttons:
+		var btn = university_buttons[tier] as Button
+		if tier == selected_university_tier:
+			var s = StyleBoxFlat.new()
+			s.bg_color = Color(0.15, 0.25, 0.35)
+			s.set_corner_radius_all(8)
+			s.border_width_left = 3
+			s.border_color = colors.accent
+			s.content_margin_left = 12; s.content_margin_right = 12
+			btn.add_theme_stylebox_override("normal", s)
+			btn.add_theme_color_override("font_color", Color(1, 1, 1))
+		else:
+			_style_panel_btn(btn, Color(0.12, 0.14, 0.2))
+			btn.add_theme_color_override("font_color", Color(0.7, 0.72, 0.76))
+
+func _on_major_selected(major_id: String):
+	selected_major_id = major_id
+	for major in MAJOR_OPTIONS:
+		if major.get("id", "") == major_id:
+			selected_major_profile = major.duplicate(true)
+			break
+	_update_major_selection()
+
+func _update_major_selection():
+	for id in major_buttons:
+		var btn = major_buttons[id] as Button
+		if id == selected_major_id:
+			var s = StyleBoxFlat.new()
+			s.bg_color = Color(0.15, 0.25, 0.35)
+			s.set_corner_radius_all(8)
+			s.border_width_left = 3
+			s.border_color = colors.accent
+			s.content_margin_left = 12; s.content_margin_right = 12
+			btn.add_theme_stylebox_override("normal", s)
+			btn.add_theme_color_override("font_color", Color(1, 1, 1))
+		else:
+			_style_panel_btn(btn, Color(0.12, 0.14, 0.2))
+			btn.add_theme_color_override("font_color", Color(0.7, 0.72, 0.76))
+
+func _major_summary(major: Dictionary) -> String:
+	return "学分要求 %d · %s · %s" % [
+		int(major.get("required_credits", 150)),
+		_major_difficulty_str(float(major.get("exam_difficulty", 1.0))),
+		major.get("desc", "")
+	]
+
+func _major_difficulty_str(difficulty: float) -> String:
+	if difficulty >= 1.25:
+		return "毕业难度很高"
+	if difficulty >= 1.15:
+		return "毕业难度偏高"
+	if difficulty >= 1.05:
+		return "毕业难度中等"
+	return "相对好毕业"
 
 func _on_roll_talents():
 	current_rolled_talents = TalentSystem.roll_talents()
@@ -684,8 +934,7 @@ func _close_panels():
 func _on_slot_picked(slot: int, _exists: bool):
 	selected_slot = slot
 	_close_panels()
-	SaveManager.set_meta("pending_char_creation_slot", slot)
-	get_tree().change_scene_to_file("res://scenes/CharacterCreation.tscn")
+	_show_char_page()
 
 func _show_char_page():
 	for child in get_children():
@@ -697,15 +946,45 @@ func _show_char_page():
 	char_name_input.grab_focus()
 	selected_gender = "male"
 	selected_background = "normal"
+	selected_university_tier = UNIVERSITY_OPTIONS[0]["tier"]
+	selected_university_name = UNIVERSITY_OPTIONS[0]["name"]
+	selected_major_id = MAJOR_OPTIONS[0]["id"]
+	selected_major_profile = MAJOR_OPTIONS[0].duplicate(true)
 	current_rolled_talents = []
 
 	_update_gender_ui()
 	_update_bg_selection()
+	_update_university_selection()
+	_update_major_selection()
+	_set_char_setup_page(0)
 
 	for child in talent_display_container.get_children():
 		child.queue_free()
 	talent_roll_btn.text = "抽取天赋"
 	talent_confirm_label.text = ""
+
+func _set_char_setup_page(index: int):
+	char_setup_page_index = clampi(index, 0, char_setup_pages.size() - 1)
+	for i in range(char_setup_pages.size()):
+		char_setup_pages[i].visible = (i == char_setup_page_index)
+	if char_page_label:
+		var titles = ["姓名", "性别", "家庭背景", "院校选择", "专业选择", "天赋抽取"]
+		char_page_label.text = "第 %d / %d 页 · %s" % [char_setup_page_index + 1, char_setup_pages.size(), titles[char_setup_page_index]]
+	if char_prev_btn:
+		char_prev_btn.visible = char_setup_page_index > 0
+	if char_next_btn:
+		char_next_btn.visible = char_setup_page_index < char_setup_pages.size() - 1
+	if char_start_btn:
+		char_start_btn.visible = char_setup_page_index == char_setup_pages.size() - 1
+
+func _go_char_next_page():
+	if char_setup_page_index == 0 and char_name_input.text.strip_edges().length() == 0:
+		char_name_input.grab_focus()
+		return
+	_set_char_setup_page(char_setup_page_index + 1)
+
+func _go_char_prev_page():
+	_set_char_setup_page(char_setup_page_index - 1)
 
 func _load_resized_icon(path: String, size: int) -> Texture2D:
 	var image = Image.load_from_file(ProjectSettings.globalize_path(path))
@@ -782,6 +1061,11 @@ func _on_start_game():
 		talent_confirm_label.add_theme_color_override("font_color", Color(0.9, 0.4, 0.4))
 		return
 
+	if selected_major_profile.is_empty():
+		talent_confirm_label.text = "请先选择一个专业。"
+		talent_confirm_label.add_theme_color_override("font_color", Color(0.9, 0.4, 0.4))
+		return
+
 	player_name = n
 	TalentSystem.set_talents(current_rolled_talents)
 
@@ -846,6 +1130,10 @@ func _enter_game():
 		"save_slot": selected_slot,
 		"is_new_game": true,
 		"background": selected_background,
+		"university_tier": selected_university_tier,
+		"university_name": selected_university_name,
+		"major_id": selected_major_id,
+		"major_profile": selected_major_profile.duplicate(true),
 		"talents": current_rolled_talents.duplicate(true),
 	})
 	get_tree().change_scene_to_file("res://scenes/Game.tscn")

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dpbw01t0fw2y8"]
 
-[ext_resource type="Script" uid="uid://ichusbs0q0fl" path="res://scripts/EventEditor.gd" id="1"]
+[ext_resource type="Script" uid="uid://32157b7863b7ce04ab120329ffedd5e156efb32c" path="res://EventEditorTool/scripts/EventEditor.gd" id="1"]
 
 [node name="EventEditor" type="Control" unique_id=1569786930]
 layout_mode = 3

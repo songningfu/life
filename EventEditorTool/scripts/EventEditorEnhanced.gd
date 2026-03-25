@@ -177,7 +177,7 @@ func _clear_choices():
 	choice_editors.clear()
 
 func _add_choice_editor(choice_data: Dictionary = {}):
-	var choice_editor = preload("res://scenes/ChoiceEditor.tscn").instantiate()
+	var choice_editor = preload("res://EventEditorTool/scenes/ChoiceEditor.tscn").instantiate()
 	choices_list.add_child(choice_editor)
 	choice_editors.append(choice_editor)
 	

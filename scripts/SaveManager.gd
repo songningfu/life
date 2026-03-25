@@ -36,6 +36,8 @@ func save_game(slot: int, game_data: Dictionary) -> bool:
 		"player_name": game_data.get("player_name", "未知"),
 		"day_index": game_data.get("day_index", 0),
 		"university_tier": game_data.get("university_tier", ""),
+		"university_name": game_data.get("university_name", ""),
+		"major_name": game_data.get("major_name", ""),
 		"year": info.year,
 		"phase": info.phase,
 		"gpa": game_data.get("gpa", 0.0),

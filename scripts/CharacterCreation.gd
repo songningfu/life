@@ -22,10 +22,12 @@ var bg_buttons: Dictionary = {}
 # 颜色
 var colors = {
 	"accent": Color(0.3, 0.7, 0.9),
+	"accent_soft": Color(0.23, 0.33, 0.5),
+	"accent_bright": Color(0.45, 0.78, 1.0),
 	"text": Color(0.88, 0.9, 0.93),
 	"dim": Color(0.45, 0.47, 0.52),
-	"good": Color(0.3, 0.8, 0.45),
-	"bad": Color(0.9, 0.35, 0.35),
+	"good": Color(0.5, 0.82, 1.0),
+	"bad": Color(0.72, 0.8, 0.92),
 }
 
 const BACKGROUNDS = {
@@ -105,6 +107,7 @@ func _style_all():
 	_style_btn($PageContainer/Page2_Gender/VBox/GenderButtons/FemaleBtn, Color(0.8, 0.3, 0.5))
 	$PageContainer/Page2_Gender/VBox/GenderButtons/MaleBtn.add_theme_font_size_override("font_size", 32)
 	$PageContainer/Page2_Gender/VBox/GenderButtons/FemaleBtn.add_theme_font_size_override("font_size", 32)
+	_update_gender_selection()
 	
 	_style_btn($PageContainer/Page2_Gender/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
 	_style_btn($PageContainer/Page2_Gender/VBox/NavButtons/NextBtn, colors.accent)
@@ -122,7 +125,7 @@ func _style_all():
 	hint.add_theme_color_override("font_color", colors.dim)
 	
 	_style_btn($PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
-	_style_btn($PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/StartBtn, Color(0.2, 0.6, 0.4))
+	_style_btn($PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/StartBtn, colors.accent)
 	$PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/StartBtn.add_theme_font_size_override("font_size", 20)
 	
 	for dot in progress_dots:
@@ -174,18 +177,43 @@ func _style_select_card(btn: Button, selected: bool):
 	btn.add_theme_stylebox_override("hover", h)
 	btn.add_theme_color_override("font_color", Color(0.9, 0.93, 0.97))
 
+func _style_gender_card(btn: Button, base_color: Color, selected: bool):
+	var s = StyleBoxFlat.new()
+	s.bg_color = base_color if selected else base_color.darkened(0.45)
+	var border_width = 2 if selected else 0
+	s.border_width_left = border_width
+	s.border_width_top = border_width
+	s.border_width_right = border_width
+	s.border_width_bottom = border_width
+	s.border_color = Color(0.78, 0.9, 1.0) if selected else Color(0, 0, 0, 0)
+	s.shadow_color = Color(base_color.r, base_color.g, base_color.b, 0.3) if selected else Color(0, 0, 0, 0)
+	s.shadow_size = 18 if selected else 0
+	s.set_corner_radius_all(12)
+	s.content_margin_left = 20
+	s.content_margin_right = 20
+	s.content_margin_top = 16
+	s.content_margin_bottom = 16
+	btn.add_theme_stylebox_override("normal", s)
+	var h = s.duplicate()
+	h.bg_color = base_color.lightened(0.08)
+	btn.add_theme_stylebox_override("hover", h)
+	var p = s.duplicate()
+	p.bg_color = base_color.darkened(0.08)
+	btn.add_theme_stylebox_override("pressed", p)
+	btn.add_theme_color_override("font_color", Color.WHITE if selected else Color(0.86, 0.89, 0.94))
+
 func _bg_effect_preview(bg_id: String) -> String:
 	match bg_id:
 		"business":
-			return "💰 生活费+500 / 月补贴+400 · 🤝 社交+8 · 🧠 心态-10"
+			return "生活费+500 / 月补贴+400 · 社交+8 · 心态-10"
 		"teacher":
-			return "📚 学习点+8 · 🧠 心态-8 · 🤝 社交-5"
+			return "学习点+8 · 心态-8 · 社交-5"
 		"rural":
-			return "💸 生活费-400 / 月补贴-300 · 💪 健康+8 · ⚙️ 能力+8"
+			return "生活费-400 / 月补贴-300 · 健康+8 · 能力+8"
 		"single_parent":
-			return "⚙️ 能力+10 · 🧠 心态-12 · 💸 生活费-200 / 月补贴-200"
+			return "能力+10 · 心态-12 · 生活费-200 / 月补贴-200"
 		_:
-			return "⚖️ 各项属性较为均衡"
+			return "各项属性较为均衡"
 
 func _build_background_list():
 	var list = $PageContainer/Page3_Background/ScrollContainer/VBox/BackgroundList
@@ -194,14 +222,14 @@ func _build_background_list():
 		var bg = BACKGROUNDS[bg_id]
 		var btn = Button.new()
 		btn.text = "%s\n%s\n%s" % [bg.name, bg.desc, _bg_effect_preview(bg_id)]
-		btn.custom_minimum_size = Vector2(0, 112)
+		btn.custom_minimum_size = Vector2(0, 94)
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		btn.add_theme_font_size_override("font_size", 15)
+		btn.add_theme_font_size_override("font_size", 14)
 		btn.pressed.connect(_on_bg_selected.bind(bg_id))
 		list.add_child(btn)
 		bg_buttons[bg_id] = btn
-		_style_btn(btn, Color(0.15, 0.17, 0.23))
+		_style_select_card(btn, false)
 		print("Added background button: ", bg.name)
 	_update_bg_selection()
 	print("Background list built, total buttons: ", bg_buttons.size())
@@ -256,7 +284,6 @@ func _update_progress_dots():
 func _select_gender(gender: String):
 	selected_gender = gender
 	if gender == "female":
-		selected_gender = "male"
 		var toast = Label.new()
 		toast.text = "女性角色开发中，敬请期待~"
 		toast.add_theme_color_override("font_color", Color(1.0, 0.75, 0.35))
@@ -268,6 +295,13 @@ func _select_gender(gender: String):
 		var tw = create_tween()
 		tw.tween_property(toast, "modulate:a", 0.0, 1.5).set_delay(1.5)
 		tw.tween_callback(toast.queue_free)
+	_update_gender_selection()
+
+func _update_gender_selection():
+	var male_btn = $PageContainer/Page2_Gender/VBox/GenderButtons/MaleBtn
+	var female_btn = $PageContainer/Page2_Gender/VBox/GenderButtons/FemaleBtn
+	_style_gender_card(male_btn, Color(0.3, 0.5, 0.8), selected_gender == "male")
+	_style_gender_card(female_btn, Color(0.8, 0.3, 0.5), selected_gender == "female")
 
 func _on_bg_selected(bg_id: String):
 	selected_background = bg_id
@@ -276,15 +310,12 @@ func _on_bg_selected(bg_id: String):
 func _update_bg_selection():
 	for id in bg_buttons:
 		var btn = bg_buttons[id]
-		if id == selected_background:
-			_style_btn(btn, Color(0.2, 0.4, 0.6))
-		else:
-			_style_btn(btn, Color(0.15, 0.17, 0.23))
+		_style_select_card(btn, id == selected_background)
 
 func _roll_talents():
 	current_talents = TalentSystem.roll_talents()
 	_display_talents()
-	$PageContainer/Page4_Talent/ScrollContainer/VBox/RollBtn.text = "🎲 重新抽取"
+	$PageContainer/Page4_Talent/ScrollContainer/VBox/RollBtn.text = "重新抽取"
 	$PageContainer/Page4_Talent/ScrollContainer/VBox/HintLabel.text = "不满意？可以重新抽取"
 
 func _display_talents():
@@ -296,9 +327,9 @@ func _display_talents():
 		var card = PanelContainer.new()
 		var s = StyleBoxFlat.new()
 		var is_good = t["type"] == "good"
-		s.bg_color = Color(0.1, 0.2, 0.15) if is_good else Color(0.2, 0.1, 0.1)
+		s.bg_color = Color(0.12, 0.17, 0.24) if is_good else Color(0.14, 0.16, 0.2)
 		s.border_width_left = 4
-		s.border_color = colors.good if is_good else colors.bad
+		s.border_color = colors.accent_bright if is_good else colors.bad
 		s.set_corner_radius_all(10)
 		s.content_margin_left = 16
 		s.content_margin_right = 16
@@ -309,12 +340,7 @@ func _display_talents():
 		var hbox = HBoxContainer.new()
 		hbox.add_theme_constant_override("separation", 14)
 		card.add_child(hbox)
-		
-		var icon = Label.new()
-		icon.text = t["icon"]
-		icon.add_theme_font_size_override("font_size", 32)
-		hbox.add_child(icon)
-		
+
 		var vbox = VBoxContainer.new()
 		vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		hbox.add_child(vbox)
@@ -322,7 +348,7 @@ func _display_talents():
 		var name_lbl = Label.new()
 		name_lbl.text = "%s  [%s]" % [t["name"], "增益" if is_good else "减益"]
 		name_lbl.add_theme_font_size_override("font_size", 20)
-		name_lbl.add_theme_color_override("font_color", Color.from_string(t["color"], Color.WHITE))
+		name_lbl.add_theme_color_override("font_color", colors.accent_bright if is_good else Color(0.82, 0.87, 0.94))
 		vbox.add_child(name_lbl)
 		
 		var desc_lbl = Label.new()
@@ -337,7 +363,7 @@ func _display_talents():
 func _start_game():
 	if current_talents.size() == 0:
 		$PageContainer/Page4_Talent/ScrollContainer/VBox/HintLabel.text = "请先抽取天赋！"
-		$PageContainer/Page4_Talent/ScrollContainer/VBox/HintLabel.add_theme_color_override("font_color", colors.bad)
+		$PageContainer/Page4_Talent/ScrollContainer/VBox/HintLabel.add_theme_color_override("font_color", colors.accent_bright)
 		return
 	
 	TalentSystem.set_talents(current_talents)
