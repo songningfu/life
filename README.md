@@ -281,17 +281,17 @@ Game (scenes/Game.tscn + Game.gd)
   ├─ 新游戏参数（姓名/性别/槽位）
   ├─ 或读取 save_slot 的 save_data
   └─ SaveManager.set_meta("pending_game_init", ...)
-                │
-                ▼
+				│
+				▼
 [Game._ready]
   ├─ _load_all_events()
   ├─ _load_flavor_texts()
   ├─ _bind_scene_nodes()
   └─ 根据 pending_game_init 分流
-       ├─ 新游戏：初始化 NamePool / Relationship / Wechat
-       └─ 读档：_load_from_save() 反序列化全部状态
-                │
-                ▼
+	   ├─ 新游戏：初始化 NamePool / Relationship / Wechat
+	   └─ 读档：_load_from_save() 反序列化全部状态
+				│
+				▼
 [Game 主循环 _process]
   ├─ day_timer 达阈值 -> _advance_one_day()
   ├─ _apply_daily_changes()
@@ -300,8 +300,8 @@ Game (scenes/Game.tscn + Game.gd)
   │    └─ 未命中    -> _maybe_show_flavor()
   ├─ WechatSystem.check_daily_messages()
   └─ _do_auto_save()
-                │
-                ▼
+				│
+				▼
 [持久化]
   ├─ _serialize_state()
   └─ SaveManager.save_game(slot, data)

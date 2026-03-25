@@ -684,7 +684,8 @@ func _close_panels():
 func _on_slot_picked(slot: int, _exists: bool):
 	selected_slot = slot
 	_close_panels()
-	_show_char_page()
+	SaveManager.set_meta("pending_char_creation_slot", slot)
+	get_tree().change_scene_to_file("res://scenes/CharacterCreation.tscn")
 
 func _show_char_page():
 	for child in get_children():
