@@ -18,6 +18,20 @@ var back_btn: Button
 var home_btn: Button
 var app_pages: Dictionary = {}
 
+const UI_ICON_PATHS = {
+	"contacts": "res://icons/kenney_game-icons/PNG/White/1x/multiplayer.png",
+	"wechat": "res://icons/kenney_board-game-icons/PNG/Default (64px)/cards_collection_outline.png",
+	"moments": "res://icons/kenney_board-game-icons/PNG/Default (64px)/cards_collection.png",
+	"schedule": "res://icons/kenney_board-game-icons/PNG/Default (64px)/timer_100.png",
+	"notes": "res://icons/kenney_board-game-icons/PNG/Default (64px)/notepad_write.png",
+	"settings": "res://icons/kenney_game-icons/PNG/White/1x/gear.png",
+	"signal": "res://icons/kenney_game-icons/PNG/White/1x/signal3.png",
+	"battery": "res://icons/kenney_game-icons/PNG/White/1x/power.png",
+	"back": "res://icons/kenney_game-icons/PNG/White/1x/arrowLeft.png",
+	"home": "res://icons/kenney_game-icons/PNG/White/1x/home.png",
+	"close": "res://icons/kenney_game-icons/PNG/White/1x/buttonX.png",
+}
+
 # ========== 颜色 ==========
 var phone_colors = {
 	"bg": Color(0.08, 0.09, 0.12, 1),
@@ -34,12 +48,12 @@ var phone_colors = {
 
 # ========== APP 定义 ==========
 var apps = [
-	{"id": "contacts", "name": "通讯录", "icon": "👥", "color": Color(0.3, 0.7, 0.9)},
-	{"id": "wechat", "name": "微信", "icon": "💬", "color": Color(0.3, 0.75, 0.4)},
-	{"id": "moments", "name": "朋友圈", "icon": "📷", "color": Color(0.3, 0.75, 0.4)},
-	{"id": "schedule", "name": "日程", "icon": "📅", "color": Color(1.0, 0.6, 0.3)},
-	{"id": "notes", "name": "备忘录", "icon": "📝", "color": Color(1.0, 0.85, 0.2)},
-	{"id": "settings", "name": "设置", "icon": "⚙️", "color": Color(0.6, 0.62, 0.68)},
+	{"id": "contacts", "name": "通讯录", "icon_path": UI_ICON_PATHS.contacts, "color": Color(0.3, 0.7, 0.9)},
+	{"id": "wechat", "name": "微信", "icon_path": UI_ICON_PATHS.wechat, "color": Color(0.3, 0.75, 0.4)},
+	{"id": "moments", "name": "朋友圈", "icon_path": UI_ICON_PATHS.moments, "color": Color(0.3, 0.75, 0.4)},
+	{"id": "schedule", "name": "日程", "icon_path": UI_ICON_PATHS.schedule, "color": Color(1.0, 0.6, 0.3)},
+	{"id": "notes", "name": "备忘录", "icon_path": UI_ICON_PATHS.notes, "color": Color(1.0, 0.85, 0.2)},
+	{"id": "settings", "name": "设置", "icon_path": UI_ICON_PATHS.settings, "color": Color(0.6, 0.62, 0.68)},
 ]
 
 func _ready():
@@ -126,11 +140,11 @@ func _build_status_bar():
 	time_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	status_bar_top.add_child(time_lbl)
 
-	var icons_lbl = Label.new()
-	icons_lbl.text = "📶  🔋"
-	icons_lbl.add_theme_font_size_override("font_size", 12)
-	icons_lbl.add_theme_color_override("font_color", phone_colors.dim)
-	status_bar_top.add_child(icons_lbl)
+	var icons_box = HBoxContainer.new()
+	icons_box.add_theme_constant_override("separation", 8)
+	status_bar_top.add_child(icons_box)
+	icons_box.add_child(_make_small_icon(UI_ICON_PATHS.signal, 13))
+	icons_box.add_child(_make_small_icon(UI_ICON_PATHS.battery, 13))
 
 func _build_nav_bar():
 	var nav = HBoxContainer.new()
@@ -147,36 +161,15 @@ func _build_nav_bar():
 	phone_screen.add_child(nav_bg)
 	nav_bg.add_child(nav)
 
-	back_btn = Button.new()
-	back_btn.text = "◀ 返回"
-	back_btn.add_theme_font_size_override("font_size", 13)
-	back_btn.add_theme_color_override("font_color", phone_colors.accent)
-	var back_s = StyleBoxFlat.new()
-	back_s.bg_color = Color(0, 0, 0, 0)
-	back_btn.add_theme_stylebox_override("normal", back_s)
-	back_btn.add_theme_stylebox_override("hover", back_s)
+	back_btn = _make_nav_button("返回", UI_ICON_PATHS.back, phone_colors.accent)
 	back_btn.pressed.connect(_on_back)
 	nav.add_child(back_btn)
 
-	home_btn = Button.new()
-	home_btn.text = "● 主屏"
-	home_btn.add_theme_font_size_override("font_size", 13)
-	home_btn.add_theme_color_override("font_color", phone_colors.text)
-	var home_s = StyleBoxFlat.new()
-	home_s.bg_color = Color(0, 0, 0, 0)
-	home_btn.add_theme_stylebox_override("normal", home_s)
-	home_btn.add_theme_stylebox_override("hover", home_s)
+	home_btn = _make_nav_button("主屏", UI_ICON_PATHS.home, phone_colors.text)
 	home_btn.pressed.connect(_show_home_screen)
 	nav.add_child(home_btn)
 
-	var close_btn = Button.new()
-	close_btn.text = "✕ 关闭"
-	close_btn.add_theme_font_size_override("font_size", 13)
-	close_btn.add_theme_color_override("font_color", phone_colors.red)
-	var close_s = StyleBoxFlat.new()
-	close_s.bg_color = Color(0, 0, 0, 0)
-	close_btn.add_theme_stylebox_override("normal", close_s)
-	close_btn.add_theme_stylebox_override("hover", close_s)
+	var close_btn = _make_nav_button("关闭", UI_ICON_PATHS.close, phone_colors.red)
 	close_btn.pressed.connect(close_phone)
 	nav.add_child(close_btn)
 
@@ -206,9 +199,9 @@ func _show_home_screen():
 		app_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 		var icon_btn = Button.new()
-		icon_btn.text = app.icon
 		icon_btn.custom_minimum_size = Vector2(70, 70)
-		icon_btn.add_theme_font_size_override("font_size", 30)
+		icon_btn.icon = _load_icon(app.icon_path, 28)
+		icon_btn.expand_icon = true
 
 		var icon_style = StyleBoxFlat.new()
 		icon_style.bg_color = Color(app.color.r, app.color.g, app.color.b, 0.15)
@@ -306,7 +299,7 @@ func _on_back():
 # ══════════════════════════════════════════════
 func _show_contacts():
 	_clear_app_container()
-	_add_app_header("👥 通讯录")
+	_add_app_header("通讯录", UI_ICON_PATHS.contacts)
 
 	var scroll = ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -431,7 +424,7 @@ func _get_level_color(level: int) -> Color:
 # ══════════════════════════════════════════════
 func _show_wechat_list():
 	_clear_app_container()
-	_add_app_header("💬 微信")
+	_add_app_header("微信", UI_ICON_PATHS.wechat)
 
 	var scroll = ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -551,7 +544,7 @@ func _open_chat(role_id: String):
 	_clear_app_container()
 
 	var info = RelationshipManager.get_npc_display(role_id)
-	_add_app_header("💬 " + info.get("nickname", "???"))
+	_add_app_header(info.get("nickname", "???"), UI_ICON_PATHS.wechat)
 
 	if RelationshipManager.npc_data.has(role_id):
 		RelationshipManager.npc_data[role_id].unread_messages = 0
@@ -688,22 +681,22 @@ func _on_reply(role_id: String, reply_index: int):
 # ══════════════════════════════════════════════
 func _show_moments():
 	_clear_app_container()
-	_add_app_header("📷 朋友圈")
+	_add_app_header("朋友圈", UI_ICON_PATHS.moments)
 	_add_placeholder("朋友圈动态 - 下次更新")
 
 func _show_schedule():
 	_clear_app_container()
-	_add_app_header("📅 日程")
+	_add_app_header("日程", UI_ICON_PATHS.schedule)
 	_add_placeholder("日程课表 - 下次更新")
 
 func _show_notes():
 	_clear_app_container()
-	_add_app_header("📝 备忘录")
+	_add_app_header("备忘录", UI_ICON_PATHS.notes)
 	_add_placeholder("备忘录 - 下次更新")
 
 func _show_settings():
 	_clear_app_container()
-	_add_app_header("⚙️ 设置")
+	_add_app_header("设置", UI_ICON_PATHS.settings)
 	_add_placeholder("系统设置 - 下次更新")
 
 # ══════════════════════════════════════════════
@@ -713,7 +706,7 @@ func _clear_app_container():
 	for child in app_container.get_children():
 		child.queue_free()
 
-func _add_app_header(title: String):
+func _add_app_header(title: String, icon_path: String = ""):
 	var header = PanelContainer.new()
 	var header_style = StyleBoxFlat.new()
 	header_style.bg_color = phone_colors.header
@@ -722,11 +715,18 @@ func _add_app_header(title: String):
 	header.add_theme_stylebox_override("panel", header_style)
 	app_container.add_child(header)
 
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	header.add_child(row)
+
+	if icon_path != "":
+		row.add_child(_make_small_icon(icon_path, 16, phone_colors.text))
+
 	var lbl = Label.new()
 	lbl.text = title
 	lbl.add_theme_font_size_override("font_size", 18)
 	lbl.add_theme_color_override("font_color", phone_colors.text)
-	header.add_child(lbl)
+	row.add_child(lbl)
 
 func _add_placeholder(text: String):
 	var margin = MarginContainer.new()
@@ -750,3 +750,36 @@ func serialize() -> Dictionary:
 
 func deserialize(_data: Dictionary):
 	pass
+
+func _load_icon(path: String, size: int = 0) -> Texture2D:
+	if size <= 0:
+		return load(path) as Texture2D
+	var image = Image.load_from_file(ProjectSettings.globalize_path(path))
+	if image == null or image.is_empty():
+		return load(path) as Texture2D
+	image.resize(size, size, Image.INTERPOLATE_LANCZOS)
+	return ImageTexture.create_from_image(image)
+
+func _make_small_icon(path: String, size: int = 16, modulate_color: Color = Color.WHITE) -> TextureRect:
+	var icon = TextureRect.new()
+	icon.texture = _load_icon(path, size)
+	icon.custom_minimum_size = Vector2(size, size)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.modulate = modulate_color
+	return icon
+
+func _make_nav_button(label: String, icon_path: String, font_color: Color) -> Button:
+	var btn = Button.new()
+	btn.text = label
+	btn.icon = _load_icon(icon_path, 22)
+	btn.expand_icon = true
+	btn.custom_minimum_size = Vector2(86, 0)
+	btn.add_theme_font_size_override("font_size", 13)
+	btn.add_theme_color_override("font_color", font_color)
+	btn.add_theme_constant_override("h_separation", 8)
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0)
+	btn.add_theme_stylebox_override("normal", style)
+	btn.add_theme_stylebox_override("hover", style)
+	return btn

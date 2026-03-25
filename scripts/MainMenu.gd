@@ -65,31 +65,31 @@ const BACKGROUNDS = {
 	"normal": {
 		"name": "普通家庭",
 		"desc": "父母朝九晚五，平凡但温暖。各项均衡，没有明显优劣。",
-		"icon": "🏠",
+		"icon_path": "res://icons/kenney_board-game-icons/PNG/Default (64px)/structure_house.png",
 		"effects": {},
 	},
 	"business": {
 		"name": "经商家庭",
 		"desc": "家里做生意，不差钱。但父母常年在外，从小缺少陪伴。",
-		"icon": "💼",
+		"icon_path": "res://icons/kenney_board-game-icons/PNG/Default (64px)/dollar.png",
 		"effects": {"living_money_bonus": 500, "monthly_bonus": 400, "social": 8, "mental": -10},
 	},
 	"teacher": {
 		"name": "教师家庭",
 		"desc": "从小在书堆里长大，学习习惯好。但管束太多，性格偏压抑。",
-		"icon": "📚",
+		"icon_path": "res://icons/kenney_board-game-icons/PNG/Default (64px)/book_open.png",
 		"effects": {"study_points": 8, "mental": -8, "social": -5},
 	},
 	"rural": {
 		"name": "农村家庭",
 		"desc": "穷人家的孩子早当家。生活费紧张，但能吃苦，身体好。",
-		"icon": "🌾",
+		"icon_path": "res://icons/kenney_board-game-icons/PNG/Default (64px)/resource_wheat.png",
 		"effects": {"living_money_bonus": -400, "monthly_bonus": -300, "health": 8, "ability": 8},
 	},
 	"single_parent": {
 		"name": "单亲家庭",
 		"desc": "很早就学会了独立。能力比同龄人强，但内心深处总有缺口。",
-		"icon": "🚶",
+		"icon_path": "res://icons/kenney_board-game-icons/PNG/Default (64px)/character.png",
 		"effects": {"ability": 10, "mental": -12, "living_money_bonus": -200, "monthly_bonus": -200},
 	},
 }
@@ -331,7 +331,7 @@ func _build_char_page():
 	talent_section.content.add_child(talent_display_container)
 
 	talent_roll_btn = Button.new()
-	talent_roll_btn.text = "🎲  抽取天赋"
+	talent_roll_btn.text = "抽取天赋"
 	talent_roll_btn.custom_minimum_size = Vector2(0, 48)
 	_style_panel_btn(talent_roll_btn, Color(0.2, 0.4, 0.6))
 	talent_roll_btn.add_theme_color_override("font_color", Color(1, 1, 1))
@@ -393,10 +393,15 @@ func _make_section(title_text: String) -> Dictionary:
 
 func _make_bg_card(bg_id: String, bg: Dictionary) -> Button:
 	var btn = Button.new()
-	btn.text = "  %s  %s\n       %s" % [bg.icon, bg.name, bg.desc]
-	btn.custom_minimum_size = Vector2(0, 64)
+	btn.text = "  %s\n  %s" % [bg.name, bg.desc]
+	var icon_path = bg.get("icon_path", "")
+	if icon_path != "":
+		btn.icon = _load_resized_icon(icon_path, 40)
+	btn.expand_icon = false
+	btn.custom_minimum_size = Vector2(0, 78)
 	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	btn.add_theme_font_size_override("font_size", 15)
+	btn.add_theme_constant_override("h_separation", 16)
 	btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 	_style_panel_btn(btn, Color(0.12, 0.14, 0.2))
@@ -428,7 +433,7 @@ func _update_bg_selection():
 func _on_roll_talents():
 	current_rolled_talents = TalentSystem.roll_talents()
 	_display_talents()
-	talent_roll_btn.text = "🎲  重新抽取"
+	talent_roll_btn.text = "重新抽取"
 	talent_confirm_label.text = "不满意？可以重新抽取，但命运每次都不同。"
 
 func _display_talents():
@@ -698,8 +703,15 @@ func _show_char_page():
 
 	for child in talent_display_container.get_children():
 		child.queue_free()
-	talent_roll_btn.text = "🎲  抽取天赋"
+	talent_roll_btn.text = "抽取天赋"
 	talent_confirm_label.text = ""
+
+func _load_resized_icon(path: String, size: int) -> Texture2D:
+	var image = Image.load_from_file(ProjectSettings.globalize_path(path))
+	if image == null or image.is_empty():
+		return load(path) as Texture2D
+	image.resize(size, size, Image.INTERPOLATE_LANCZOS)
+	return ImageTexture.create_from_image(image)
 
 func _on_delete_slot(slot: int):
 	SaveManager.delete_save(slot)
