@@ -62,6 +62,75 @@ const NPC_ROLES = {
 	"counselor": "female",
 }
 
+const ROOMMATE_ARCHETYPES = [
+	{
+		"id": "night_gamer", "title": "电竞仙人", "weight": 16.0,
+		"summary": "半夜耳机一摘就开始复盘团战，白天补觉像人间蒸发。",
+		"detail": "作息像住在另一个时区，但人很仗义，帮带饭从不忘记你的口味。",
+		"effects": {"social": 3, "mental": -2},
+	},
+	{
+		"id": "clean_freak", "title": "洁癖巡逻员", "weight": 14.0,
+		"summary": "桌面必须对齐，拖鞋角度都像量过一样。",
+		"detail": "嘴上总嫌你乱，真到你忙的时候，又会顺手把公共区收拾干净。",
+		"effects": {"mental": 2, "health": 1},
+	},
+	{
+		"id": "social_hub", "title": "社牛情报站", "weight": 15.0,
+		"summary": "楼里谁分手、谁挂科、哪家外卖打折，他总是第一个知道。",
+		"detail": "话多得像二十四小时广播站，但办事真靠谱，找人帮忙他永远冲在前面。",
+		"effects": {"social": 4, "mental": 1},
+	},
+	{
+		"id": "health_master", "title": "养生怪人", "weight": 12.0,
+		"summary": "保温杯里泡枸杞，晚上十点半准时催大家关灯。",
+		"detail": "像提前过上了退休生活，可他确实会在你咳嗽时把药和热水一起递过来。",
+		"effects": {"health": 3, "mental": 1},
+	},
+	{
+		"id": "repairman", "title": "手作修理工", "weight": 11.0,
+		"summary": "吹风机、插排、椅子轮子，没有什么是他不想拆开看看的。",
+		"detail": "动静大得吓人，但宿舍小毛病基本都能被他鼓捣好。",
+		"effects": {"ability": 3, "social": 1},
+	},
+	{
+		"id": "mystic", "title": "玄学实践派", "weight": 10.0,
+		"summary": "转锦鲤、看黄历、考试前换幸运头像，一套流程极其完整。",
+		"detail": "嘴里老说运势，真到你紧张的时候，他又会第一个拍着你说没事。",
+		"effects": {"mental": 2, "social": 1},
+	},
+	{
+		"id": "night_snacker", "title": "夜宵组织者", "weight": 13.0,
+		"summary": "晚上十一点准时问一句：'有人下楼吗？'",
+		"detail": "总把减肥计划吃成宿舍团建，但会认真记得谁不能吃辣。",
+		"effects": {"social": 3, "health": -1},
+	},
+	{
+		"id": "anime_voice", "title": "沉浸式二次元", "weight": 12.0,
+		"summary": "会突然模仿番剧台词，情绪上来了连开门都像角色登场。",
+		"detail": "偶尔中二得让人脚趾蜷缩，但借资料、借充电器都特别爽快。",
+		"effects": {"mental": 2, "social": 1},
+	},
+	{
+		"id": "coupon_master", "title": "省钱大师", "weight": 11.0,
+		"summary": "买瓶水都要先比三家券，算满减像在做高数。",
+		"detail": "精打细算到夸张，却常常顺手帮全宿舍把最划算的方案算出来。",
+		"effects": {"living_money": 120, "ability": 1},
+	},
+	{
+		"id": "romance_advisor", "title": "恋爱军师", "weight": 9.0,
+		"summary": "自己的感情一团糟，分析别人的时候却头头是道。",
+		"detail": "爱八卦也爱拱火，不过真有人尴尬冷场，他反而最会出来圆。",
+		"effects": {"social": 2, "mental": 1},
+	},
+	{
+		"id": "top_roommate", "title": "极品舍友", "weight": 0.6,
+		"summary": "安静、分寸感强、会做事，还能把宿舍气氛拿捏得刚刚好。",
+		"detail": "像抽卡时误入隐藏池的SSR，几乎挑不出毛病。",
+		"effects": {"social": 5, "mental": 5, "health": 2},
+	},
+]
+
 # ========== 日历系统 ==========
 var day_index: int = 0
 var total_days: int = 1460
@@ -113,6 +182,20 @@ var earned_credits: int = 0
 var last_display_day: int = -1
 var text_line_count: int = 0
 var max_text_lines: int = 300
+var roommate_roster: Array = []
+var roommate_preview_roster: Array = []
+var roommate_intro_done: bool = false
+var roommate_overlay: CanvasLayer
+var roommate_overlay_bg: ColorRect
+var roommate_list_box: VBoxContainer
+var roommate_hint_label: Label
+var roommate_panel_root: Control
+var roommate_slot_cards: Array = []
+var roommate_reroll_btn: Button
+var roommate_confirm_btn: Button
+var roommate_spin_generation: int = 0
+var roommate_pending_stops: int = 0
+var roommate_roster_label: Label
 
 # ========== 自动存档 ==========
 var auto_save_interval: int = 30
@@ -184,6 +267,7 @@ func _ready():
 	_load_flavor_texts()
 	_bind_scene_nodes()
 	_apply_styles()
+	_build_roommate_overlay()
 
 	var init_data = null
 	if SaveManager.has_meta("pending_game_init"):
@@ -275,8 +359,460 @@ func _replace_names(text: String) -> String:
 	for role_id in NPC_ROLES:
 		text = text.replace("{%s}" % role_id, NamePool.get_nickname(role_id))
 		text = text.replace("{%s.full}" % role_id, NamePool.get_full_name(role_id))
+	for roommate in roommate_roster:
+		var role_id = str(roommate.get("role_id", ""))
+		if role_id == "":
+			continue
+		text = text.replace("{%s}" % role_id, NamePool.get_nickname(role_id))
+		text = text.replace("{%s.full}" % role_id, NamePool.get_full_name(role_id))
 	text = text.replace("{player}", player_name)
 	return text
+
+func _build_roommate_overlay():
+	roommate_overlay = CanvasLayer.new()
+	roommate_overlay.layer = 120
+	add_child(roommate_overlay)
+
+	roommate_overlay_bg = ColorRect.new()
+	roommate_overlay_bg.color = Color(0.02, 0.025, 0.04, 0.985)
+	roommate_overlay_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	roommate_overlay_bg.visible = false
+	roommate_overlay.add_child(roommate_overlay_bg)
+
+	var frame = MarginContainer.new()
+	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	frame.add_theme_constant_override("margin_left", 120)
+	frame.add_theme_constant_override("margin_right", 120)
+	frame.add_theme_constant_override("margin_top", 56)
+	frame.add_theme_constant_override("margin_bottom", 56)
+	roommate_overlay_bg.add_child(frame)
+
+	var panel = PanelContainer.new()
+	roommate_panel_root = panel
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.095, 0.13, 0.985)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(0.24, 0.3, 0.38, 1)
+	style.set_corner_radius_all(14)
+	style.shadow_color = Color(0, 0, 0, 0.38)
+	style.shadow_size = 24
+	style.content_margin_left = 30
+	style.content_margin_right = 30
+	style.content_margin_top = 26
+	style.content_margin_bottom = 26
+	panel.add_theme_stylebox_override("panel", style)
+	frame.add_child(panel)
+
+	var root = VBoxContainer.new()
+	root.add_theme_constant_override("separation", 18)
+	panel.add_child(root)
+
+	var top_line = ColorRect.new()
+	top_line.custom_minimum_size = Vector2(0, 3)
+	top_line.color = Color(0.42, 0.78, 1.0, 0.9)
+	root.add_child(top_line)
+
+	var title = Label.new()
+	title.text = "新生宿舍分配"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 34)
+	title.add_theme_color_override("font_color", Color(0.9, 0.94, 0.98))
+	root.add_child(title)
+
+	var subtitle = Label.new()
+	subtitle.text = "报到日 · 五人间 · 3号床是你。可以反复换一批，直到你满意。"
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.add_theme_font_size_override("font_size", 15)
+	subtitle.add_theme_color_override("font_color", Color(0.54, 0.58, 0.65))
+	root.add_child(subtitle)
+
+	var divider = HSeparator.new()
+	divider.modulate = Color(0.4, 0.48, 0.58, 0.45)
+	root.add_child(divider)
+
+	roommate_hint_label = Label.new()
+	roommate_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	roommate_hint_label.add_theme_font_size_override("font_size", 14)
+	roommate_hint_label.add_theme_color_override("font_color", Color(0.63, 0.84, 1.0))
+	root.add_child(roommate_hint_label)
+
+	var scroll = ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_child(scroll)
+
+	roommate_list_box = VBoxContainer.new()
+	roommate_list_box.add_theme_constant_override("separation", 10)
+	roommate_list_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(roommate_list_box)
+
+	var actions = HBoxContainer.new()
+	actions.alignment = BoxContainer.ALIGNMENT_CENTER
+	actions.add_theme_constant_override("separation", 14)
+	root.add_child(actions)
+
+	roommate_roster_label = Label.new()
+	roommate_roster_label.text = "本次抽到的宿舍名单"
+	roommate_roster_label.add_theme_font_size_override("font_size", 15)
+	roommate_roster_label.add_theme_color_override("font_color", Color(0.7, 0.76, 0.84))
+	roommate_roster_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	roommate_list_box.add_child(roommate_roster_label)
+
+	roommate_slot_cards.clear()
+	for i in range(4):
+		var slot_card = _create_roommate_preview_card()
+		roommate_list_box.add_child(slot_card)
+		roommate_slot_cards.append(slot_card)
+
+	var player_card = PanelContainer.new()
+	player_card.custom_minimum_size = Vector2(0, 62)
+	var player_style = StyleBoxFlat.new()
+	player_style.bg_color = Color(0.16, 0.22, 0.28, 1)
+	player_style.border_width_left = 4
+	player_style.border_color = Color(0.98, 0.82, 0.35, 1)
+	player_style.set_corner_radius_all(8)
+	player_style.content_margin_left = 14
+	player_style.content_margin_right = 14
+	player_style.content_margin_top = 10
+	player_style.content_margin_bottom = 10
+	player_card.add_theme_stylebox_override("panel", player_style)
+	var player_label = Label.new()
+	player_label.text = "3号床 · %s · 你自己" % player_name
+	player_label.add_theme_font_size_override("font_size", 17)
+	player_label.add_theme_color_override("font_color", Color(0.98, 0.92, 0.76))
+	player_card.add_child(player_label)
+	roommate_list_box.add_child(player_card)
+
+	roommate_reroll_btn = Button.new()
+	roommate_reroll_btn.text = "换一批"
+	_style_roommate_action_btn(roommate_reroll_btn, false)
+	roommate_reroll_btn.custom_minimum_size = Vector2(160, 44)
+	roommate_reroll_btn.pressed.connect(_reroll_roommates)
+	actions.add_child(roommate_reroll_btn)
+
+	roommate_confirm_btn = Button.new()
+	roommate_confirm_btn.text = "就这批了"
+	_style_roommate_action_btn(roommate_confirm_btn, true)
+	roommate_confirm_btn.custom_minimum_size = Vector2(200, 44)
+	roommate_confirm_btn.pressed.connect(_confirm_roommates)
+	actions.add_child(roommate_confirm_btn)
+
+func _generate_roommate_preview() -> Array:
+	var preview := []
+	var available = ROOMMATE_ARCHETYPES.duplicate(true)
+	var occupied_beds = [1, 2, 4, 5]
+	for i in range(occupied_beds.size()):
+		var picked = _pick_roommate_archetype(available)
+		var name_data = NamePool.preview_name("male")
+		var roommate = {
+			"role_id": "roommate_slot_%d" % (i + 1),
+			"bed_no": occupied_beds[i],
+			"name": name_data.get("full_name", "某同学"),
+			"nickname": name_data.get("nickname", "某同学"),
+			"name_data": name_data.duplicate(true),
+			"archetype_id": picked.get("id", ""),
+			"title": picked.get("title", "普通室友"),
+			"summary": picked.get("summary", ""),
+			"effects": picked.get("effects", {}).duplicate(true),
+		}
+		preview.append(roommate)
+	return preview
+
+func _pick_roommate_archetype(available: Array) -> Dictionary:
+	if available.is_empty():
+		return {}
+	var total_weight = 0.0
+	for item in available:
+		total_weight += float(item.get("weight", 1.0))
+	var roll = randf() * max(total_weight, 0.001)
+	var cumulative = 0.0
+	for i in range(available.size()):
+		var item = available[i]
+		cumulative += float(item.get("weight", 1.0))
+		if roll <= cumulative:
+			available.remove_at(i)
+			return item
+	return available.pop_back()
+
+func _apply_roommate_roster_effects():
+	var total_effects := {}
+	for roommate in roommate_roster:
+		var effects = roommate.get("effects", {})
+		for attr in effects:
+			total_effects[attr] = float(total_effects.get(attr, 0.0)) + float(effects[attr])
+
+	for attr in total_effects:
+		if attr == "living_money":
+			living_money += int(round(float(total_effects[attr])))
+		else:
+			_set_attr(attr, _get_attr(attr) + float(total_effects[attr]))
+	_clamp_all()
+
+func _show_roommate_draw_page():
+	waiting_for_choice = true
+	time_running = false
+	_clear_choices()
+	next_btn.visible = false
+	if roommate_preview_roster.is_empty():
+		roommate_preview_roster = _generate_roommate_preview()
+	roommate_overlay_bg.visible = true
+	roommate_overlay_bg.modulate.a = 0.0
+	if roommate_panel_root:
+		roommate_panel_root.modulate = Color(1, 1, 1, 0)
+		roommate_panel_root.scale = Vector2(0.985, 0.985)
+	var tw = create_tween().set_parallel(true)
+	tw.tween_property(roommate_overlay_bg, "modulate:a", 1.0, 0.22)
+	if roommate_panel_root:
+		tw.tween_property(roommate_panel_root, "modulate:a", 1.0, 0.28).set_ease(Tween.EASE_OUT)
+		tw.tween_property(roommate_panel_root, "scale", Vector2(1.0, 1.0), 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_start_roommate_spin(roommate_preview_roster, true)
+
+func _render_roommate_preview():
+	roommate_hint_label.text = "大部分舍友都不太正常，但通常人都还行。极品舍友极其稀有。"
+	_animate_roommate_preview_cards()
+
+func _create_roommate_preview_card() -> PanelContainer:
+	var card = PanelContainer.new()
+	card.custom_minimum_size = Vector2(0, 94)
+	card.modulate = Color(1, 1, 1, 0)
+	card.position.x += 18
+
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.12, 0.14, 0.19, 1)
+	style.border_width_left = 5
+	style.border_color = Color(0.36, 0.68, 0.92, 1)
+	style.set_corner_radius_all(10)
+	style.shadow_color = Color(0, 0, 0, 0.22)
+	style.shadow_size = 10
+	style.content_margin_left = 14
+	style.content_margin_right = 14
+	style.content_margin_top = 12
+	style.content_margin_bottom = 12
+	card.add_theme_stylebox_override("panel", style)
+
+	var shell = VBoxContainer.new()
+	shell.add_theme_constant_override("separation", 6)
+	card.add_child(shell)
+
+	var top = HBoxContainer.new()
+	top.add_theme_constant_override("separation", 8)
+	shell.add_child(top)
+
+	var bed_badge = Label.new()
+	bed_badge.text = " ?号床 "
+	bed_badge.add_theme_font_size_override("font_size", 12)
+	bed_badge.add_theme_color_override("font_color", Color(0.9, 0.95, 1.0))
+	var bed_style = StyleBoxFlat.new()
+	bed_style.bg_color = Color(0.2, 0.3, 0.42, 1)
+	bed_style.set_corner_radius_all(999)
+	bed_badge.add_theme_stylebox_override("normal", bed_style)
+	top.add_child(bed_badge)
+
+	var name_label = Label.new()
+	name_label.text = "分配中..."
+	name_label.add_theme_font_size_override("font_size", 17)
+	name_label.add_theme_color_override("font_color", Color(0.93, 0.95, 0.98))
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(name_label)
+
+	var type_badge = Label.new()
+	type_badge.text = " "
+	type_badge.add_theme_font_size_override("font_size", 12)
+	type_badge.add_theme_color_override("font_color", Color(0.14, 0.16, 0.2))
+	var type_style = StyleBoxFlat.new()
+	type_style.bg_color = Color(0.66, 0.87, 1.0, 1)
+	type_style.set_corner_radius_all(999)
+	type_badge.add_theme_stylebox_override("normal", type_style)
+	top.add_child(type_badge)
+
+	var summary = Label.new()
+	summary.text = "新的舍友正在朝这间宿舍走来。"
+	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	summary.add_theme_font_size_override("font_size", 13)
+	summary.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
+	shell.add_child(summary)
+
+	card.set_meta("bed_badge", bed_badge)
+	card.set_meta("bed_style", bed_style)
+	card.set_meta("name_label", name_label)
+	card.set_meta("type_badge", type_badge)
+	card.set_meta("type_style", type_style)
+	card.set_meta("summary_label", summary)
+	card.set_meta("panel_style", style)
+
+	return card
+
+func _animate_roommate_preview_cards():
+	var delay = 0.0
+	for child in roommate_list_box.get_children():
+		child.modulate = Color(1, 1, 1, 0)
+		if child is Control:
+			child.position.x += 14
+		var tw = create_tween()
+		tw.tween_interval(delay)
+		tw.tween_property(child, "modulate:a", 1.0, 0.18).set_ease(Tween.EASE_OUT)
+		if child is Control:
+			tw.parallel().tween_property(child, "position:x", child.position.x - 14, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		delay += 0.035
+
+func _set_roommate_action_enabled(enabled: bool):
+	if roommate_reroll_btn:
+		roommate_reroll_btn.disabled = not enabled
+	if roommate_confirm_btn:
+		roommate_confirm_btn.disabled = not enabled
+
+func _apply_roommate_card_data(card: PanelContainer, roommate: Dictionary):
+	var is_top = str(roommate.get("archetype_id", "")) == "top_roommate"
+	var panel_style = card.get_meta("panel_style") as StyleBoxFlat
+	panel_style.border_color = Color(0.95, 0.78, 0.32, 1) if is_top else Color(0.36, 0.68, 0.92, 1)
+	panel_style.bg_color = Color(0.125, 0.115, 0.09, 1) if is_top else Color(0.12, 0.14, 0.19, 1)
+	card.add_theme_stylebox_override("panel", panel_style)
+
+	var bed_badge = card.get_meta("bed_badge") as Label
+	bed_badge.text = " %d号床 " % int(roommate.get("bed_no", 0))
+	var bed_style = card.get_meta("bed_style") as StyleBoxFlat
+	bed_style.bg_color = Color(0.52, 0.38, 0.14, 1) if is_top else Color(0.2, 0.3, 0.42, 1)
+	bed_badge.add_theme_stylebox_override("normal", bed_style)
+
+	var name_label = card.get_meta("name_label") as Label
+	name_label.text = str(roommate.get("name", "某同学"))
+
+	var type_badge = card.get_meta("type_badge") as Label
+	type_badge.text = " %s " % str(roommate.get("title", "普通室友"))
+	var type_style = card.get_meta("type_style") as StyleBoxFlat
+	type_style.bg_color = Color(0.95, 0.78, 0.32, 1) if is_top else Color(0.66, 0.87, 1.0, 1)
+	type_badge.add_theme_stylebox_override("normal", type_style)
+
+	var summary_label = card.get_meta("summary_label") as Label
+	summary_label.text = str(roommate.get("summary", ""))
+
+func _random_roommate_roll_for_bed(bed_no: int) -> Dictionary:
+	var picked = ROOMMATE_ARCHETYPES[randi() % ROOMMATE_ARCHETYPES.size()]
+	var name_data = NamePool.preview_name("male")
+	return {
+		"bed_no": bed_no,
+		"name": name_data.get("full_name", "某同学"),
+		"archetype_id": picked.get("id", ""),
+		"title": picked.get("title", "普通室友"),
+		"summary": picked.get("summary", ""),
+	}
+
+func _start_roommate_spin(target_roster: Array, first_open: bool = false):
+	roommate_spin_generation += 1
+	var gen = roommate_spin_generation
+	roommate_pending_stops = min(roommate_slot_cards.size(), target_roster.size())
+	_set_roommate_action_enabled(false)
+	roommate_hint_label.text = "宿舍分配中..."
+	if roommate_roster_label:
+		roommate_roster_label.text = "宿舍名单滚动中"
+	for i in range(roommate_pending_stops):
+		_spin_roommate_card(i, target_roster[i], 0.55 + float(i) * 0.14, gen)
+	if first_open:
+		_animate_roommate_preview_cards()
+
+func _spin_roommate_card(slot_index: int, final_roommate: Dictionary, duration: float, gen: int):
+	_spin_roommate_card_async(slot_index, final_roommate, duration, gen)
+
+func _spin_roommate_card_async(slot_index: int, final_roommate: Dictionary, duration: float, gen: int):
+	var card = roommate_slot_cards[slot_index] as PanelContainer
+	var start_time = Time.get_ticks_msec()
+	var bed_no = int(final_roommate.get("bed_no", slot_index + 1))
+	while gen == roommate_spin_generation and float(Time.get_ticks_msec() - start_time) / 1000.0 < duration:
+		_apply_roommate_card_data(card, _random_roommate_roll_for_bed(bed_no))
+		await get_tree().create_timer(0.055).timeout
+	if gen != roommate_spin_generation:
+		return
+	_apply_roommate_card_data(card, final_roommate)
+	roommate_pending_stops -= 1
+	if roommate_pending_stops <= 0:
+		roommate_hint_label.text = "抽取完成。满意的话，就带着这批舍友开始吧。"
+		if roommate_roster_label:
+			roommate_roster_label.text = "本次抽到的宿舍名单"
+		_set_roommate_action_enabled(true)
+
+func _style_roommate_action_btn(btn: Button, primary: bool):
+	btn.add_theme_font_size_override("font_size", 16)
+	btn.add_theme_color_override("font_color", Color(1, 1, 1) if primary else Color(0.9, 0.93, 0.97))
+	var s = StyleBoxFlat.new()
+	s.bg_color = Color(0.26, 0.54, 0.82, 1) if primary else Color(0.17, 0.2, 0.26, 1)
+	s.border_width_left = 1
+	s.border_width_top = 1
+	s.border_width_right = 1
+	s.border_width_bottom = 1
+	s.border_color = Color(0.5, 0.8, 1.0, 0.6) if primary else Color(0.34, 0.38, 0.46, 1)
+	s.set_corner_radius_all(10)
+	s.content_margin_left = 18
+	s.content_margin_right = 18
+	s.content_margin_top = 10
+	s.content_margin_bottom = 10
+	btn.add_theme_stylebox_override("normal", s)
+	var h = s.duplicate()
+	h.bg_color = s.bg_color.lightened(0.12)
+	btn.add_theme_stylebox_override("hover", h)
+	var p = s.duplicate()
+	p.bg_color = s.bg_color.darkened(0.08)
+	btn.add_theme_stylebox_override("pressed", p)
+
+func _reroll_roommates():
+	roommate_preview_roster = _generate_roommate_preview()
+	_start_roommate_spin(roommate_preview_roster, false)
+
+func _confirm_roommates():
+	roommate_roster = roommate_preview_roster.duplicate(true)
+	for roommate in roommate_roster:
+		var role_id = str(roommate.get("role_id", ""))
+		var archetype_tag = "roommate_" + str(roommate.get("archetype_id", "unknown"))
+		var name_data = roommate.get("name_data", {})
+		if role_id != "":
+			NamePool.assign_existing_name(role_id, name_data)
+		if archetype_tag not in tags:
+			tags.append(archetype_tag)
+		if roommate.get("archetype_id", "") == "top_roommate" and "rare_top_roommate" not in tags:
+			tags.append("rare_top_roommate")
+	if "y1s1_roommate" not in used_event_ids:
+		used_event_ids.append("y1s1_roommate")
+	_apply_roommate_roster_effects()
+	_finish_roommate_intro()
+
+func _finish_roommate_intro():
+	var top_count = 0
+	for roommate in roommate_roster:
+		if roommate.get("archetype_id", "") == "top_roommate":
+			top_count += 1
+
+	_clear_choices()
+	var tw = create_tween().set_parallel(true)
+	tw.tween_property(roommate_overlay_bg, "modulate:a", 0.0, 0.2)
+	if roommate_panel_root:
+		tw.tween_property(roommate_panel_root, "modulate:a", 0.0, 0.18).set_ease(Tween.EASE_IN)
+		tw.tween_property(roommate_panel_root, "scale", Vector2(0.988, 0.988), 0.18).set_ease(Tween.EASE_IN)
+	tw.finished.connect(func():
+		roommate_overlay_bg.visible = false
+		roommate_overlay_bg.modulate.a = 1.0
+		if roommate_panel_root:
+			roommate_panel_root.modulate = Color(1, 1, 1, 1)
+			roommate_panel_root.scale = Vector2(1, 1)
+		roommate_preview_roster.clear()
+		roommate_intro_done = true
+		waiting_for_choice = false
+
+		if top_count > 0:
+			_append("\n[color=#ccc]你看着这一屋子怪人，忽然生出一点荒唐的安心感。\n至少这一届命运，待你还不算太差。[/color]\n")
+		else:
+			_append("\n[color=#ccc]他们好像没一个算得上正常。\n可再听两句、再看两眼，你又觉得这屋子的人，大概都不坏。[/color]\n")
+
+		_show_game_start_prompt()
+	)
+
+func _show_game_start_prompt():
+	time_control_bar.visible = true
+	next_btn.visible = false
+	_append("\n[color=#888]点击上方 ▶ 开始，时间就会真正往前走。[/color]\n")
+	_append("[color=#888]大学生活从这一天开始，事件出现时会自动暂停。[/color]\n\n")
+	update_ui()
+	_update_time_display()
 
 # ══════════════════════════════════════════════
 #                 主循环
@@ -1311,13 +1847,11 @@ func _start_new_game():
 	_clamp_all()
 	game_started = true
 	_clear_choices()
-	time_control_bar.visible = true
 	next_btn.visible = false
-
-	_append("\n[color=#888]点击上方 ▶ 开始 来开始大学生活。[/color]\n")
-	_append("[color=#888]遇到事件时时间会自动暂停，等你做出选择。[/color]\n\n")
-	update_ui()
-	_update_time_display()
+	if roommate_intro_done:
+		_show_game_start_prompt()
+	else:
+		_show_roommate_draw_page()
 
 func _apply_background_effects():
 	if selected_background not in BACKGROUNDS:
@@ -1480,6 +2014,8 @@ func _serialize_state() -> Dictionary:
 		"event_last_triggered": event_last_triggered.duplicate(),
 		"last_phase": last_phase, "last_display_day": last_display_day,
 		"last_auto_save_day": last_auto_save_day,
+		"roommate_roster": roommate_roster.duplicate(true),
+		"roommate_intro_done": roommate_intro_done,
 		"current_year": info.year, "current_phase": info.phase,
 		"name_pool": NamePool.serialize(),
 		"relationships": RelationshipManager.serialize(),
@@ -1534,6 +2070,8 @@ func _load_from_save(data: Dictionary):
 	last_phase = data.get("last_phase", "")
 	last_display_day = data.get("last_display_day", -1)
 	last_auto_save_day = data.get("last_auto_save_day", 0)
+	roommate_roster = data.get("roommate_roster", []).duplicate(true)
+	roommate_intro_done = bool(data.get("roommate_intro_done", true))
 	if data.has("name_pool"):
 		NamePool.deserialize(data["name_pool"])
 	if data.has("relationships"):
@@ -1599,6 +2137,12 @@ func _translate_tag(tag: String) -> String:
 		"postgrad_committed": "考研冲刺", "postgrad_success": "考研上岸",
 		"big_company_intern": "大厂实习", "startup_intern": "创业公司实习",
 		"started_business": "创业中", "mass_apply": "海投简历",
+		"roommate_night_gamer": "电竞舍友", "roommate_clean_freak": "洁癖舍友",
+		"roommate_social_hub": "社牛舍友", "roommate_health_master": "养生舍友",
+		"roommate_repairman": "修理工舍友", "roommate_mystic": "玄学舍友",
+		"roommate_night_snacker": "夜宵舍友", "roommate_anime_voice": "二次元舍友",
+		"roommate_coupon_master": "省钱舍友", "roommate_romance_advisor": "恋爱军师舍友",
+		"roommate_top_roommate": "极品舍友", "rare_top_roommate": "宿舍隐藏SSR",
 	}
 	return t.get(tag, tag)
 

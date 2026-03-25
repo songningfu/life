@@ -19,12 +19,28 @@ var home_btn: Button
 var app_pages: Dictionary = {}
 
 const UI_ICON_PATHS = {
-	"contacts": "res://icons/kenney_game-icons/PNG/White/1x/multiplayer.png",
-	"wechat": "res://icons/kenney_board-game-icons/PNG/Default (64px)/cards_collection_outline.png",
-	"moments": "res://icons/kenney_board-game-icons/PNG/Default (64px)/cards_collection.png",
-	"schedule": "res://icons/kenney_board-game-icons/PNG/Default (64px)/timer_100.png",
-	"notes": "res://icons/kenney_board-game-icons/PNG/Default (64px)/notepad_write.png",
-	"settings": "res://icons/kenney_game-icons/PNG/White/1x/gear.png",
+	"camera": "res://images/phone_icons/camera.png",
+	"messages": "res://images/phone_icons/messages.png",
+	"gallery": "res://images/phone_icons/gallery.png",
+	"settings_app": "res://images/phone_icons/settings.png",
+	"music": "res://images/phone_icons/music.png",
+	"weather": "res://images/phone_icons/weather.png",
+	"maps": "res://images/phone_icons/maps.png",
+	"calendar": "res://images/phone_icons/calendar.png",
+	"social": "res://images/phone_icons/social.png",
+	"email": "res://images/phone_icons/email.png",
+	"phone": "res://images/phone_icons/phone.png",
+	"clock": "res://images/phone_icons/clock.png",
+	"globe": "res://images/phone_icons/globe.png",
+	"folder": "res://images/phone_icons/folder.png",
+	"notes_app": "res://images/phone_icons/notes.png",
+	"play": "res://images/phone_icons/play.png",
+	"contacts": "res://images/phone_icons/phone.png",
+	"wechat": "res://images/phone_icons/messages.png",
+	"moments": "res://images/phone_icons/social.png",
+	"schedule": "res://images/phone_icons/calendar.png",
+	"notes": "res://images/phone_icons/notes.png",
+	"settings": "res://images/phone_icons/settings.png",
 	"signal": "res://icons/kenney_game-icons/PNG/White/1x/signal3.png",
 	"battery": "res://icons/kenney_game-icons/PNG/White/1x/power.png",
 	"back": "res://icons/kenney_game-icons/PNG/White/1x/arrowLeft.png",
@@ -199,17 +215,24 @@ func _show_home_screen():
 		app_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 		var icon_btn = Button.new()
-		icon_btn.custom_minimum_size = Vector2(70, 70)
-		icon_btn.icon = _load_icon(app.icon_path, 28)
+		icon_btn.custom_minimum_size = Vector2(84, 84)
+		icon_btn.icon = _load_icon(app.icon_path, 62)
 		icon_btn.expand_icon = true
 
 		var icon_style = StyleBoxFlat.new()
-		icon_style.bg_color = Color(app.color.r, app.color.g, app.color.b, 0.15)
-		icon_style.set_corner_radius_all(16)
+		icon_style.bg_color = Color(0, 0, 0, 0)
+		icon_style.set_corner_radius_all(22)
+		icon_style.content_margin_left = 4
+		icon_style.content_margin_right = 4
+		icon_style.content_margin_top = 4
+		icon_style.content_margin_bottom = 4
 		icon_btn.add_theme_stylebox_override("normal", icon_style)
 		var icon_hover = icon_style.duplicate()
-		icon_hover.bg_color = Color(app.color.r, app.color.g, app.color.b, 0.3)
+		icon_hover.bg_color = Color(app.color.r, app.color.g, app.color.b, 0.14)
 		icon_btn.add_theme_stylebox_override("hover", icon_hover)
+		var icon_pressed = icon_style.duplicate()
+		icon_pressed.bg_color = Color(app.color.r, app.color.g, app.color.b, 0.22)
+		icon_btn.add_theme_stylebox_override("pressed", icon_pressed)
 		icon_btn.pressed.connect(_open_app.bind(app.id))
 		app_btn.add_child(icon_btn)
 

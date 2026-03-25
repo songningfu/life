@@ -934,7 +934,8 @@ func _close_panels():
 func _on_slot_picked(slot: int, _exists: bool):
 	selected_slot = slot
 	_close_panels()
-	_show_char_page()
+	SaveManager.set_meta("pending_char_creation_slot", slot)
+	get_tree().change_scene_to_file("res://scenes/CharacterCreation.tscn")
 
 func _show_char_page():
 	for child in get_children():
@@ -1081,6 +1082,7 @@ func _start_intro():
 	intro_overlay.visible = true
 	intro_active = true
 	intro_phase = 0
+	var major_name = str(selected_major_profile.get("name", "未定专业"))
 
 	intro_texts = [
 		"[center][color=#6ec6ff]致那些难忘的日子[/color][/center]",
@@ -1090,7 +1092,9 @@ func _start_intro():
 		"[center]高考结束那天，%s走出考场，\n抬头看了看天。\n\n天很蓝，云很白。\n感觉好像什么结束了，\n又好像什么要开始了。[/center]" % player_name,
 		"[center]那个暑假出奇地漫长。\n\n你翻了翻旧课本，\n又从书架上拿下来又放回去。\n窗外的蝉还在叫，\n但教室的钟声已经不会再响了。[/center]",
 		"[center]七月的某个下午，\n你盯着电脑屏幕，\n手指悬在鼠标上方。\n\n查分系统的页面刷了三遍才打开。[/center]",
-		"[center]成绩出来了。\n\n说不上特别好，也说不上差。\n就是你努力了三年之后，\n命运给你的那个数字。\n\n接下来——你要做选择了。[/center]",
+		"[center]成绩出来了。\n\n说不上特别好，也说不上差。\n就是你努力了三年之后，\n命运给你的那个数字。\n\n后来，志愿也慢慢填完了。[/center]",
+		"[center]录取结果落下来的那天，\n你盯着屏幕看了很久。\n\n%s。\n%s。\n\n那些曾经只存在于纸上的选项，\n忽然变成了你接下来几年的人生。[/center]" % [selected_university_name, major_name],
+		"[center]通知书装进书包的时候，\n你第一次真切地意识到：\n这次不是模拟，不是想象，\n而是你已经替自己选好了方向。\n\n新的生活，要开始了。[/center]",
 	]
 
 	_show_intro_text(intro_texts[0])

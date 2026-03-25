@@ -48,6 +48,13 @@ func init_new_game(seed_value: int = -1):
 		_rng.seed = seed_value
 
 func generate_name(gender: String = "male") -> Dictionary:
+	var name_data = _generate_name_data(gender, true)
+	return name_data
+
+func preview_name(gender: String = "male") -> Dictionary:
+	return _generate_name_data(gender, false)
+
+func _generate_name_data(gender: String, reserve: bool) -> Dictionary:
 	var pool = male_given_names if gender == "male" else female_given_names
 	var attempts = 0
 	var full_name = ""
@@ -58,11 +65,12 @@ func generate_name(gender: String = "male") -> Dictionary:
 		sur = surnames[_rng.randi() % surnames.size()]
 		given = pool[_rng.randi() % pool.size()]
 		full_name = sur + given
-		if full_name not in _used_full_names:
+		if (not reserve) or full_name not in _used_full_names:
 			break
 		attempts += 1
 
-	_used_full_names.append(full_name)
+	if reserve:
+		_used_full_names.append(full_name)
 	var nickname = _make_nickname(sur, given, gender)
 
 	return {
@@ -80,6 +88,15 @@ func assign_name(role_id: String, gender: String = "male") -> Dictionary:
 	name_data["role_id"] = role_id
 	_assigned_names[role_id] = name_data
 	return name_data
+
+func assign_existing_name(role_id: String, name_data: Dictionary) -> Dictionary:
+	var assigned = name_data.duplicate(true)
+	assigned["role_id"] = role_id
+	_assigned_names[role_id] = assigned
+	var full_name = str(assigned.get("full_name", ""))
+	if full_name != "" and full_name not in _used_full_names:
+		_used_full_names.append(full_name)
+	return assigned
 
 func get_npc_name(role_id: String) -> Dictionary:
 	if _assigned_names.has(role_id):

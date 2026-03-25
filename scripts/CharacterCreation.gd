@@ -3,12 +3,16 @@ extends Control
 # 分页式角色创建系统
 
 var current_page: int = 1
-var total_pages: int = 4
+var total_pages: int = 6
 
 # 数据
 var player_name: String = ""
 var selected_gender: String = "male"
 var selected_background: String = "normal"
+var selected_university_tier: String = "985"
+var selected_university_name: String = "东岚大学"
+var selected_major_id: String = "computer_science"
+var selected_major_profile: Dictionary = {}
 var current_talents: Array = []
 var save_slot: int = -1
 
@@ -16,8 +20,20 @@ var save_slot: int = -1
 var pages: Array = []
 var progress_dots: Array = []
 
+# 开场过场
+var intro_overlay: ColorRect
+var intro_label: RichTextLabel
+var intro_hint: Label
+var intro_texts: Array = []
+var intro_phase: int = 0
+var intro_active: bool = false
+
 # 背景按钮
 var bg_buttons: Dictionary = {}
+var university_buttons: Dictionary = {}
+var major_buttons: Dictionary = {}
+var major_page_index: int = 0
+const MAJORS_PER_PAGE := 8
 
 # 颜色
 var colors = {
@@ -38,32 +54,145 @@ const BACKGROUNDS = {
 	"single_parent": {"name": "单亲家庭", "desc": "很早就学会了独立。能力比同龄人强，但内心深处总有缺口。", "effects": {"ability": 10, "mental": -12, "living_money_bonus": -200, "monthly_bonus": -200}},
 }
 
+const UNIVERSITY_OPTIONS = [
+	{"id": "985", "tier": "985", "name": "东岚大学", "desc": "老牌研究型名校，学业压力大，资源也最集中。"},
+	{"id": "normal", "tier": "normal", "name": "江城理工大学", "desc": "综合实力稳定，就业导向清晰，校园生活比较均衡。"},
+	{"id": "low", "tier": "low", "name": "临海学院", "desc": "城市氛围轻松，平台普通一些，但机会要靠自己争取。"},
+]
+
+const MAJOR_OPTIONS = [
+	{"id": "clinical_medicine", "name": "临床医学", "required_credits": 200, "exam_difficulty": 1.35, "desc": "学制长、课程密、实习重，典型难毕业专业。"},
+	{"id": "architecture", "name": "建筑学", "required_credits": 185, "exam_difficulty": 1.28, "desc": "课程之外还有大量设计作业和熬图。"},
+	{"id": "law", "name": "法学", "required_credits": 170, "exam_difficulty": 1.22, "desc": "记忆量大、案例多，对持续投入要求高。"},
+	{"id": "mathematics", "name": "数学与应用数学", "required_credits": 162, "exam_difficulty": 1.20, "desc": "基础课硬核，抽象课程多，容错率不高。"},
+	{"id": "electronic_info", "name": "电子信息工程", "required_credits": 168, "exam_difficulty": 1.20, "desc": "数理基础和实验课都不轻松。"},
+	{"id": "computer_science", "name": "计算机科学与技术", "required_credits": 165, "exam_difficulty": 1.18, "desc": "核心课密集，项目和考试双线并行。"},
+	{"id": "mechanical_engineering", "name": "机械工程", "required_credits": 168, "exam_difficulty": 1.17, "desc": "理论与实践都要兼顾，课程负担偏重。"},
+	{"id": "automation", "name": "自动化", "required_credits": 166, "exam_difficulty": 1.16, "desc": "控制、数电、模电等课程组合比较吃基础。"},
+	{"id": "civil_engineering", "name": "土木工程", "required_credits": 165, "exam_difficulty": 1.14, "desc": "专业课和制图计算都比较讲究。"},
+	{"id": "pharmacy", "name": "药学", "required_credits": 162, "exam_difficulty": 1.10, "desc": "记忆和实验都不少，稳定偏难。"},
+	{"id": "finance", "name": "金融学", "required_credits": 158, "exam_difficulty": 1.08, "desc": "课程难度中上，但整体节奏可控。"},
+	{"id": "psychology", "name": "心理学", "required_credits": 155, "exam_difficulty": 1.06, "desc": "统计、实验和理论课都要兼顾。"},
+	{"id": "nursing", "name": "护理学", "required_credits": 160, "exam_difficulty": 1.05, "desc": "课程和实践安排都比较满。"},
+	{"id": "accounting", "name": "会计学", "required_credits": 156, "exam_difficulty": 1.04, "desc": "偏稳定，细致度要求高。"},
+	{"id": "english", "name": "英语", "required_credits": 150, "exam_difficulty": 1.00, "desc": "整体中等，重在日常积累。"},
+	{"id": "international_trade", "name": "国际经济与贸易", "required_credits": 150, "exam_difficulty": 0.98, "desc": "课程分布较均衡，毕业压力适中。"},
+	{"id": "journalism", "name": "新闻学", "required_credits": 148, "exam_difficulty": 0.97, "desc": "专业课压力不算最大，但实践会占时间。"},
+	{"id": "chinese_literature", "name": "汉语言文学", "required_credits": 150, "exam_difficulty": 0.96, "desc": "阅读写作多，考试强度相对友好。"},
+	{"id": "marketing", "name": "市场营销", "required_credits": 145, "exam_difficulty": 0.92, "desc": "整体偏灵活，属于相对好毕业的一类。"},
+]
+
 func _ready():
 	_init_pages()
 	_init_progress_dots()
 	_style_all()
 	_bind_events()
+	_build_intro_overlay()
 	
 	if SaveManager.has_meta("pending_char_creation_slot"):
 		save_slot = SaveManager.get_meta("pending_char_creation_slot")
 		SaveManager.set_meta("pending_char_creation_slot", null)
 	
 	_show_page(1)
+	_start_intro()
 
 func _init_pages():
 	pages = [
 		$PageContainer/Page1_Name,
 		$PageContainer/Page2_Gender,
 		$PageContainer/Page3_Background,
-		$PageContainer/Page4_Talent
+		$PageContainer/Page4_University,
+		$PageContainer/Page5_Major,
+		$PageContainer/Page6_Talent
 	]
+
+func _build_intro_overlay():
+	intro_overlay = ColorRect.new()
+	intro_overlay.color = Color(0.01, 0.01, 0.02, 1)
+	intro_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	intro_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(intro_overlay)
+
+	intro_label = RichTextLabel.new()
+	intro_label.bbcode_enabled = true
+	intro_label.fit_content = true
+	intro_label.scroll_active = false
+	intro_label.add_theme_font_size_override("normal_font_size", 26)
+	intro_label.add_theme_color_override("default_color", Color(0.82, 0.84, 0.88))
+	intro_label.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+	intro_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	intro_label.custom_minimum_size = Vector2(820, 340)
+	intro_label.offset_left = -410
+	intro_label.offset_top = -170
+	intro_label.offset_right = 410
+	intro_label.offset_bottom = 170
+	intro_overlay.add_child(intro_label)
+
+	intro_hint = Label.new()
+	intro_hint.text = "点击屏幕继续..."
+	intro_hint.add_theme_color_override("font_color", Color(0.34, 0.36, 0.4))
+	intro_hint.add_theme_font_size_override("font_size", 14)
+	intro_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	intro_hint.offset_left = -190
+	intro_hint.offset_top = -48
+	intro_overlay.add_child(intro_hint)
+
+	intro_overlay.gui_input.connect(_on_intro_input)
+
+func _start_intro():
+	intro_texts = [
+		"[center][font_size=34][color=#d8dde4]Subconscious Echo Studios[/color][/font_size]\n[font_size=22][color=#79818c]出品[/color][/font_size][/center]",
+		"[center][color=#6ec6ff]致那些难忘的日子[/color][/center]",
+		"[center]高考结束那天，\n风从教学楼的长廊穿过去，\n把喧闹一点点吹散。\n\n有人笑，有人沉默，\n而你只是站在人群里，\n听见时间忽然往前走了一步。[/center]",
+		"[center]走出考场的时候，\n手指还记得握笔太久的酸。\n\n蝉鸣很响，天很亮，\n像什么都没有改变；\n可你知道，\n有些日子已经停在身后了。[/center]",
+		"[center]后来你才明白，\n青春里很多告别都没有配乐。\n\n它不会郑重其事地说再见，\n只会在某个傍晚让你忽然意识到:\n\n从明天起，\n你再也不用回到那间教室。[/center]",
+		"[center]那个夏天很长，\n长得像一卷被阳光晒得发白的胶片。\n\n查分，等待，失眠，\n把未来想了很多遍，\n却还是不知道\n下一幕会从哪里开始。[/center]",
+		"[center]原来所谓长大，\n不是终于变得无所不能。\n\n而是有一天，\n轮到你一个人站在岔路口，\n看着天色渐暗，\n然后轻声对自己说:\n\n往前走吧。[/center]",
+	]
+
+	intro_phase = 0
+	intro_active = true
+	intro_overlay.visible = true
+	intro_overlay.modulate = Color(1, 1, 1, 1)
+	_show_intro_text(intro_texts[0])
+
+func _show_intro_text(text: String):
+	intro_label.clear()
+	intro_label.append_text(text)
+	intro_label.modulate = Color(1, 1, 1, 0)
+	var tw = create_tween()
+	tw.tween_property(intro_label, "modulate:a", 1.0, 0.8)
+
+func _on_intro_input(event: InputEvent):
+	if not intro_active:
+		return
+	if (event is InputEventMouseButton and event.pressed) or \
+		(event is InputEventKey and event.pressed):
+		intro_phase += 1
+		if intro_phase < intro_texts.size():
+			var current_phase = intro_phase
+			var tw = create_tween()
+			tw.tween_property(intro_label, "modulate:a", 0.0, 0.25)
+			tw.tween_callback(func():
+				if current_phase < intro_texts.size():
+					_show_intro_text(intro_texts[current_phase])
+			)
+		else:
+			intro_active = false
+			var tw = create_tween()
+			tw.tween_property(intro_overlay, "modulate:a", 0.0, 0.6)
+			tw.tween_callback(func():
+				intro_overlay.visible = false
+			)
 
 func _init_progress_dots():
 	progress_dots = [
 		$ProgressIndicator/Dot1,
 		$ProgressIndicator/Dot2,
 		$ProgressIndicator/Dot3,
-		$ProgressIndicator/Dot4
+		$ProgressIndicator/Dot4,
+		$ProgressIndicator/Dot5,
+		$ProgressIndicator/Dot6
 	]
 
 func _style_all():
@@ -78,7 +207,7 @@ func _style_all():
 		subtitle.add_theme_color_override("font_color", colors.dim)
 	
 	# 第3页和第4页 - 尝试两种路径
-	for i in range(2, 4):
+	for i in range(2, 6):
 		var title
 		var subtitle
 		# 尝试VBox路径
@@ -116,17 +245,27 @@ func _style_all():
 	
 	_style_btn($PageContainer/Page3_Background/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
 	_style_btn($PageContainer/Page3_Background/ScrollContainer/VBox/NavButtons/NextBtn, colors.accent)
+
+	_build_university_list()
+	_style_btn($PageContainer/Page4_University/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
+	_style_btn($PageContainer/Page4_University/ScrollContainer/VBox/NavButtons/NextBtn, colors.accent)
+
+	_build_major_list()
+	_style_btn($PageContainer/Page5_Major/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
+	_style_btn($PageContainer/Page5_Major/ScrollContainer/VBox/NavButtons/NextBtn, colors.accent)
+	_style_btn($PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/PrevPageBtn, Color(0.26, 0.3, 0.38))
+	_style_btn($PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/NextPageBtn, Color(0.26, 0.3, 0.38))
 	
-	_style_btn($PageContainer/Page4_Talent/ScrollContainer/VBox/RollBtn, Color(0.32, 0.52, 0.86))
-	$PageContainer/Page4_Talent/ScrollContainer/VBox/RollBtn.add_theme_font_size_override("font_size", 24)
+	_style_btn($PageContainer/Page6_Talent/ScrollContainer/VBox/RollBtn, Color(0.32, 0.52, 0.86))
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/RollBtn.add_theme_font_size_override("font_size", 24)
 	
-	var hint = $PageContainer/Page4_Talent/ScrollContainer/VBox/HintLabel
+	var hint = $PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel
 	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", colors.dim)
 	
-	_style_btn($PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
-	_style_btn($PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/StartBtn, colors.accent)
-	$PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/StartBtn.add_theme_font_size_override("font_size", 20)
+	_style_btn($PageContainer/Page6_Talent/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
+	_style_btn($PageContainer/Page6_Talent/ScrollContainer/VBox/NavButtons/StartBtn, colors.accent)
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/NavButtons/StartBtn.add_theme_font_size_override("font_size", 20)
 	
 	for dot in progress_dots:
 		var s = StyleBoxFlat.new()
@@ -202,26 +341,12 @@ func _style_gender_card(btn: Button, base_color: Color, selected: bool):
 	btn.add_theme_stylebox_override("pressed", p)
 	btn.add_theme_color_override("font_color", Color.WHITE if selected else Color(0.86, 0.89, 0.94))
 
-func _bg_effect_preview(bg_id: String) -> String:
-	match bg_id:
-		"business":
-			return "生活费+500 / 月补贴+400 · 社交+8 · 心态-10"
-		"teacher":
-			return "学习点+8 · 心态-8 · 社交-5"
-		"rural":
-			return "生活费-400 / 月补贴-300 · 健康+8 · 能力+8"
-		"single_parent":
-			return "能力+10 · 心态-12 · 生活费-200 / 月补贴-200"
-		_:
-			return "各项属性较为均衡"
-
 func _build_background_list():
 	var list = $PageContainer/Page3_Background/ScrollContainer/VBox/BackgroundList
-	print("Building background list, list node: ", list)
 	for bg_id in BACKGROUNDS:
 		var bg = BACKGROUNDS[bg_id]
 		var btn = Button.new()
-		btn.text = "%s\n%s\n%s" % [bg.name, bg.desc, _bg_effect_preview(bg_id)]
+		btn.text = "%s\n%s" % [bg.name, bg.desc]
 		btn.custom_minimum_size = Vector2(0, 94)
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -230,9 +355,27 @@ func _build_background_list():
 		list.add_child(btn)
 		bg_buttons[bg_id] = btn
 		_style_select_card(btn, false)
-		print("Added background button: ", bg.name)
 	_update_bg_selection()
-	print("Background list built, total buttons: ", bg_buttons.size())
+
+func _build_university_list():
+	var list = $PageContainer/Page4_University/ScrollContainer/VBox/UniversityList
+	for option in UNIVERSITY_OPTIONS:
+		var btn = Button.new()
+		btn.text = "%s · %s\n%s" % [_tier_str(option.get("tier", "")), option.get("name", ""), option.get("desc", "")]
+		btn.custom_minimum_size = Vector2(0, 92)
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		btn.add_theme_font_size_override("font_size", 15)
+		btn.pressed.connect(_on_university_selected.bind(option.get("tier", ""), option.get("name", "")))
+		list.add_child(btn)
+		university_buttons[option.get("tier", "")] = btn
+		_style_select_card(btn, false)
+	_update_university_selection()
+
+func _build_major_list():
+	major_page_index = 0
+	selected_major_profile = MAJOR_OPTIONS[0].duplicate(true)
+	_render_major_page()
 
 func _bind_events():
 	$PageContainer/Page1_Name/VBox/NextBtn.pressed.connect(func(): _next_page())
@@ -242,9 +385,15 @@ func _bind_events():
 	$PageContainer/Page2_Gender/VBox/NavButtons/NextBtn.pressed.connect(func(): _next_page())
 	$PageContainer/Page3_Background/ScrollContainer/VBox/NavButtons/BackBtn.pressed.connect(func(): _prev_page())
 	$PageContainer/Page3_Background/ScrollContainer/VBox/NavButtons/NextBtn.pressed.connect(func(): _next_page())
-	$PageContainer/Page4_Talent/ScrollContainer/VBox/RollBtn.pressed.connect(_roll_talents)
-	$PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/BackBtn.pressed.connect(func(): _prev_page())
-	$PageContainer/Page4_Talent/ScrollContainer/VBox/NavButtons/StartBtn.pressed.connect(_start_game)
+	$PageContainer/Page4_University/ScrollContainer/VBox/NavButtons/BackBtn.pressed.connect(func(): _prev_page())
+	$PageContainer/Page4_University/ScrollContainer/VBox/NavButtons/NextBtn.pressed.connect(func(): _next_page())
+	$PageContainer/Page5_Major/ScrollContainer/VBox/NavButtons/BackBtn.pressed.connect(func(): _prev_page())
+	$PageContainer/Page5_Major/ScrollContainer/VBox/NavButtons/NextBtn.pressed.connect(func(): _next_page())
+	$PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/PrevPageBtn.pressed.connect(_prev_major_page)
+	$PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/NextPageBtn.pressed.connect(_next_major_page)
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/RollBtn.pressed.connect(_roll_talents)
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/NavButtons/BackBtn.pressed.connect(func(): _prev_page())
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/NavButtons/StartBtn.pressed.connect(_start_game)
 
 func _show_page(page: int):
 	current_page = page
@@ -261,6 +410,8 @@ func _next_page():
 		if name.length() == 0:
 			return
 		player_name = name
+	if current_page == 5 and selected_major_profile.is_empty():
+		return
 	
 	if current_page < total_pages:
 		_show_page(current_page + 1)
@@ -312,14 +463,94 @@ func _update_bg_selection():
 		var btn = bg_buttons[id]
 		_style_select_card(btn, id == selected_background)
 
+func _on_university_selected(tier: String, school_name: String):
+	selected_university_tier = tier
+	selected_university_name = school_name
+	_update_university_selection()
+
+func _update_university_selection():
+	for tier in university_buttons:
+		var btn = university_buttons[tier]
+		_style_select_card(btn, tier == selected_university_tier)
+
+func _on_major_selected(major_id: String):
+	selected_major_id = major_id
+	for major in MAJOR_OPTIONS:
+		if major.get("id", "") == major_id:
+			selected_major_profile = major.duplicate(true)
+			break
+	_update_major_selection()
+
+func _update_major_selection():
+	for id in major_buttons:
+		var btn = major_buttons[id]
+		_style_select_card(btn, id == selected_major_id)
+
+func _major_summary(major: Dictionary) -> String:
+	return str(major.get("desc", ""))
+
+func _render_major_page():
+	var list = $PageContainer/Page5_Major/ScrollContainer/VBox/MajorList
+	for child in list.get_children():
+		child.queue_free()
+	major_buttons.clear()
+
+	var start_index = major_page_index * MAJORS_PER_PAGE
+	var end_index = mini(start_index + MAJORS_PER_PAGE, MAJOR_OPTIONS.size())
+	for i in range(start_index, end_index):
+		var major = MAJOR_OPTIONS[i]
+		var btn = Button.new()
+		btn.text = "%s\n%s" % [major.get("name", ""), _major_summary(major)]
+		btn.custom_minimum_size = Vector2(420, 82)
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		btn.add_theme_font_size_override("font_size", 13)
+		btn.pressed.connect(_on_major_selected.bind(major.get("id", "")))
+		list.add_child(btn)
+		major_buttons[major.get("id", "")] = btn
+		_style_select_card(btn, false)
+
+	var page_label = $PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/PageLabel
+	var total_major_pages = int(ceil(float(MAJOR_OPTIONS.size()) / float(MAJORS_PER_PAGE)))
+	page_label.text = "第 %d / %d 组" % [major_page_index + 1, total_major_pages]
+	$PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/PrevPageBtn.visible = major_page_index > 0
+	$PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/NextPageBtn.visible = major_page_index < total_major_pages - 1
+
+	_update_major_selection()
+
+func _prev_major_page():
+	if major_page_index <= 0:
+		return
+	major_page_index -= 1
+	_render_major_page()
+
+func _next_major_page():
+	var total_major_pages = int(ceil(float(MAJOR_OPTIONS.size()) / float(MAJORS_PER_PAGE)))
+	if major_page_index >= total_major_pages - 1:
+		return
+	major_page_index += 1
+	_render_major_page()
+
+func _tier_str(t: String) -> String:
+	match t:
+		"985":
+			return "985高校"
+		"normal":
+			return "普通一本"
+		"low":
+			return "二本院校"
+		_:
+			return "大学"
+
 func _roll_talents():
 	current_talents = TalentSystem.roll_talents()
 	_display_talents()
-	$PageContainer/Page4_Talent/ScrollContainer/VBox/RollBtn.text = "重新抽取"
-	$PageContainer/Page4_Talent/ScrollContainer/VBox/HintLabel.text = "不满意？可以重新抽取"
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/RollBtn.text = "重新抽取"
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.text = ""
 
 func _display_talents():
-	var list = $PageContainer/Page4_Talent/ScrollContainer/VBox/TalentList
+	var list = $PageContainer/Page6_Talent/ScrollContainer/VBox/TalentList
 	for child in list.get_children():
 		child.queue_free()
 	
@@ -362,8 +593,8 @@ func _display_talents():
 
 func _start_game():
 	if current_talents.size() == 0:
-		$PageContainer/Page4_Talent/ScrollContainer/VBox/HintLabel.text = "请先抽取天赋！"
-		$PageContainer/Page4_Talent/ScrollContainer/VBox/HintLabel.add_theme_color_override("font_color", colors.accent_bright)
+		$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.text = "请先抽取天赋！"
+		$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.add_theme_color_override("font_color", colors.accent_bright)
 		return
 	
 	TalentSystem.set_talents(current_talents)
@@ -374,6 +605,10 @@ func _start_game():
 		"save_slot": save_slot,
 		"is_new_game": true,
 		"background": selected_background,
+		"university_tier": selected_university_tier,
+		"university_name": selected_university_name,
+		"major_id": selected_major_id,
+		"major_profile": selected_major_profile.duplicate(true),
 		"talents": current_talents.duplicate(true),
 	})
 	get_tree().change_scene_to_file("res://scenes/Game.tscn")
