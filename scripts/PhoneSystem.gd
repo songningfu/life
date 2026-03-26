@@ -64,130 +64,98 @@ var phone_colors = {
 
 # ========== APP 定义 ==========
 var apps = [
-	{"id": "contacts", "name": "通讯录", "icon_path": UI_ICON_PATHS.contacts, "color": Color(0.3, 0.7, 0.9)},
-	{"id": "wechat", "name": "微信", "icon_path": UI_ICON_PATHS.wechat, "color": Color(0.3, 0.75, 0.4)},
-	{"id": "moments", "name": "朋友圈", "icon_path": UI_ICON_PATHS.moments, "color": Color(0.3, 0.75, 0.4)},
-	{"id": "schedule", "name": "日程", "icon_path": UI_ICON_PATHS.schedule, "color": Color(1.0, 0.6, 0.3)},
-	{"id": "notes", "name": "备忘录", "icon_path": UI_ICON_PATHS.notes, "color": Color(1.0, 0.85, 0.2)},
-	{"id": "settings", "name": "设置", "icon_path": UI_ICON_PATHS.settings, "color": Color(0.6, 0.62, 0.68)},
+	{"id": "contacts", "name": "通讯录", "icon": "👥", "color": Color(0.2, 0.6, 1.0), "gradient": Color(0.4, 0.75, 1.0)},
+	{"id": "wechat", "name": "微信", "icon": "💬", "color": Color(0.15, 0.7, 0.3), "gradient": Color(0.3, 0.85, 0.45)},
+	{"id": "moments", "name": "朋友圈", "icon": "📷", "color": Color(0.9, 0.4, 0.15), "gradient": Color(1.0, 0.55, 0.3)},
+	{"id": "schedule", "name": "日程", "icon": "📅", "color": Color(0.95, 0.5, 0.2), "gradient": Color(1.0, 0.65, 0.35)},
+	{"id": "notes", "name": "备忘录", "icon": "📝", "color": Color(1.0, 0.75, 0.1), "gradient": Color(1.0, 0.85, 0.3)},
+	{"id": "settings", "name": "设置", "icon": "⚙️", "color": Color(0.5, 0.55, 0.6), "gradient": Color(0.65, 0.7, 0.75)},
 ]
 
 func _ready():
 	layer = 100
-	_build_phone_ui()
+	_init_ui_nodes()
 	phone_panel.visible = false
 	var ov = get_node_or_null("PhoneOverlay")
 	if ov:
 		ov.visible = false
+	
+	# 独立运行测试模式
+	if get_tree().current_scene == self:
+		_test_mode()
 
-# ══════════════════════════════════════════════
-#              构建手机 UI
-# ══════════════════════════════════════════════
-func _build_phone_ui():
-	var overlay = ColorRect.new()
-	overlay.name = "PhoneOverlay"
-	overlay.color = Color(0, 0, 0, 0.5)
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.visible = false
-	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+func _init_ui_nodes():
+	phone_panel = $PhonePanel
+	phone_screen = $PhonePanel/PhoneScreen
+	status_bar_top = $PhonePanel/PhoneScreen/StatusBarBg/StatusBar
+	app_container = $PhonePanel/PhoneScreen/ScreenBg/AppContainer
+	back_btn = $PhonePanel/PhoneScreen/NavBarBg/NavBar/BackBtn
+	home_btn = $PhonePanel/PhoneScreen/NavBarBg/NavBar/HomeBtn
+	var close_btn = $PhonePanel/PhoneScreen/NavBarBg/NavBar/CloseBtn
+	
+	_setup_styles()
+	_setup_icons()
+	
+	back_btn.pressed.connect(_on_back)
+	home_btn.pressed.connect(_show_home_screen)
+	close_btn.pressed.connect(close_phone)
+	
+	var overlay = $PhoneOverlay
 	overlay.gui_input.connect(func(event):
 		if event is InputEventMouseButton and event.pressed:
 			close_phone()
 	)
-	add_child(overlay)
 
-	phone_panel = PanelContainer.new()
-	phone_panel.name = "PhonePanel"
-	phone_panel.custom_minimum_size = Vector2(360, 640)
-	phone_panel.set_anchors_preset(Control.PRESET_CENTER)
-	phone_panel.position = Vector2(-180, -320)
-
-	var frame_style = StyleBoxFlat.new()
-	frame_style.bg_color = Color(0.06, 0.06, 0.08, 1)
-	frame_style.set_corner_radius_all(20)
-	frame_style.border_width_left = 2; frame_style.border_width_right = 2
-	frame_style.border_width_top = 2; frame_style.border_width_bottom = 2
-	frame_style.border_color = Color(0.25, 0.27, 0.32, 1)
-	frame_style.content_margin_left = 8; frame_style.content_margin_right = 8
-	frame_style.content_margin_top = 8; frame_style.content_margin_bottom = 8
-	phone_panel.add_theme_stylebox_override("panel", frame_style)
-	add_child(phone_panel)
-
-	phone_screen = VBoxContainer.new()
-	phone_screen.add_theme_constant_override("separation", 0)
-	phone_panel.add_child(phone_screen)
-
-	_build_status_bar()
-
-	app_container = VBoxContainer.new()
-	app_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-
-	var screen_bg = PanelContainer.new()
-	var screen_style = StyleBoxFlat.new()
-	screen_style.bg_color = phone_colors.screen
-	screen_style.set_corner_radius_all(0)
-	screen_bg.add_theme_stylebox_override("panel", screen_style)
-	screen_bg.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	phone_screen.add_child(screen_bg)
-	screen_bg.add_child(app_container)
-
-	_build_nav_bar()
-	_show_home_screen()
-
-func _build_status_bar():
-	status_bar_top = HBoxContainer.new()
-	status_bar_top.custom_minimum_size = Vector2(0, 28)
-	status_bar_top.add_theme_constant_override("separation", 0)
-
-	var bar_bg = PanelContainer.new()
+func _setup_styles():
+	var status_bg = $PhonePanel/PhoneScreen/StatusBarBg
 	var bar_style = StyleBoxFlat.new()
 	bar_style.bg_color = Color(0.05, 0.05, 0.07, 1)
-	bar_style.corner_radius_top_left = 12; bar_style.corner_radius_top_right = 12
-	bar_style.content_margin_left = 15; bar_style.content_margin_right = 15
+	bar_style.corner_radius_top_left = 12
+	bar_style.corner_radius_top_right = 12
+	bar_style.content_margin_left = 15
+	bar_style.content_margin_right = 15
 	bar_style.content_margin_top = 4
-	bar_bg.add_theme_stylebox_override("panel", bar_style)
-	phone_screen.add_child(bar_bg)
-	bar_bg.add_child(status_bar_top)
-
-	var time_lbl = Label.new()
-	time_lbl.text = "9:41"
-	time_lbl.add_theme_font_size_override("font_size", 13)
-	time_lbl.add_theme_color_override("font_color", phone_colors.text)
-	time_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	status_bar_top.add_child(time_lbl)
-
-	var icons_box = HBoxContainer.new()
-	icons_box.add_theme_constant_override("separation", 8)
-	status_bar_top.add_child(icons_box)
-	icons_box.add_child(_make_small_icon(UI_ICON_PATHS.signal, 13))
-	icons_box.add_child(_make_small_icon(UI_ICON_PATHS.battery, 13))
-
-func _build_nav_bar():
-	var nav = HBoxContainer.new()
-	nav.custom_minimum_size = Vector2(0, 48)
-	nav.add_theme_constant_override("separation", 20)
-	nav.alignment = BoxContainer.ALIGNMENT_CENTER
-
-	var nav_bg = PanelContainer.new()
+	status_bg.add_theme_stylebox_override("panel", bar_style)
+	
+	var screen_bg = $PhonePanel/PhoneScreen/ScreenBg
+	var screen_style = StyleBoxFlat.new()
+	screen_style.bg_color = phone_colors.screen
+	screen_bg.add_theme_stylebox_override("panel", screen_style)
+	
+	var nav_bg = $PhonePanel/PhoneScreen/NavBarBg
 	var nav_style = StyleBoxFlat.new()
 	nav_style.bg_color = Color(0.05, 0.05, 0.07, 1)
-	nav_style.corner_radius_bottom_left = 12; nav_style.corner_radius_bottom_right = 12
-	nav_style.content_margin_top = 4; nav_style.content_margin_bottom = 8
+	nav_style.corner_radius_bottom_left = 12
+	nav_style.corner_radius_bottom_right = 12
+	nav_style.content_margin_top = 4
+	nav_style.content_margin_bottom = 8
 	nav_bg.add_theme_stylebox_override("panel", nav_style)
-	phone_screen.add_child(nav_bg)
-	nav_bg.add_child(nav)
+	
+	for btn in [back_btn, home_btn, $PhonePanel/PhoneScreen/NavBarBg/NavBar/CloseBtn]:
+		var style = StyleBoxFlat.new()
+		style.bg_color = Color(0, 0, 0, 0)
+		btn.add_theme_stylebox_override("normal", style)
+		btn.add_theme_stylebox_override("hover", style)
 
-	back_btn = _make_nav_button("返回", UI_ICON_PATHS.back, phone_colors.accent)
-	back_btn.pressed.connect(_on_back)
-	nav.add_child(back_btn)
+func _setup_icons():
+	var icons_box = $PhonePanel/PhoneScreen/StatusBarBg/StatusBar/IconsBox
+	
+	# 状态栏图标 - 使用emoji
+	var signal_icon = Label.new()
+	signal_icon.text = "📶"
+	signal_icon.add_theme_font_size_override("font_size", 14)
+	icons_box.add_child(signal_icon)
+	
+	var battery_icon = Label.new()
+	battery_icon.text = "🔋"
+	battery_icon.add_theme_font_size_override("font_size", 14)
+	icons_box.add_child(battery_icon)
+	
+	# 导航栏按钮 - 使用emoji
+	_set_button_emoji(back_btn, "◀", 20)
+	_set_button_emoji(home_btn, "⚪", 20)
+	_set_button_emoji($PhonePanel/PhoneScreen/NavBarBg/NavBar/CloseBtn, "✖", 18)
 
-	home_btn = _make_nav_button("主屏", UI_ICON_PATHS.home, phone_colors.text)
-	home_btn.pressed.connect(_show_home_screen)
-	nav.add_child(home_btn)
-
-	var close_btn = _make_nav_button("关闭", UI_ICON_PATHS.close, phone_colors.red)
-	close_btn.pressed.connect(close_phone)
-	nav.add_child(close_btn)
 
 # ══════════════════════════════════════════════
 #              主屏幕（APP图标）
@@ -211,43 +179,82 @@ func _show_home_screen():
 
 	for app in apps:
 		var app_btn = VBoxContainer.new()
-		app_btn.add_theme_constant_override("separation", 4)
+		app_btn.add_theme_constant_override("separation", 6)
 		app_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-		var icon_btn = Button.new()
-		icon_btn.custom_minimum_size = Vector2(84, 84)
-		icon_btn.icon = _load_icon(app.icon_path, 62)
-		icon_btn.expand_icon = true
-
+		# 创建图标容器（带渐变背景）
+		var icon_container = PanelContainer.new()
+		icon_container.custom_minimum_size = Vector2(72, 72)
+		
+		# 渐变背景样式
 		var icon_style = StyleBoxFlat.new()
-		icon_style.bg_color = Color(0, 0, 0, 0)
-		icon_style.set_corner_radius_all(22)
-		icon_style.content_margin_left = 4
-		icon_style.content_margin_right = 4
-		icon_style.content_margin_top = 4
-		icon_style.content_margin_bottom = 4
-		icon_btn.add_theme_stylebox_override("normal", icon_style)
-		var icon_hover = icon_style.duplicate()
-		icon_hover.bg_color = Color(app.color.r, app.color.g, app.color.b, 0.14)
-		icon_btn.add_theme_stylebox_override("hover", icon_hover)
-		var icon_pressed = icon_style.duplicate()
-		icon_pressed.bg_color = Color(app.color.r, app.color.g, app.color.b, 0.22)
-		icon_btn.add_theme_stylebox_override("pressed", icon_pressed)
+		icon_style.bg_color = app.color
+		icon_style.set_corner_radius_all(18)
+		icon_style.shadow_color = Color(0, 0, 0, 0.3)
+		icon_style.shadow_size = 4
+		icon_style.shadow_offset = Vector2(0, 2)
+		icon_container.add_theme_stylebox_override("panel", icon_style)
+		
+		# 创建按钮覆盖层
+		var icon_btn = Button.new()
+		icon_btn.flat = true
+		icon_btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		var btn_normal = StyleBoxFlat.new()
+		btn_normal.bg_color = Color(0, 0, 0, 0)
+		btn_normal.set_corner_radius_all(18)
+		icon_btn.add_theme_stylebox_override("normal", btn_normal)
+		var btn_hover = StyleBoxFlat.new()
+		btn_hover.bg_color = Color(1, 1, 1, 0.15)
+		btn_hover.set_corner_radius_all(18)
+		icon_btn.add_theme_stylebox_override("hover", btn_hover)
+		var btn_pressed = StyleBoxFlat.new()
+		btn_pressed.bg_color = Color(0, 0, 0, 0.2)
+		btn_pressed.set_corner_radius_all(18)
+		icon_btn.add_theme_stylebox_override("pressed", btn_pressed)
 		icon_btn.pressed.connect(_open_app.bind(app.id))
-		app_btn.add_child(icon_btn)
+		
+		# Emoji图标
+		var icon_label = Label.new()
+		icon_label.text = app.icon
+		icon_label.add_theme_font_size_override("font_size", 38)
+		icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		icon_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		
+		icon_container.add_child(icon_label)
+		icon_container.add_child(icon_btn)
+		app_btn.add_child(icon_container)
 
+		# 未读消息徽章
 		if app.id == "wechat" and RelationshipManager.npc_data.size() > 0:
 			var unread = _get_total_unread()
 			if unread > 0:
-				var badge = Label.new()
-				badge.text = str(unread)
-				badge.add_theme_font_size_override("font_size", 11)
-				badge.add_theme_color_override("font_color", Color.WHITE)
-				icon_btn.add_child(badge)
+				var badge = PanelContainer.new()
+				badge.position = Vector2(52, -4)
+				badge.custom_minimum_size = Vector2(20, 20)
+				var badge_style = StyleBoxFlat.new()
+				badge_style.bg_color = Color(1.0, 0.25, 0.25)
+				badge_style.set_corner_radius_all(10)
+				badge_style.border_width_left = 2
+				badge_style.border_width_top = 2
+				badge_style.border_width_right = 2
+				badge_style.border_width_bottom = 2
+				badge_style.border_color = phone_colors.screen
+				badge.add_theme_stylebox_override("panel", badge_style)
+				var badge_text = Label.new()
+				badge_text.text = str(min(unread, 99))
+				badge_text.add_theme_font_size_override("font_size", 10)
+				badge_text.add_theme_color_override("font_color", Color.WHITE)
+				badge_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				badge_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+				badge.add_child(badge_text)
+				icon_container.add_child(badge)
 
+		# APP名称
 		var name_lbl = Label.new()
 		name_lbl.text = app.name
-		name_lbl.add_theme_font_size_override("font_size", 12)
+		name_lbl.add_theme_font_size_override("font_size", 13)
 		name_lbl.add_theme_color_override("font_color", phone_colors.text)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		app_btn.add_child(name_lbl)
@@ -792,17 +799,22 @@ func _make_small_icon(path: String, size: int = 16, modulate_color: Color = Colo
 	icon.modulate = modulate_color
 	return icon
 
-func _make_nav_button(label: String, icon_path: String, font_color: Color) -> Button:
-	var btn = Button.new()
-	btn.text = label
-	btn.icon = _load_icon(icon_path, 22)
-	btn.expand_icon = true
-	btn.custom_minimum_size = Vector2(86, 0)
-	btn.add_theme_font_size_override("font_size", 13)
-	btn.add_theme_color_override("font_color", font_color)
-	btn.add_theme_constant_override("h_separation", 8)
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0)
-	btn.add_theme_stylebox_override("normal", style)
-	btn.add_theme_stylebox_override("hover", style)
-	return btn
+func _set_button_emoji(btn: Button, emoji: String, font_size: int = 20):
+	btn.text = emoji
+	btn.add_theme_font_size_override("font_size", font_size)
+	btn.add_theme_color_override("font_color", Color(0.9, 0.92, 0.95))
+
+# ══════════════════════════════════════════════
+#              测试模式
+# ══════════════════════════════════════════════
+func _test_mode():
+	print("PhoneUI 独立测试模式")
+	open_phone()
+	
+	# 添加测试按钮
+	var test_btn = Button.new()
+	test_btn.text = "切换手机"
+	test_btn.custom_minimum_size = Vector2(120, 40)
+	test_btn.position = Vector2(20, 20)
+	test_btn.pressed.connect(toggle_phone)
+	add_child(test_btn)

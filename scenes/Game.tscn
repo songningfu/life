@@ -1,7 +1,21 @@
 [gd_scene format=3 uid="uid://cj6f7vu70deon"]
 
 [ext_resource type="Script" uid="uid://bs4uhhtvcp7vj" path="res://scripts/Game.gd" id="1_ibkli"]
-[ext_resource type="Texture2D" path="res://images/backgrounds/dorm_room_day.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://balo6r1cxcihr" path="res://images/backgrounds/dorm_room_day.png" id="2_bg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background_window"]
+bg_color = Color(0.03, 0.04, 0.06, 0.16)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.38, 0.44, 0.54, 0.22)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.18)
+shadow_size = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_normal"]
 content_margin_left = 12.0
@@ -87,20 +101,6 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background_window"]
-bg_color = Color(0.03, 0.04, 0.06, 0.16)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.38, 0.44, 0.54, 0.22)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 22
-corner_radius_bottom_left = 22
-shadow_color = Color(0, 0, 0, 0.18)
-shadow_size = 20
-
 [node name="GameRoot" type="VBoxContainer" unique_id=370035806]
 anchors_preset = 15
 anchor_right = 1.0
@@ -113,21 +113,12 @@ script = ExtResource("1_ibkli")
 [node name="BackgroundWindow" type="PanelContainer" parent="." unique_id=370035809]
 top_level = true
 z_index = -20
-layout_mode = 1
-offset_left = 12.0
-offset_top = 84.0
-offset_right = 1908.0
-offset_bottom = 1068.0
+layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_background_window")
 
 [node name="SceneBackground" type="TextureRect" parent="BackgroundWindow" unique_id=370035807]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_bg")
 expand_mode = 1
@@ -135,11 +126,6 @@ stretch_mode = 6
 
 [node name="SceneBackgroundShade" type="ColorRect" parent="BackgroundWindow" unique_id=370035808]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 mouse_filter = 2
 color = Color(0.01, 0.015, 0.03, 0.5)
 

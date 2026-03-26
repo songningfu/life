@@ -21,7 +21,7 @@ SaveManager="*res://scripts/SaveManager.gd"
 NamePool="*res://scripts/NamePool.gd"
 RelationshipManager="*res://scripts/RelationshipManager.gd"
 WechatSystem="*res://scripts/WechatSystem.gd"
-PhoneSystem="*res://scripts/PhoneSystem.gd"
+PhoneSystem="*res://scenes/PhoneUI.tscn"
 AudioManager="*res://scripts/AudioManager.gd"
 TalentSystem="*res://scripts/TalentSystem.gd"
 
