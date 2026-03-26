@@ -71,6 +71,24 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_current_card"]
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+bg_color = Color(0.05, 0.075, 0.11, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.27, 0.45, 0.58, 0.72)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 10
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_right_panel"]
 content_margin_left = 14.0
 content_margin_top = 12.0
@@ -255,20 +273,57 @@ theme_override_constants/separation = 8
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
+theme_override_constants/separation = 8
+
+[node name="CurrentCard" type="PanelContainer" parent="MainHBox/LeftPanel" unique_id=123905771]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_current_card")
+
+[node name="CurrentMargin" type="MarginContainer" parent="MainHBox/LeftPanel/CurrentCard" unique_id=123905772]
+layout_mode = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="CurrentVBox" type="VBoxContainer" parent="MainHBox/LeftPanel/CurrentCard/CurrentMargin" unique_id=123905773]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="CurrentHint" type="Label" parent="MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox" unique_id=123905774]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.74, 0.88, 1)
+theme_override_font_sizes/font_size = 13
+text = "当前内容"
+
+[node name="CurrentText" type="RichTextLabel" parent="MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox" unique_id=123905775]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.95, 0.96, 0.98, 1)
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+scroll_active = true
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="MainHBox/LeftPanel" unique_id=1553769099]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LogHeader" type="Label" parent="MainHBox/LeftPanel" unique_id=123905776]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.7, 0.78, 1)
+theme_override_font_sizes/font_size = 13
+text = "日志记录"
 
 [node name="EventText" type="RichTextLabel" parent="MainHBox/LeftPanel" unique_id=1714752636]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/default_color = Color(0.9, 0.92, 0.95, 1)
-theme_override_font_sizes/normal_font_size = 16
+theme_override_font_sizes/normal_font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_event_text")
 bbcode_enabled = true
 scroll_following = true
-
-[node name="ChoicesContainer" type="VBoxContainer" parent="MainHBox/LeftPanel" unique_id=1553769099]
-layout_mode = 2
-theme_override_constants/separation = 8
 
 [node name="NextButton" type="Button" parent="MainHBox/LeftPanel" unique_id=1586175151]
 visible = false

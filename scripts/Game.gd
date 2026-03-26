@@ -138,8 +138,8 @@ var total_days: int = 1460
 
 var year_calendar = [
 	[0,   6,   "开学季",         1],
-	[7,   13,  "军训",           1],
-	[14,  90,  "上学期日常",     1],
+	[7,   20,  "军训",           1],
+	[21,  90,  "上学期日常",     1],
 	[91,  105, "上学期复习周",   1],
 	[106, 120, "上学期考试周",   1],
 	[121, 136, "寒假前",         1],
@@ -219,10 +219,14 @@ var bar_dot_indicators: Array = []
 var bar_phase_color: Color = Color(0.22, 0.58, 0.88, 1)
 var bar_target_phase_color: Color = Color(0.22, 0.58, 0.88, 1)
 var text_reveal_tween: Tween = null
+var current_text_queue: Array[String] = []
+var current_text_busy: bool = false
+var current_text_generation: int = 0
 var text_soft_effect: RichTextEffect = preload("res://scripts/TextSoftFadeEffect.gd").new()
 var text_mark_effect: RichTextEffect = preload("res://scripts/TextHighlightEffect.gd").new()
 
 # ========== 节点引用（直接绑定场景节点）==========
+@onready var current_text: RichTextLabel       = $MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox/CurrentText
 @onready var event_text: RichTextLabel         = $MainHBox/LeftPanel/EventText
 @onready var choices_container: VBoxContainer  = $MainHBox/LeftPanel/ChoicesContainer
 @onready var next_btn: Button                  = $MainHBox/LeftPanel/NextButton
@@ -365,17 +369,22 @@ func _bind_scene_nodes():
 		"mental": $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow/MentalValue,
 		"health": $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow/HealthValue,
 	}
+	current_text.bbcode_enabled = true
+	current_text.scroll_active = true
+	current_text.custom_effects = [text_soft_effect, text_mark_effect]
+	current_text.add_theme_font_size_override("normal_font_size", 20)
+	current_text.add_theme_constant_override("line_separation", 7)
 	event_text.scroll_following = true
 	event_text.custom_effects = [text_soft_effect, text_mark_effect]
-	event_text.add_theme_font_size_override("normal_font_size", 15)
-	event_text.add_theme_constant_override("line_separation", 6)
+	event_text.add_theme_font_size_override("normal_font_size", 14)
+	event_text.add_theme_constant_override("line_separation", 4)
 	var event_style = event_text.get_theme_stylebox("normal")
 	if event_style is StyleBoxFlat:
 		var roomy_style = event_style.duplicate() as StyleBoxFlat
-		roomy_style.content_margin_left = 22
-		roomy_style.content_margin_right = 22
-		roomy_style.content_margin_top = 18
-		roomy_style.content_margin_bottom = 18
+		roomy_style.content_margin_left = 16
+		roomy_style.content_margin_right = 16
+		roomy_style.content_margin_top = 14
+		roomy_style.content_margin_bottom = 14
 		event_text.add_theme_stylebox_override("normal", roomy_style)
 
 	pause_btn.pressed.connect(toggle_pause)
@@ -1049,6 +1058,7 @@ func _show_next_roommate_arrival_step():
 		_style_choice_btn(btn)
 		btn.pressed.connect(_on_roommate_arrival_choice.bind(roommate_intro_sequence_index, choice))
 		choices_container.add_child(btn)
+	_refresh_choice_buttons_state()
 
 func _build_roommate_arrival_text(index: int) -> String:
 	if index < 0 or index >= roommate_roster.size():
@@ -1209,6 +1219,7 @@ func _on_roommate_arrival_choice(index: int, choice: Dictionary):
 	_style_choice_btn(btn)
 	btn.pressed.connect(_show_next_roommate_arrival_step)
 	choices_container.add_child(btn)
+	_refresh_choice_buttons_state()
 
 func _start_roommate_arrival_sequence_v2():
 	roommate_intro_sequence_index = -1
@@ -1235,6 +1246,7 @@ func _show_next_roommate_arrival_step_v2():
 		_style_choice_btn(btn)
 		btn.pressed.connect(_on_roommate_arrival_choice.bind(roommate_intro_sequence_index, choice))
 		choices_container.add_child(btn)
+	_refresh_choice_buttons_state()
 
 func _build_roommate_arrival_text_v2(index: int) -> String:
 	if index < 0 or index >= roommate_roster.size():
@@ -1288,6 +1300,7 @@ func _on_roommate_arrival_choice_v2(index: int, choice: Dictionary):
 	_style_choice_btn(btn)
 	btn.pressed.connect(_show_next_roommate_arrival_step)
 	choices_container.add_child(btn)
+	_refresh_choice_buttons_state()
 
 func _show_game_start_prompt_v2():
 	time_control_bar.visible = true
@@ -1890,6 +1903,8 @@ func _passes_basic_filters(e: Dictionary, info: Dictionary) -> bool:
 			var check_val_max = _get_condition_check_value(attr, float(max_v))
 			if check_val_max > _normalize_condition_threshold(attr, float(max_v)):
 				return false
+	if not _check_day_conditions(e, info):
+		return false
 	return true
 
 func _check_story_timing(e: Dictionary, info: Dictionary) -> bool:
@@ -1918,6 +1933,8 @@ func _check_day_conditions(e: Dictionary, info: Dictionary) -> bool:
 	if dc.has("is_exam") and info.is_exam != dc["is_exam"]:
 		return false
 	if dc.has("is_review") and info.is_review != dc["is_review"]:
+		return false
+	if dc.has("is_military") and info.is_military != dc["is_military"]:
 		return false
 	if dc.has("weekday") and info.weekday not in dc["weekday"]:
 		return false
@@ -2093,9 +2110,58 @@ func _show_event(event_data: Dictionary):
 		btn.pressed.connect(_on_choice.bind(choice, event_data))
 		choices_container.add_child(btn)
 		shown_count += 1
+	_refresh_choice_buttons_state()
 
 	if shown_count == 0:
 		waiting_for_choice = false
+
+func _ensure_npc_met(role_id: String):
+	if RelationshipManager.npc_data.has(role_id):
+		RelationshipManager.npc_data[role_id].met = true
+
+func _apply_relationship_effects(relationship_effects: Dictionary):
+	for role_id in relationship_effects:
+		var amount = int(round(float(relationship_effects[role_id])))
+		if amount == 0:
+			continue
+		RelationshipManager.change_affinity(str(role_id), amount, day_index)
+
+func _relation_level_from_key(level_key: String) -> int:
+	match level_key.to_lower():
+		"stranger":
+			return 0
+		"acquaintance":
+			return 1
+		"friend":
+			return 2
+		"close_friend":
+			return 3
+		"best_friend":
+			return 4
+		"crush":
+			return 5
+		"lover":
+			return 6
+		"ex":
+			return 7
+		_:
+			return -1
+
+func _apply_special_relations(special_relations: Dictionary):
+	for role_id in special_relations:
+		var level = _relation_level_from_key(str(special_relations[role_id]))
+		if level < 0:
+			continue
+		_ensure_npc_met(str(role_id))
+		RelationshipManager.set_special_relation(str(role_id), level)
+
+func _sync_tag_driven_relations():
+	if "in_relationship" in tags:
+		_ensure_npc_met("crush_target")
+		RelationshipManager.set_special_relation("crush_target", 6)
+	elif "crush" in tags or "secret_crush" in tags:
+		_ensure_npc_met("crush_target")
+		RelationshipManager.set_special_relation("crush_target", 5)
 
 func _on_choice(choice: Dictionary, _event_data: Dictionary):
 	var effects = choice.get("effects", {})
@@ -2126,11 +2192,15 @@ func _on_choice(choice: Dictionary, _event_data: Dictionary):
 	if mental < mental_floor:
 		mental = mental_floor
 
+	_apply_relationship_effects(choice.get("relationship_effects", {}))
+	_apply_special_relations(choice.get("special_relations", {}))
+
 	for tag in choice.get("add_tags", []):
 		if tag not in tags:
 			tags.append(tag)
 	for tag in choice.get("remove_tags", []):
 		tags.erase(tag)
+	_sync_tag_driven_relations()
 
 	var result_text = choice.get("result", "")
 	if choice.get("_dynamic", false):
@@ -2355,6 +2425,7 @@ func _start_new_game():
 		text_reveal_tween = null
 	event_text.clear()
 	event_text.visible_characters = -1
+	_reset_current_text_feed()
 	text_line_count = 0
 	_append("[color=#6ec6ff]══════ 大学四年 ══════[/color]\n\n")
 	_clear_choices()
@@ -2652,7 +2723,7 @@ func _load_from_save(data: Dictionary):
 	if text_reveal_tween:
 		text_reveal_tween.kill()
 		text_reveal_tween = null
-	event_text.clear(); event_text.visible_characters = -1; text_line_count = 0
+	event_text.clear(); event_text.visible_characters = -1; _reset_current_text_feed(); text_line_count = 0
 
 	var info = get_date_info()
 	_append("[color=#6ec6ff]══════ 大学四年 ══════[/color]\n\n")
@@ -3059,35 +3130,85 @@ func _format_story_passage(text: String) -> String:
 		return title_line + "\n"
 	return "%s\n\n%s\n" % [title_line, "\n".join(body_lines)]
 
+func _set_choice_buttons_disabled(disabled: bool):
+	for child in choices_container.get_children():
+		if child is BaseButton:
+			(child as BaseButton).disabled = disabled
+
+func _refresh_choice_buttons_state():
+	_set_choice_buttons_disabled(current_text_busy or not current_text_queue.is_empty())
+
+func _reset_current_text_feed():
+	current_text_generation += 1
+	current_text_queue.clear()
+	current_text_busy = false
+	if text_reveal_tween:
+		text_reveal_tween.kill()
+		text_reveal_tween = null
+	current_text.clear()
+	current_text.visible_characters = -1
+	_set_choice_buttons_disabled(false)
+
+func _enqueue_current_text(text: String):
+	var cleaned = text.strip_edges()
+	if cleaned == "":
+		return
+	current_text_queue.append(cleaned)
+	_play_next_current_text()
+
+func _play_next_current_text():
+	if current_text_busy:
+		return
+	if current_text_queue.is_empty():
+		_set_choice_buttons_disabled(false)
+		return
+
+	current_text_busy = true
+	_set_choice_buttons_disabled(true)
+	var generation = current_text_generation
+	var payload = str(current_text_queue.pop_front())
+	current_text.clear()
+	current_text.visible_characters = -1
+	current_text.append_text(payload)
+
+	var end_visible = current_text.get_total_character_count()
+	if end_visible <= 0:
+		current_text_busy = false
+		_play_next_current_text()
+		return
+
+	current_text.visible_characters = 0
+	if text_reveal_tween:
+		text_reveal_tween.kill()
+	var duration = clamp(float(end_visible) * 0.03, 0.2, 2.4)
+	text_reveal_tween = create_tween()
+	text_reveal_tween.tween_property(current_text, "visible_characters", end_visible, duration).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
+	text_reveal_tween.finished.connect(func():
+		if generation != current_text_generation:
+			return
+		current_text.visible_characters = -1
+		text_reveal_tween = null
+		var pause_duration = clampf(0.12 + float(end_visible) * 0.0026, 0.12, 0.55)
+		get_tree().create_timer(pause_duration).timeout.connect(func():
+			if generation != current_text_generation:
+				return
+			current_text_busy = false
+			_play_next_current_text()
+		)
+	)
+
 func _append(text: String):
 	text_line_count += text.count("\n") + 1
 	if text_line_count > max_text_lines:
-		if text_reveal_tween:
-			text_reveal_tween.kill()
 		event_text.clear()
 		event_text.visible_characters = -1
 		event_text.append_text("[color=#555]... 较早的内容已省略 ...[/color]\n\n")
 		text_line_count = 5
-	var start_visible = event_text.get_total_character_count()
-	if event_text.visible_characters >= 0:
-		start_visible = event_text.visible_characters
-	if text_reveal_tween:
-		text_reveal_tween.kill()
 	event_text.append_text(text)
-	var end_visible = event_text.get_total_character_count()
-	if end_visible <= start_visible:
-		event_text.visible_characters = -1
-		return
-	event_text.visible_characters = start_visible
-	var reveal_chars = end_visible - start_visible
-	var duration = clamp(float(reveal_chars) * 0.034, 0.24, 2.2)
-	text_reveal_tween = create_tween()
-	text_reveal_tween.tween_property(event_text, "visible_characters", end_visible, duration).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
-	text_reveal_tween.finished.connect(func():
-		event_text.visible_characters = -1
-		text_reveal_tween = null
-	)
+	event_text.visible_characters = -1
+	_enqueue_current_text(text)
 
 func _clear_choices():
 	for child in choices_container.get_children():
 		child.queue_free()
+	_set_choice_buttons_disabled(false)

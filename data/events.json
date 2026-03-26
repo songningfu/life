@@ -17,7 +17,8 @@
 		  "mental": 5
 		},
 		"add_tags": [
-          "roommate_warm_opening"
+          "roommate_warm_opening",
+          "roommate_intro_done"
 		],
 		"result": "你先开了口，至少没让第一晚冷得太尴尬。哪怕有人不太理你，宿舍里那点生分也还是被你撕开了一个口子。"
 	  },
@@ -28,7 +29,8 @@
 		  "gpa": 3
 		},
 		"add_tags": [
-          "roommate_observer"
+          "roommate_observer",
+          "roommate_intro_done"
 		],
 		"result": "你没有急着表现自己，只是安静地把每个人的样子、说话方式和进门顺序记在心里。后来回头想，这些细节就是宿线真正开始的地方。"
 	  },
@@ -38,7 +40,8 @@
 		  "mental": 3
 		},
 		"add_tags": [
-          "roommate_slow_warm"
+          "roommate_slow_warm",
+          "roommate_intro_done"
 		],
 		"result": "你先把属于自己的那张床和桌子收拾妥当。等人都到齐时，宿舍已经有了热闹和沉默并存的味道，而你也正式成了其中一员。"
 	  }
@@ -97,6 +100,331 @@
           "no_club"
 		],
 		"result": "你慢慢走回宿舍，耳边终于安静下来。室友问你报了什么，你笑着摇头：\"先把日子过明白再说。\""
+	  }
+	]
+  },
+  {
+	"id": "y1s1_military_start",
+	"type": "story",
+	"year_min": 1,
+	"year_max": 1,
+	"semester": 1,
+	"phase": 0,
+	"once": true,
+	"weight": 22,
+	"requires": [
+      "roommate_intro_done"
+	],
+	"day_conditions": {
+	  "is_military": true
+	},
+	"text": "军训第二天，宿舍里已经没人把它当成什么热血开场了。\n有人一边系腰带一边骂太阳，有人盯着镜子里的黑眼圈发呆，还有人昨晚跟着学长跑出去喝酒，今早坐在床边像灵魂刚回体。\n你忽然意识到，这两周的重点可能不是把动作练标准，而是谁能在操场上少受点罪。",
+	"choices": [
+	  {
+		"text": "先去站两天，摸清教官脾气再想办法",
+		"effects": {
+		  "social": 3,
+		  "health": -4,
+		  "mental": -2
+		},
+		"add_tags": [
+          "military_started",
+          "military_hardcarry"
+		],
+		"result": "你咬牙把最晒的那半天熬过去，回来时肩膀酸得像灌了铅。可也正因为硬撑过一轮，你很快摸清了教官点名、放人和抓偷懒的节奏。"
+	  },
+	  {
+		"text": "捂着太阳穴去医务点，先混个见习再说",
+		"effects": {
+		  "social": 2,
+		  "health": -1,
+		  "mental": 4
+		},
+		"add_tags": [
+          "military_started",
+          "military_fake_sick"
+		],
+		"result": "你把脸色演得半真半假，最后真被分去了操场边当见习。比起在队列里晒到发晕，这活轻松得多，也让你第一次有空把整片操场上的人都看个仔细。"
+	  },
+	  {
+		"text": "昨晚喝得太晚，只能硬着头皮去集合",
+		"effects": {
+		  "social": 4,
+		  "health": -7,
+		  "mental": -4,
+		  "living_money": -60
+		},
+		"add_tags": [
+          "military_started",
+          "military_night_drinker"
+		],
+		"result": "你脑袋发沉地站进队伍，太阳一晒，昨晚那点酒气和困意全往上翻。舍友在旁边憋笑，你却在心里默默想：今晚最好别再这么喝。"
+	  }
+	]
+  },
+  {
+	"id": "y1s1_military_girl_meet",
+	"type": "story",
+	"year_min": 1,
+	"year_max": 1,
+	"semester": 1,
+	"phase": 0,
+	"once": true,
+	"weight": 24,
+	"requires": [
+      "military_started"
+	],
+	"day_conditions": {
+	  "is_military": true
+	},
+	"text": "那天你又借口不舒服，被安排在操场边见习。\n正午的塑胶跑道被晒得发白，队伍里的人个个像快蒸熟一样。你正靠着树荫发呆，旁边忽然递来一瓶水。\n你抬头，看见一个穿着迷彩服的女生站在你面前。她看了你两秒，语气平平地说：\"装得挺像的。\"",
+	"choices": [
+	  {
+		"text": "嘴硬回她一句：\"那也得有人配合我演。\"",
+		"effects": {
+		  "social": 5,
+		  "mental": 4
+		},
+		"relationship_effects": {
+		  "crush_target": 12
+		},
+		"special_relations": {
+		  "crush_target": "crush"
+		},
+		"add_tags": [
+          "crush",
+          "military_girl_met"
+		],
+		"result": "她先是愣了一下，随即笑了，笑意很浅，却比太阳底下的风还让人记得住。你们顺着这句玩笑聊了下去，她没拆穿你，你也第一次认真记住了她。"
+	  },
+	  {
+		"text": "干脆承认：\"主要是不想晒，病倒了更亏。\"",
+		"effects": {
+		  "social": 3,
+		  "mental": 5
+		},
+		"relationship_effects": {
+		  "crush_target": 10
+		},
+		"special_relations": {
+		  "crush_target": "crush"
+		},
+		"add_tags": [
+          "crush",
+          "military_girl_met"
+		],
+		"result": "她拧开自己的水瓶，低声说了句\"倒也诚实\"，然后坐到了你旁边。你们没聊太久，可那种被看穿又没被讨厌的感觉，还是让你心里轻轻动了一下。"
+	  },
+	  {
+		"text": "装傻把话题岔开，顺势问她叫什么",
+		"effects": {
+		  "social": 6,
+		  "mental": 3
+		},
+		"relationship_effects": {
+		  "crush_target": 11
+		},
+		"special_relations": {
+		  "crush_target": "crush"
+		},
+		"add_tags": [
+          "crush",
+          "military_girl_met"
+		],
+		"result": "她看出你在转移话题，却还是报了名字。你把那两个字在心里默念了一遍，忽然觉得这场军训总算有了点值得期待的东西。"
+	  }
+	]
+  },
+  {
+	"id": "y1s1_military_night_shift",
+	"type": "story",
+	"year_min": 1,
+	"year_max": 1,
+	"semester": 1,
+	"phase": 0,
+	"once": true,
+	"weight": 22,
+	"requires": [
+      "military_girl_met"
+	],
+	"day_conditions": {
+	  "is_military": true
+	},
+	"text": "军训过半后，宿舍的人已经摸出了自己的生存方式。\n白天能请假就请假，混不上见习就硬撑；晚上训练一结束，谁起头说一句\"出去坐会儿\"，半个宿舍都会跟着溜去校外小馆子喝酒。\n问题是酒总是前一晚喝的，苦却要第二天早上吃。闹钟一响，宿舍很快分成了两种人：一种咬牙爬起来去操场，一种翻身继续睡，打算装死到底。",
+	"choices": [
+	  {
+		"text": "硬撑着去，至少别在点名时缺席",
+		"effects": {
+		  "social": 3,
+		  "health": -6,
+		  "mental": -4,
+		  "living_money": -80
+		},
+		"relationship_effects": {
+		  "crush_target": 6
+		},
+		"add_tags": [
+          "military_morning_resolved",
+          "military_hardcarry_morning"
+		],
+		"result": "你顶着宿醉站进队伍，整个人都像被太阳钉在地上。休息时她一眼就看出你状态不对，皱着眉把藿香正气水塞给你，嘴上说着\"活该\"，人却没走开。"
+	  },
+	  {
+		"text": "翻身继续睡，赌今天没人来查你",
+		"effects": {
+		  "social": -4,
+		  "mental": 5,
+		  "living_money": -80
+		},
+		"relationship_effects": {
+		  "crush_target": 4
+		},
+		"add_tags": [
+          "military_morning_resolved",
+          "military_skip_training"
+		],
+		"result": "你一觉睡到中午，手机里已经堆满了班长和舍友的消息。下午在宿舍楼下撞见她时，她只问了句\"睡醒了？\"语气淡淡的，却让你心虚得一句借口都编不顺。"
+	  },
+	  {
+		"text": "先装病混见习，再慢慢蹭去操场边",
+		"effects": {
+		  "social": 2,
+		  "health": -2,
+		  "mental": 4,
+		  "living_money": -50
+		},
+		"relationship_effects": {
+		  "crush_target": 8
+		},
+		"add_tags": [
+          "military_morning_resolved",
+          "military_fake_sick_master"
+		],
+		"result": "你熟门熟路地把流程走了一遍，又一次成功混成见习。别人还在太阳底下喊口号时，你已经坐到了操场边，而她也比前几天更自然地坐到了你旁边。"
+	  }
+	]
+  },
+  {
+	"id": "y1s1_military_bond",
+	"type": "story",
+	"year_min": 1,
+	"year_max": 1,
+	"semester": 1,
+	"phase": 0,
+	"once": true,
+	"weight": 24,
+	"requires": [
+      "military_morning_resolved"
+	],
+	"day_conditions": {
+	  "is_military": true
+	},
+	"text": "军训后半段，你和她在操场边碰面的次数越来越多。\n你装病、见习、硬撑、睡过头，她几乎都看在眼里；她嘴上总说你不靠谱，可每次真有事，第一个看向的又总是你。\n那天下午队伍里有人差点中暑，场面一乱，所有人的真实反应都被照得很清楚。",
+	"choices": [
+	  {
+		"text": "第一时间过去扶人、拿水、找医务老师",
+		"effects": {
+		  "social": 8,
+		  "health": -2
+		},
+		"relationship_effects": {
+		  "crush_target": 10
+		},
+		"add_tags": [
+          "military_crush_bond"
+		],
+		"result": "你反应比谁都快，几乎没多想就冲了过去。她站在旁边看着你忙前忙后，等人安顿下来后，才低声说了一句：\"原来你也不是只会躲。\""
+	  },
+	  {
+		"text": "先招呼舍友一起搭手，自己留下来陪着",
+		"effects": {
+		  "social": 6,
+		  "mental": 2
+		},
+		"relationship_effects": {
+		  "crush_target": 8
+		},
+		"add_tags": [
+          "military_crush_bond"
+		],
+		"result": "你没逞英雄，而是很快把能帮忙的人都叫了过来。场面稳住后，她看你的眼神明显和之前不一样了，像是第一次把你从\"爱摸鱼的人\"和\"还挺靠谱的人\"放在了一起。"
+	  },
+	  {
+		"text": "先把自己的水递过去，安抚对方别慌",
+		"effects": {
+		  "social": 5
+		},
+		"relationship_effects": {
+		  "crush_target": 6
+		},
+		"add_tags": [
+          "military_crush_bond"
+		],
+		"result": "你没多说，只是先把水塞过去，让对方坐稳喘气。她站在一边帮你扶着人，等事情过去后忽然说：\"你认真起来的时候，和你平时一点都不像。\""
+	  }
+	]
+  },
+  {
+	"id": "y1s1_military_end",
+	"type": "story",
+	"year_min": 1,
+	"year_max": 1,
+	"semester": 1,
+	"phase": 0,
+	"once": true,
+	"weight": 24,
+	"requires": [
+      "military_crush_bond"
+	],
+	"day_conditions": {
+	  "is_military": true
+	},
+	"text": "汇演前一天，所有人终于难得认真起来。\n之前还能插科打诨的动作，到了最后反而没人想再敷衍。宿舍几个人一边骂军训折磨人，一边又不想在最后两天掉链子。\n而你比谁都清楚，自己突然想认真，不只是为了队伍走整齐。",
+	"choices": [
+	  {
+		"text": "这次认真走完，不想在她面前一直像个混子",
+		"effects": {
+		  "social": 5,
+		  "health": -4,
+		  "mental": 4
+		},
+		"relationship_effects": {
+		  "crush_target": 12
+		},
+		"add_tags": [
+          "military_finished",
+          "military_crush_locked"
+		],
+		"result": "那天你没请假，也没找借口，老老实实跟完整个队列。训练结束后，她看着你额头上的汗，轻轻挑了下眉：\"今天倒是没偷懒。\"明明只是句很轻的话，却让你记了一整晚。"
+	  },
+	  {
+		"text": "照样想混，但至少别拖队伍后腿",
+		"effects": {
+		  "social": 2,
+		  "mental": 3
+		},
+		"relationship_effects": {
+		  "crush_target": 7
+		},
+		"add_tags": [
+          "military_finished",
+          "military_crush_locked"
+		],
+		"result": "你还是没变成什么模范标兵，但至少没有再故意划水。她看得出来你在收着玩笑，走回宿舍区时还难得主动和你并肩聊了一路。"
+	  },
+	  {
+		"text": "最后两天还是去当见习，能躲就继续躲",
+		"effects": {
+		  "social": -2,
+		  "mental": 4
+		},
+		"relationship_effects": {
+		  "crush_target": 3
+		},
+		"add_tags": [
+          "military_finished"
+		],
+		"result": "你依旧把偷懒贯彻到了最后。她没说你什么，只是在解散时看了你一眼，像是有点无奈，又像是早就猜到你会这样。"
 	  }
 	]
   },
@@ -380,35 +708,61 @@
 	"phase": 0,
 	"once": true,
 	"weight": 7,
-	"text": "新学期第一周，选修课教室里阳光正好。\n你注意到窗边那个人，低头翻书时侧脸被光勾出一圈柔边，你突然有点走神。",
+	"requires": [
+      "military_girl_met"
+	],
+	"text": "寒假回来后的第一周，你在选修课教室里又看见了她。\n军训时那些在操场边断断续续的闲聊、递过来的水、还有那句\"装得挺像的\"，忽然都顺着记忆一起冒了出来。她抬头看见你，先笑了一下：\"这次总不是来装病的吧？\"",
 	"choices": [
 	  {
-		"text": "下课主动搭话：\"这门课你也第一次上吗？\"",
+		"text": "顺势接话，约她下课后一起去吃饭",
 		"effects": {
-		  "social": 8,
+		  "social": 6,
 		  "mental": 5
+		},
+		"relationship_effects": {
+		  "crush_target": 8
+		},
+		"special_relations": {
+		  "crush_target": "crush"
 		},
 		"add_tags": [
           "crush"
 		],
-		"result": "TA先是愣了一下，随即笑着接话。你们从课程聊到食堂，最后顺理成章交换了微信。"
+		"result": "她没怎么犹豫就答应了。你们一路从军训糗事聊到寒假见闻，原本只停在操场边的关系，也终于开始往日常里延伸。"
 	  },
 	  {
-		"text": "先不打扰，默默把这份心动藏起来",
+		"text": "先聊军训那段日子，把熟悉感慢慢接回来",
 		"effects": {
-		  "mental": -3
+		  "social": 4,
+		  "mental": 2
+		},
+		"relationship_effects": {
+		  "crush_target": 5
+		},
+		"special_relations": {
+		  "crush_target": "crush"
 		},
 		"add_tags": [
-          "secret_crush"
+          "crush"
 		],
-		"result": "你每次上课都会不自觉看向窗边那个位置。明明什么都没发生，心里却总像压着一句没说出口的话。"
+		"result": "你把话题从军训第一天、操场边的树荫聊到宿舍里那些离谱的喝酒夜。她听得一直在笑，气氛比你想象中还自然，像你们之间那根线根本没断过。"
 	  },
 	  {
-		"text": "把注意力拉回课本：先把自己过好",
+		"text": "嘴上还想装镇定，只在微信上慢慢靠近",
 		"effects": {
-		  "gpa": 3
+		  "mental": -2,
+		  "gpa": 2
 		},
-		"result": "你把笔记记得很满，没再抬头。理性告诉你这很正确，只是偶尔还是会想起那一瞬间。"
+		"relationship_effects": {
+		  "crush_target": 3
+		},
+		"special_relations": {
+		  "crush_target": "crush"
+		},
+		"add_tags": [
+          "crush"
+		],
+		"result": "你表面上没多说什么，回去后却忍不住点开和她的聊天框。消息一来一回，看起来比军训时克制，心里的在意却比那时更明显。"
 	  }
 	]
   },
@@ -422,7 +776,8 @@
 	"once": true,
 	"weight": 9,
 	"requires": [
-      "crush"
+      "crush",
+      "military_girl_met"
 	],
 	"text": "你和 TA 聊天越来越自然。\n某天晚上，TA约你去操场散步。跑道边风很轻，天上的星星也很亮。",
 	"choices": [
@@ -430,6 +785,12 @@
 		"text": "停下脚步，认真把心意说出来",
 		"effects": {
 		  "mental": 15
+		},
+		"relationship_effects": {
+		  "crush_target": 15
+		},
+		"special_relations": {
+		  "crush_target": "lover"
 		},
 		"add_tags": [
           "in_relationship"
@@ -440,6 +801,12 @@
 		"text": "把话咽回去，告诉自己再等等",
 		"effects": {
 		  "mental": -5
+		},
+		"relationship_effects": {
+		  "crush_target": 4
+		},
+		"special_relations": {
+		  "crush_target": "crush"
 		},
 		"result": "你们还是像以前一样并肩走着，但你心里那句话越来越重。关系没变坏，只是你有点遗憾。"
 	  }
