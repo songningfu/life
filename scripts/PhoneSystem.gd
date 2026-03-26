@@ -763,7 +763,7 @@ func _create_contact_card(info: Dictionary) -> PanelContainer:
 	vbox.add_child(name_row)
 
 	var name_lbl = Label.new()
-	name_lbl.text = info.get("name", "???")
+	name_lbl.text = info.get("name", "未命名")
 	name_lbl.add_theme_font_size_override("font_size", 16)
 	name_lbl.add_theme_color_override("font_color", phone_colors.text)
 	name_row.add_child(name_lbl)
@@ -981,7 +981,7 @@ func _create_wechat_card(role_id: String, info: Dictionary, conv: Dictionary) ->
 	vbox.add_child(top_row)
 
 	var name_lbl = Label.new()
-	name_lbl.text = info.get("nickname", "???")
+	name_lbl.text = info.get("nickname", "未命名")
 	name_lbl.add_theme_font_size_override("font_size", 16)
 	name_lbl.add_theme_color_override("font_color", phone_colors.text)
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1064,7 +1064,7 @@ func _open_chat(role_id: String):
 	_clear_app_container()
 
 	var info = RelationshipManager.get_npc_display(role_id)
-	_add_app_header(info.get("nickname", "???"), info.get("icon", "👤"))
+	_add_app_header(info.get("nickname", "未命名"), info.get("icon", "👤"))
 
 	if RelationshipManager.npc_data.has(role_id):
 		RelationshipManager.npc_data[role_id].unread_messages = 0

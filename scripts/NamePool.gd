@@ -106,12 +106,12 @@ func get_npc_name(role_id: String) -> Dictionary:
 func get_nickname(role_id: String) -> String:
 	if _assigned_names.has(role_id):
 		return _assigned_names[role_id].nickname
-	return "???"
+	return "未命名"
 
 func get_full_name(role_id: String) -> String:
 	if _assigned_names.has(role_id):
 		return _assigned_names[role_id].full_name
-	return "???"
+	return "未命名"
 
 func _make_nickname(sur: String, given: String, _gender: String) -> String:
 	var roll = _rng.randi() % 100

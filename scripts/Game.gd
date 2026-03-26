@@ -20,6 +20,7 @@ var health: float = 80.0
 # ========== 玩家信息 ==========
 var player_name: String = "你"
 var player_gender: String = "male"
+var player_origin_region: String = ""
 var save_slot: int = 0
 
 # ========== 家庭背景 ==========
@@ -196,12 +197,16 @@ var roommate_confirm_btn: Button
 var roommate_spin_generation: int = 0
 var roommate_pending_stops: int = 0
 var roommate_roster_label: Label
+var roommate_intro_sequence_index: int = -1
 
 # ========== 自动存档 ==========
 var auto_save_interval: int = 30
 var last_auto_save_day: int = 0
 var last_settled_semester_key: String = ""
 var in_overdraft: bool = false
+
+# ========== 个人信息面板 ==========
+var player_info_panel: CanvasLayer = null
 
 # ========== 进度条动画 ==========
 var bar_tween: Tween = null
@@ -213,6 +218,9 @@ var bar_last_target_value: float = 0.0
 var bar_dot_indicators: Array = []
 var bar_phase_color: Color = Color(0.22, 0.58, 0.88, 1)
 var bar_target_phase_color: Color = Color(0.22, 0.58, 0.88, 1)
+var text_reveal_tween: Tween = null
+var text_soft_effect: RichTextEffect = preload("res://scripts/TextSoftFadeEffect.gd").new()
+var text_mark_effect: RichTextEffect = preload("res://scripts/TextHighlightEffect.gd").new()
 
 # ========== 节点引用（直接绑定场景节点）==========
 @onready var event_text: RichTextLabel         = $MainHBox/LeftPanel/EventText
@@ -330,6 +338,12 @@ func _ready():
 
 	if has_node("MainHBox/LeftPanel/CampusMapPanel/CampusMap"):
 		$MainHBox/LeftPanel/CampusMapPanel/CampusMap.setup(self)
+	
+	# 实例化个人信息面板
+	var info_panel_scene = load("res://scenes/PlayerInfoPanel.tscn")
+	if info_panel_scene:
+		player_info_panel = info_panel_scene.instantiate()
+		add_child(player_info_panel)
 
 func _bind_scene_nodes():
 	speed_buttons = [
@@ -351,12 +365,29 @@ func _bind_scene_nodes():
 		"mental": $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow/MentalValue,
 		"health": $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow/HealthValue,
 	}
+	event_text.scroll_following = true
+	event_text.custom_effects = [text_soft_effect, text_mark_effect]
+	event_text.add_theme_font_size_override("normal_font_size", 15)
+	event_text.add_theme_constant_override("line_separation", 6)
+	var event_style = event_text.get_theme_stylebox("normal")
+	if event_style is StyleBoxFlat:
+		var roomy_style = event_style.duplicate() as StyleBoxFlat
+		roomy_style.content_margin_left = 22
+		roomy_style.content_margin_right = 22
+		roomy_style.content_margin_top = 18
+		roomy_style.content_margin_bottom = 18
+		event_text.add_theme_stylebox_override("normal", roomy_style)
 
 	pause_btn.pressed.connect(toggle_pause)
 	(speed_buttons[0] as Button).pressed.connect(set_speed.bind(1.0))
 	(speed_buttons[1] as Button).pressed.connect(set_speed.bind(2.0))
 	(speed_buttons[2] as Button).pressed.connect(set_speed.bind(4.0))
 	$TimeControlBar/PhoneBtn.pressed.connect(func(): PhoneSystem.toggle_phone())
+	if has_node("TimeControlBar/ProfileBtn"):
+		$TimeControlBar/ProfileBtn.pressed.connect(func():
+			if player_info_panel:
+				player_info_panel.toggle(self)
+		)
 	
 	# 绑定顶部状态栏信息标签
 	money_info_label = $TimeControlBar/TopStatusInfo/MoneyInfo
@@ -561,17 +592,18 @@ func _build_roommate_overlay():
 	root.add_child(top_line)
 
 	var title = Label.new()
-	title.text = "新生宿舍分配"
+	title.text = "新生宿舍"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 34)
 	title.add_theme_color_override("font_color", Color(0.9, 0.94, 0.98))
 	root.add_child(title)
 
 	var subtitle = Label.new()
-	subtitle.text = "报到日 · 五人间 · 3号床是你。可以反复换一批，直到你满意。"
+	subtitle.text = "五人间宿舍里，你是第一个到的人，先把 3 号床铺好。接下来，其他四个人会一个一个推门进来。"
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle.add_theme_font_size_override("font_size", 15)
 	subtitle.add_theme_color_override("font_color", Color(0.54, 0.58, 0.65))
+	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(subtitle)
 
 	var divider = HSeparator.new()
@@ -599,36 +631,44 @@ func _build_roommate_overlay():
 	root.add_child(actions)
 
 	roommate_roster_label = Label.new()
-	roommate_roster_label.text = "本次抽到的宿舍名单"
+	roommate_roster_label.text = "五人宿舍全员（含你）"
 	roommate_roster_label.add_theme_font_size_override("font_size", 15)
 	roommate_roster_label.add_theme_color_override("font_color", Color(0.7, 0.76, 0.84))
 	roommate_roster_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	roommate_list_box.add_child(roommate_roster_label)
 
 	roommate_slot_cards.clear()
-	for i in range(4):
+	for bed_no in [1, 2, 3, 4, 5]:
+		if bed_no == 3:
+			var player_card = PanelContainer.new()
+			player_card.custom_minimum_size = Vector2(0, 62)
+			var player_style = StyleBoxFlat.new()
+			player_style.bg_color = Color(0.16, 0.22, 0.28, 1)
+			player_style.border_width_left = 4
+			player_style.border_color = Color(0.98, 0.82, 0.35, 1)
+			player_style.set_corner_radius_all(8)
+			player_style.content_margin_left = 14
+			player_style.content_margin_right = 14
+			player_style.content_margin_top = 10
+			player_style.content_margin_bottom = 10
+			player_card.add_theme_stylebox_override("panel", player_style)
+			var player_label = Label.new()
+			player_label.text = "3号床 | %s | 你" % player_name
+			player_label.add_theme_font_size_override("font_size", 17)
+			player_label.add_theme_color_override("font_color", Color(0.98, 0.92, 0.76))
+			player_card.add_child(player_label)
+			roommate_list_box.add_child(player_card)
+			continue
+
 		var slot_card = _create_roommate_preview_card()
+		_apply_roommate_card_data(slot_card, {
+			"bed_no": bed_no,
+			"name": "等待入住",
+			"title": "还没到",
+			"summary": "你先到了，其他人还在路上。",
+		})
 		roommate_list_box.add_child(slot_card)
 		roommate_slot_cards.append(slot_card)
-
-	var player_card = PanelContainer.new()
-	player_card.custom_minimum_size = Vector2(0, 62)
-	var player_style = StyleBoxFlat.new()
-	player_style.bg_color = Color(0.16, 0.22, 0.28, 1)
-	player_style.border_width_left = 4
-	player_style.border_color = Color(0.98, 0.82, 0.35, 1)
-	player_style.set_corner_radius_all(8)
-	player_style.content_margin_left = 14
-	player_style.content_margin_right = 14
-	player_style.content_margin_top = 10
-	player_style.content_margin_bottom = 10
-	player_card.add_theme_stylebox_override("panel", player_style)
-	var player_label = Label.new()
-	player_label.text = "3号床 · %s · 你自己" % player_name
-	player_label.add_theme_font_size_override("font_size", 17)
-	player_label.add_theme_color_override("font_color", Color(0.98, 0.92, 0.76))
-	player_card.add_child(player_label)
-	roommate_list_box.add_child(player_card)
 
 	roommate_reroll_btn = Button.new()
 	roommate_reroll_btn.text = "换一批"
@@ -658,7 +698,7 @@ func _generate_roommate_preview() -> Array:
 			"nickname": name_data.get("nickname", "某同学"),
 			"name_data": name_data.duplicate(true),
 			"archetype_id": picked.get("id", ""),
-			"title": picked.get("title", "普通室友"),
+			"title": picked.get("title", "普通舍友"),
 			"summary": picked.get("summary", ""),
 			"effects": picked.get("effects", {}).duplicate(true),
 		}
@@ -715,7 +755,7 @@ func _show_roommate_draw_page():
 	_start_roommate_spin(roommate_preview_roster, true)
 
 func _render_roommate_preview():
-	roommate_hint_label.text = "大部分舍友都不太正常，但通常人都还行。极品舍友极其稀有。"
+	roommate_hint_label.text = "你刚把床铺好，门口已经开始有脚步声了。"
 	_animate_roommate_preview_cards()
 
 func _create_roommate_preview_card() -> PanelContainer:
@@ -756,7 +796,7 @@ func _create_roommate_preview_card() -> PanelContainer:
 	top.add_child(bed_badge)
 
 	var name_label = Label.new()
-	name_label.text = "分配中..."
+	name_label.text = "还没到"
 	name_label.add_theme_font_size_override("font_size", 17)
 	name_label.add_theme_color_override("font_color", Color(0.93, 0.95, 0.98))
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -773,7 +813,7 @@ func _create_roommate_preview_card() -> PanelContainer:
 	top.add_child(type_badge)
 
 	var summary = Label.new()
-	summary.text = "新的舍友正在朝这间宿舍走来。"
+	summary.text = "门外传来脚步声，新的舍友正往这间宿舍走来。"
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	summary.add_theme_font_size_override("font_size", 13)
 	summary.add_theme_color_override("font_color", Color(0.68, 0.72, 0.78))
@@ -825,7 +865,7 @@ func _apply_roommate_card_data(card: PanelContainer, roommate: Dictionary):
 	name_label.text = str(roommate.get("name", "某同学"))
 
 	var type_badge = card.get_meta("type_badge") as Label
-	type_badge.text = " %s " % str(roommate.get("title", "普通室友"))
+	type_badge.text = " %s " % str(roommate.get("title", "普通舍友"))
 	var type_style = card.get_meta("type_style") as StyleBoxFlat
 	type_style.bg_color = Color(0.95, 0.78, 0.32, 1) if is_top else Color(0.66, 0.87, 1.0, 1)
 	type_badge.add_theme_stylebox_override("normal", type_style)
@@ -840,7 +880,7 @@ func _random_roommate_roll_for_bed(bed_no: int) -> Dictionary:
 		"bed_no": bed_no,
 		"name": name_data.get("full_name", "某同学"),
 		"archetype_id": picked.get("id", ""),
-		"title": picked.get("title", "普通室友"),
+		"title": picked.get("title", "普通舍友"),
 		"summary": picked.get("summary", ""),
 	}
 
@@ -849,9 +889,9 @@ func _start_roommate_spin(target_roster: Array, first_open: bool = false):
 	var gen = roommate_spin_generation
 	roommate_pending_stops = min(roommate_slot_cards.size(), target_roster.size())
 	_set_roommate_action_enabled(false)
-	roommate_hint_label.text = "宿舍分配中..."
+	roommate_hint_label.text = "你坐在床边听着动静，舍友正在一个个到齐。"
 	if roommate_roster_label:
-		roommate_roster_label.text = "宿舍名单滚动中"
+		roommate_roster_label.text = "正在进宿舍的人"
 	for i in range(roommate_pending_stops):
 		_spin_roommate_card(i, target_roster[i], 0.55 + float(i) * 0.14, gen)
 	if first_open:
@@ -906,6 +946,7 @@ func _reroll_roommates():
 
 func _confirm_roommates():
 	roommate_roster = roommate_preview_roster.duplicate(true)
+	_apply_roommate_first_impressions()
 	for roommate in roommate_roster:
 		var role_id = str(roommate.get("role_id", ""))
 		var archetype_tag = "roommate_" + str(roommate.get("archetype_id", "unknown"))
@@ -916,17 +957,13 @@ func _confirm_roommates():
 			tags.append(archetype_tag)
 		if roommate.get("archetype_id", "") == "top_roommate" and "rare_top_roommate" not in tags:
 			tags.append("rare_top_roommate")
-	if "y1s1_roommate" not in used_event_ids:
-		used_event_ids.append("y1s1_roommate")
+		for intro_tag in roommate.get("persona_tags", []):
+			if intro_tag not in tags:
+				tags.append(intro_tag)
 	_apply_roommate_roster_effects()
 	_finish_roommate_intro()
 
 func _finish_roommate_intro():
-	var top_count = 0
-	for roommate in roommate_roster:
-		if roommate.get("archetype_id", "") == "top_roommate":
-			top_count += 1
-
 	_clear_choices()
 	var tw = create_tween().set_parallel(true)
 	tw.tween_property(roommate_overlay_bg, "modulate:a", 0.0, 0.2)
@@ -942,16 +979,384 @@ func _finish_roommate_intro():
 		roommate_preview_roster.clear()
 		roommate_intro_done = true
 		waiting_for_choice = false
-
-		if top_count > 0:
-			_append("\n[color=#ccc]你看着这一屋子怪人，忽然生出一点荒唐的安心感。\n至少这一届命运，待你还不算太差。[/color]\n")
-		else:
-			_append("\n[color=#ccc]他们好像没一个算得上正常。\n可再听两句、再看两眼，你又觉得这屋子的人，大概都不坏。[/color]\n")
-
-		_show_game_start_prompt()
+		_start_roommate_arrival_sequence()
 	)
 
+func _apply_roommate_first_impressions():
+	var persona_defs = [
+		{
+			"persona_title": "安静冷脸",
+			"persona_summary": "一号舍友，第一眼就很安静。你主动和他说床位更大，他也没接话，只像把距离感穿在身上。",
+			"arrival_label": "一号舍友进门了",
+			"persona_tags": ["roommate_intro_quiet", "roommate_slot_1_first_impression"],
+		},
+		{
+			"persona_title": "热情矮个子",
+			"persona_summary": "二号舍友，个子不高，但进门就先打招呼，是那种会主动把宿舍气氛带热的人。",
+			"arrival_label": "二号舍友也到了",
+			"persona_tags": ["roommate_intro_warm", "roommate_slot_2_first_impression"],
+		},
+		{
+			"persona_title": "会聊家常",
+			"persona_summary": "三号舍友，跟家里人一起来，还主动问你从哪里来，说话自然，给人的第一感觉很会聊天。",
+			"arrival_label": "三号舍友推门进来",
+			"persona_tags": ["roommate_intro_chatty", "roommate_slot_3_first_impression"],
+		},
+		{
+			"persona_title": "闷声到齐",
+			"persona_summary": "四号舍友，等你吃完饭回宿舍时已经在里面了，话不多，存在感却一下把五人间补完整了。",
+			"arrival_label": "四号舍友已经在里面了",
+			"persona_tags": ["roommate_intro_reserved", "roommate_slot_4_first_impression"],
+		},
+	]
+
+	for i in range(min(roommate_roster.size(), persona_defs.size())):
+		var roommate = roommate_roster[i]
+		var persona = persona_defs[i]
+		roommate["intro_index"] = i + 1
+		roommate["persona_title"] = persona.get("persona_title", "")
+		roommate["persona_summary"] = persona.get("persona_summary", "")
+		roommate["arrival_label"] = persona.get("arrival_label", "")
+		roommate["persona_tags"] = persona.get("persona_tags", []).duplicate()
+		roommate_roster[i] = roommate
+
+func _start_roommate_arrival_sequence():
+	_start_roommate_arrival_sequence_v2()
+	return
+	roommate_intro_sequence_index = -1
+	waiting_for_choice = true
+	time_running = false
+	var info = get_date_info()
+	_append("\n[color=#aaa][ %d月%d日 %s ][/color]\n" % [info.month, info.day, info.weekday_name])
+	_append("[color=#ccc]你是第一个到宿舍的人。\n行李箱轮子停下来的那一刻，整间五人宿舍还是空的，只有铁床、木桌、窗外闷热的风，还有一种刚离开旧生活的陌生感。\n你先把 3 号床收拾好，床单一点点铺平，像是在给自己铺一段真正要开始的新日子。\n门外偶尔传来脚步声。你知道，再过一会儿，另外四个人会一个一个走进来，而这间宿舍也会从今天起变成你大学四年最难绕开的地方。[/color]\n")
+	_show_next_roommate_arrival_step()
+
+func _show_next_roommate_arrival_step():
+	_show_next_roommate_arrival_step_v2()
+	return
+	roommate_intro_sequence_index += 1
+	_clear_choices()
+
+	if roommate_intro_sequence_index >= roommate_roster.size():
+		_append("[color=#ccc]虽然大家还不熟，但这间宿舍已经开始有了会一起过很多天的感觉。[/color]\n")
+		_show_roommate_opening_event()
+		return
+
+	_append(_build_roommate_arrival_text(roommate_intro_sequence_index))
+	for choice in _get_roommate_arrival_choices(roommate_intro_sequence_index):
+		var btn = Button.new()
+		btn.text = "  " + str(choice.get("text", "继续"))
+		_style_choice_btn(btn)
+		btn.pressed.connect(_on_roommate_arrival_choice.bind(roommate_intro_sequence_index, choice))
+		choices_container.add_child(btn)
+
+func _build_roommate_arrival_text(index: int) -> String:
+	if index < 0 or index >= roommate_roster.size():
+		return ""
+
+	var roommate = roommate_roster[index]
+	var roommate_name = str(roommate.get("name", "舍友"))
+	var persona_title = str(roommate.get("persona_title", "第一印象"))
+	var label = str(roommate.get("arrival_label", "舍友到了"))
+
+	match index:
+		0:
+			return "[color=#8fd3ff]【%s】%s · %s[/color]\n[color=#ccc]门第一次被推开时，宿舍里连空气都像跟着停了一下。\n%s站在门口，手里还扶着行李杆，神情安静得近乎冷淡，像是整个人都还留在门外，还没真正走进来。\n你主动跟他说：“这个床位大一点，你可以选这个。”\n他抬眼看了你一下，目光短暂停在你脸上，却没接话，只转身又跟着父母一起出去了。\n门重新合上后，你忽然觉得，这个人以后要么很难靠近，要么一旦靠近，就会被你记很久。[/color]\n" % [label, roommate_name, persona_title, roommate_name]
+		1:
+			return "[color=#8fd3ff]【%s】%s · %s[/color]\n[color=#ccc]第二次响起的脚步声明显轻快一些。\n%s个子不高，进门时甚至差点被门槛绊一下，可他自己先笑了出来，行李都还没放稳，就冲你抬手打招呼：“你好啊，我来晚了没？”\n这一句带着笑意的招呼落下来，整间宿舍一下有了点活气，像终于从空房间变成了有人会住的地方。[/color]\n" % [label, roommate_name, persona_title, roommate_name]
+		2:
+			return "[color=#8fd3ff]【%s】%s · %s[/color]\n[color=#ccc]%s是跟父亲和姐姐一起来的。\n他进门后先帮家里人把东西往里挪，动作不急不慢，等一切稍微稳下来，才转过头问你：“你从哪里来？”\n你说新疆。\n他点点头，说：“那是个好地方。”\n这句话并不复杂，却说得很自然，不像硬找话题，更像他真的愿意和你把第一句认识说得像样一点。你当时就觉得，这个人以后多半是宿舍里最会把气氛接住的那种。[/color]\n" % [label, roommate_name, persona_title, roommate_name]
+		3:
+			return "[color=#8fd3ff]【%s】%s · %s[/color]\n[color=#ccc]等你晚上吃完饭再回宿舍时，天色已经暗了一层。\n门一推开，%s已经在里面了，正低头整理自己的东西，动作很轻，像是不想惊动任何人。\n你们没说太多话，宿舍里只剩行李挪动、塑料袋摩擦和床板偶尔发出的轻响。\n可也就是在那一刻，你忽然特别清楚地意识到，这间五人宿舍的人终于差不多到齐了。往后无数个早起、熄灯、夜聊、冷战和笑声，大概都会从今晚开始。[/color]\n" % [label, roommate_name, persona_title, roommate_name]
+		_:
+			return ""
+
+func _get_roommate_arrival_choices(index: int) -> Array:
+	match index:
+		0:
+			return [
+				{
+					"text": "再主动一点：“要不我帮你把箱子先推进来？”",
+					"result": "他像是没料到你会再接一句，停了一下，才低低回了句：“不用，我自己来。”\n声音很轻，几乎要被走廊里的动静盖过去，但到底算是你们之间真正意义上的第一句完整对话。\n你忽然意识到，他不是故意显得冷，只是把自己关得很紧，像在刚进大学的第一天，也还没学会怎么一下子融进陌生人里。",
+					"effects": {"social": 2, "mental": 1},
+					"memory": "第一次对话时，你主动想帮他搬东西，他低声回了句“不用，我自己来”。",
+					"choice_id": "quiet_help_offer",
+				},
+				{
+					"text": "识趣地让开半步：“行，你先慢慢看床位。”",
+					"result": "你没有继续追问，只往旁边让了半步，把门口的位置腾给他。\n他看了你一眼，轻轻点了下头，还是没多说什么。\n可也正因为那一下安静的点头，你反而更容易记住他。大学第一天，总有人靠一句热闹的话让人记住，也总有人靠一句都没说出口的话留下印象。",
+					"effects": {"mental": 2},
+					"memory": "第一次见面时，你给了他一点空间，他只轻轻点了下头，没有把距离拉得更远。",
+					"choice_id": "quiet_give_space",
+				},
+				{
+					"text": "先把这人记住，不再硬聊",
+					"result": "你没再往下接话，只在心里先给他贴了个“很难靠近”的标签。\n他跟着父母出门后，宿舍又重新安静下来，像刚才那场短得不能再短的碰面根本没真正开始过。\n可偏偏是这种戛然而止，最容易在很多天以后突然想起来。",
+					"effects": {"social": -1, "mental": -1},
+					"memory": "你第一眼就觉得他不太好接近，于是没再继续找话题。",
+					"choice_id": "quiet_back_off",
+				},
+			]
+		1:
+			return [
+				{
+					"text": "笑着接话：“你这招呼打得还挺快，叫什么名字？”",
+					"result": "他把行李往床边一放，立刻顺着你的话往下聊，连名字和老家都报得利利索索，像是根本不知道“拘谨”两个字怎么写。\n你们明明才刚见面，几句话一接上，宿舍里的空气就跟着松快起来。\n有些人天生不是为了制造尴尬来的，而是专门在这种第一天、第一晚、第一句问候里，把“陌生”往后推一大截。",
+					"effects": {"social": 3, "mental": 1},
+					"memory": "二号舍友一进门就热情接上了你的话，像天生就不怕生。",
+					"choice_id": "warm_chat_back",
+				},
+				{
+					"text": "先帮他扶一把行李，再边走边聊",
+					"result": "你上手帮他把包往里挪，他立刻笑着说了句“谢了哥们”。\n他人不高，动作却很麻利，嘴上也一直没停，像是很自然就把你划进了“可以先熟起来”的范围。\n那一瞬间你会觉得，大学有时候就是这样开始的，不一定靠什么大事，只靠有人进门时，你顺手帮他扶了一下箱子。",
+					"effects": {"social": 2, "health": -1},
+					"memory": "你帮他搭了把手，他立刻热情回应，像那种很容易熟起来的人。",
+					"choice_id": "warm_help_luggage",
+				},
+				{
+					"text": "顺手开个玩笑：“你这一进门，宿舍总算有点人气了。”",
+					"result": "他先愣了一下，随即笑出声来，说“那我可算来对了”。\n一句玩笑把气氛彻底带活了，连你自己都觉得这一晚终于不像独自待在空房间里。\n直到很多天以后你回头想，宿舍真正开始有“宿舍味”的那一刻，也许就是这句半开玩笑的话落下来的时候。",
+					"effects": {"social": 2, "mental": 2},
+					"memory": "你用一句玩笑把场子热起来，他也很自然地接住了。",
+					"choice_id": "warm_joke_opening",
+				},
+			]
+		2:
+			return [
+				{
+					"text": "笑着说自己是北方来的",
+					"result": "你说自己是北方来的。\n他点了点头，接得很自然，说北方人说话听着就敞亮，还顺势问了你几句家那边的天气和吃饭口味。\n你一边回，一边忽然觉得，自己像是把过去很多年的生活，正式带进了这间宿舍。而他没有把这句自我介绍接得很轻，反而认真听住了。",
+					"effects": {"social": 2, "mental": 2},
+					"memory": "你告诉他自己是北方来的，他接话很自然，也认真听你往下说。",
+					"choice_id": "chatty_talk_north",
+					"set_player_origin_region": "north",
+					"add_tags": ["player_from_north"],
+				},
+				{
+					"text": "笑着说自己是南方来的",
+					"result": "你说自己是南方来的。\n他一下就把话接了过去，说南方好啊，气候、吃的、口音，随便哪一样都够聊很久。你们站在床边就这么聊开了，像刚见面就把陌生感拆掉了一层。\n有些人适合深夜才熟起来，有些人则在第一眼、第一问里就把距离拉近了。",
+					"effects": {"social": 3},
+					"memory": "你告诉他自己是南方来的，他立刻把话题接下去，明显很会聊天。",
+					"choice_id": "chatty_talk_south",
+					"set_player_origin_region": "south",
+					"add_tags": ["player_from_south"],
+				},
+				{
+					"text": "先笑笑，只说以后慢慢聊家里那边",
+					"result": "你没把话题一下说深，只是笑着说以后熟了再慢慢聊。\n他也不追问，反而很自然地点点头，把这句留白接住了。你能感觉到，他不是非得现在就问清楚，而是真的懂得给人留余地。",
+					"effects": {"social": 2, "ability": 1},
+					"memory": "他问你哪里人时，你没立刻细说，他也没有追问，反而显得很有分寸。",
+					"choice_id": "chatty_hold_region",
+				},
+			]
+		3:
+			return [
+				{
+					"text": "主动问一句：“你已经收拾多久了？”",
+					"result": "他手上的动作顿了顿，才回你一句“刚到没多久”。\n话还是不多，但至少把沉默撬开了一条缝。\n你听得出来，他不是不想说，而是天生慢热，像那种需要时间去煮开的水，不会一下滚起来，却未必不热。",
+					"effects": {"social": 1, "mental": 1},
+					"memory": "四号舍友说话很省，但你主动问时，他还是会认真回一句。",
+					"choice_id": "reserved_small_talk",
+				},
+				{
+					"text": "顺手告诉他插座和桌位怎么分比较顺",
+					"result": "你把宿舍里已经看明白的插座、桌位和通道说给他听，他抬头看了你一眼，说了句“好，我知道了”。\n这句话很短，却有一种愿意记你这份提醒的感觉。\n有时候宿舍关系不是从热闹开始的，而是从“我先把这点细节告诉你”这种小事开始的。",
+					"effects": {"ability": 1, "social": 1},
+					"memory": "你先把宿舍里的细节告诉了他，他虽然寡言，但明显把你的提醒听进去了。",
+					"choice_id": "reserved_share_layout",
+				},
+				{
+					"text": "点点头打个招呼，先各自收拾",
+					"result": "你们只是简单点了点头，谁也没把对话硬往下接。\n宿舍里只剩布料摩擦和箱子开合的声音，但这种不打扰彼此的安静，反而让第一晚显得没那么别扭。\n等很多天以后你再回头想，也许会发现，有些关系最开始并不是靠说了什么，而是靠彼此都没让对方难堪。",
+					"effects": {"mental": 2},
+					"memory": "你们没聊太多，却很快形成了一种互不打扰的默契。",
+					"choice_id": "reserved_nod_only",
+				},
+			]
+		_:
+			return []
+
+func _on_roommate_arrival_choice(index: int, choice: Dictionary):
+	_on_roommate_arrival_choice_v2(index, choice)
+	return
+	var effects = choice.get("effects", {})
+	_apply_story_effects(effects)
+	for tag in choice.get("add_tags", []):
+		if tag not in tags:
+			tags.append(tag)
+	for tag in choice.get("remove_tags", []):
+		tags.erase(tag)
+	var origin_region = str(choice.get("set_player_origin_region", ""))
+	if origin_region != "":
+		_set_player_origin_region(origin_region)
+	_remember_roommate_intro(
+		index,
+		str(choice.get("memory", "")),
+		str(choice.get("choice_id", ""))
+	)
+
+	var result_text = str(choice.get("result", ""))
+	if result_text != "":
+		_append("[color=#ccc]%s[/color]\n" % result_text)
+
+	var effect_hint = _format_effect_hint(effects, [], [])
+	if effect_hint != "":
+		_append("[color=#888](%s)[/color]\n" % effect_hint)
+
+	_clear_choices()
+	var btn = Button.new()
+	btn.text = "  " + _roommate_arrival_continue_text(index)
+	_style_choice_btn(btn)
+	btn.pressed.connect(_show_next_roommate_arrival_step)
+	choices_container.add_child(btn)
+
+func _start_roommate_arrival_sequence_v2():
+	roommate_intro_sequence_index = -1
+	waiting_for_choice = true
+	time_running = false
+	var info = get_date_info()
+	_append("\n[color=#aaa][ %d月%d日 %s ][/color]\n" % [info.month, info.day, info.weekday_name])
+	_append_soft("[color=#ccc]你是第一个到宿舍的人。\n行李箱轮子停下来的那一刻，整间五人宿舍还是空的，只有铁床、木桌、窗外闷热的风，还有一种刚离开旧生活的陌生感。\n你先把 3 号床收拾好，床单一点点铺平，像是在给自己铺一段真正要开始的新日子。\n门外偶尔传来脚步声。你知道，再过一会儿，另外四个人会一个个走进来，而这间宿舍也会从今天起变成你大学四年最难绕开的地方。[/color]\n", "span=0.34 delay=0.016 distance=14 rise=3.5")
+	_show_next_roommate_arrival_step_v2()
+
+func _show_next_roommate_arrival_step_v2():
+	roommate_intro_sequence_index += 1
+	_clear_choices()
+
+	if roommate_intro_sequence_index >= roommate_roster.size():
+		_append_marked("[color=#ccc]虽然大家还不熟，但这间宿舍已经开始有了会一起过很多天的感觉。[/color]\n", "strength=0.08 speed=1.1 phase=0.12")
+		_show_roommate_opening_event()
+		return
+
+	_append_soft(_format_story_passage(_build_roommate_arrival_text_v2(roommate_intro_sequence_index)), "span=0.3 delay=0.014 distance=12 rise=2.8")
+	for choice in _get_roommate_arrival_choices(roommate_intro_sequence_index):
+		var btn = Button.new()
+		btn.text = "  " + str(choice.get("text", "继续"))
+		_style_choice_btn(btn)
+		btn.pressed.connect(_on_roommate_arrival_choice.bind(roommate_intro_sequence_index, choice))
+		choices_container.add_child(btn)
+
+func _build_roommate_arrival_text_v2(index: int) -> String:
+	if index < 0 or index >= roommate_roster.size():
+		return ""
+
+	var roommate = roommate_roster[index]
+	var roommate_name = str(roommate.get("name", "舍友"))
+	var persona_title = str(roommate.get("persona_title", "第一印象"))
+	var label = str(roommate.get("arrival_label", "舍友到了"))
+
+	match index:
+		0:
+			return "[color=#8fd3ff]【%s】%s · %s[/color]\n[color=#ccc]门第一次被推开时，宿舍里连空气都像跟着停了一下。\n%s站在门口，手里还扶着行李杆，神情安静得近乎冷淡，像是整个人都还留在门外，还没真正走进来。\n你主动跟他说：“这个床位大一点，你可以选这个。”\n他抬眼看了你一下，目光短暂停在你脸上，却没接话，只转身又跟着父母一起出去了。\n门重新合上后，你忽然觉得，这个人以后要么很难靠近，要么一旦靠近，就会被你记很久。[/color]\n" % [label, roommate_name, persona_title, roommate_name]
+		1:
+			return "[color=#8fd3ff]【%s】%s · %s[/color]\n[color=#ccc]第二次响起的脚步声明显轻快一些。\n%s个子不高，进门时甚至差点被门槛绊一下，可他自己先笑了出来，行李都还没放稳，就冲你抬手打招呼：“你好啊，我来晚了没？”\n这一句带着笑意的招呼落下来，整间宿舍一下有了点活气，像终于从空房间变成了有人会住的地方。[/color]\n" % [label, roommate_name, persona_title, roommate_name]
+		2:
+			return "[color=#8fd3ff]【%s】%s · %s[/color]\n[color=#ccc]%s是跟父亲和姐姐一起来的。\n他进门后先帮家里人把东西往里挪，动作不急不慢，等一切稍微稳下来，才转过头问你：“你从哪里来？”\n这个问题不重，却一下把你也拉进了这间宿舍。\n他说话自然，不像硬找话题，更像真的愿意和你把第一句认识说得像样一点。你当时就觉得，这个人以后多半是宿舍里最会把气氛接住的那种。[/color]\n" % [label, roommate_name, persona_title, roommate_name]
+		3:
+			return "[color=#8fd3ff]【%s】%s · %s[/color]\n[color=#ccc]等你晚上吃完饭再回宿舍时，天色已经暗了一层。\n门一推开，%s已经在里面了，正低头整理自己的东西，动作很轻，像是不想惊动任何人。\n你们没说太多话，宿舍里只剩行李挪动、塑料袋摩擦和床板偶尔发出的轻响。\n可也就是在那一刻，你忽然特别清楚地意识到，这间五人宿舍的人终于差不多到齐了。往后无数个早起、熄灯、夜聊、冷战和笑声，大概都会从今晚开始。[/color]\n" % [label, roommate_name, persona_title, roommate_name]
+		_:
+			return ""
+
+func _on_roommate_arrival_choice_v2(index: int, choice: Dictionary):
+	var effects = choice.get("effects", {})
+	_apply_story_effects(effects)
+	for tag in choice.get("add_tags", []):
+		if tag not in tags:
+			tags.append(tag)
+	for tag in choice.get("remove_tags", []):
+		tags.erase(tag)
+	var origin_region = str(choice.get("set_player_origin_region", ""))
+	if origin_region != "":
+		_set_player_origin_region(origin_region)
+	_remember_roommate_intro(
+		index,
+		str(choice.get("memory", "")),
+		str(choice.get("choice_id", ""))
+	)
+
+	var result_text = str(choice.get("result", ""))
+	if result_text != "":
+		_append_soft(_format_story_passage("[color=#ccc]%s[/color]\n" % result_text), "span=0.24 delay=0.01 distance=8 rise=1.6")
+
+	var effect_hint = _format_effect_hint(effects, [], [])
+	if effect_hint != "":
+		_append("[color=#888](%s)[/color]\n" % effect_hint)
+
+	_clear_choices()
+	var btn = Button.new()
+	btn.text = "  " + _roommate_arrival_continue_text(index)
+	_style_choice_btn(btn)
+	btn.pressed.connect(_show_next_roommate_arrival_step)
+	choices_container.add_child(btn)
+
+func _show_game_start_prompt_v2():
+	time_control_bar.visible = true
+	next_btn.visible = false
+	_append_soft("\n[color=#888]点击上方 ▶ 开始，时间就会真正往前走。[/color]\n", "span=0.22 delay=0.008 distance=6 rise=1.0")
+	_append_soft("[color=#888]大学生活从这一天开始，事件出现时会自动暂停。[/color]\n\n", "span=0.22 delay=0.008 distance=6 rise=1.0")
+	update_ui()
+	_update_time_display()
+
+func _apply_story_effects(effects: Dictionary):
+	for attr in effects:
+		var val = float(effects[attr])
+		if val > 0:
+			match attr:
+				"social":
+					val *= TalentSystem.get_social_multiplier()
+				"ability":
+					val *= TalentSystem.get_ability_multiplier()
+		elif val < 0:
+			match attr:
+				"health":
+					val *= TalentSystem.get_health_loss_multiplier()
+				"mental":
+					val *= TalentSystem.get_mental_loss_multiplier()
+		match attr:
+			"money":
+				living_money += _convert_money_effect(int(val))
+			"living_money":
+				living_money += int(round(val))
+			_:
+				_set_attr(attr, _get_attr(attr) + val)
+	_clamp_all()
+	var mental_floor = TalentSystem.get_mental_floor()
+	if mental < mental_floor:
+		mental = mental_floor
+	update_ui()
+
+func _remember_roommate_intro(index: int, memory_text: String, choice_id: String = ""):
+	if index < 0 or index >= roommate_roster.size():
+		return
+	var roommate = roommate_roster[index]
+	if memory_text != "":
+		roommate["intro_memory"] = memory_text
+	if choice_id != "":
+		roommate["intro_choice_id"] = choice_id
+	roommate_roster[index] = roommate
+
+func _set_player_origin_region(region: String):
+	player_origin_region = region
+	if region == "north":
+		tags.erase("player_from_south")
+	elif region == "south":
+		tags.erase("player_from_north")
+
+func _roommate_arrival_continue_text(index: int) -> String:
+	if index >= roommate_roster.size() - 1:
+		return "宿舍五个人终于到齐了"
+	return "看看下一个舍友"
+
+func _show_roommate_opening_event():
+	var event_data = _find_event_by_id("y1s1_roommate")
+	if event_data.is_empty():
+		_show_game_start_prompt()
+		return
+	_show_event(event_data)
+
 func _show_game_start_prompt():
+	_show_game_start_prompt_v2()
+	return
 	time_control_bar.visible = true
 	next_btn.visible = false
 	_append("\n[color=#888]点击上方 ▶ 开始，时间就会真正往前走。[/color]\n")
@@ -971,19 +1376,24 @@ func _process(delta):
 		_advance_one_day()
 		
 func _input(event):
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		if PhoneSystem.is_open:
-			PhoneSystem.close_phone()
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_I and player_info_panel:
+			player_info_panel.toggle(self)
+			get_viewport().set_input_as_handled()
 			return
-		# 如果菜单已打开，按ESC关闭
-		var existing = get_tree().root.get_node_or_null("EscMenuLayer")
-		if existing:
-			existing.queue_free()
-			if not game_over:
-				time_running = true
-				_update_time_display()
-			return
-		_show_esc_menu()
+		if event.keycode == KEY_ESCAPE:
+			if PhoneSystem.is_open:
+				PhoneSystem.close_phone()
+				return
+			# 如果菜单已打开，按ESC关闭
+			var existing = get_tree().root.get_node_or_null("EscMenuLayer")
+			if existing:
+				existing.queue_free()
+				if not game_over:
+					time_running = true
+					_update_time_display()
+				return
+			_show_esc_menu()
 
 func _show_esc_menu():
 	if game_over:
@@ -1746,8 +2156,11 @@ func _on_choice(choice: Dictionary, _event_data: Dictionary):
 
 	if not game_over:
 		waiting_for_choice = false
-		time_running = true
-		_update_time_display()
+		if str(_event_data.get("id", "")) == "y1s1_roommate":
+			_show_game_start_prompt()
+		else:
+			time_running = true
+			_update_time_display()
 
 # ══════════════════════════════════════════════
 #              时间控制
@@ -1937,7 +2350,11 @@ func _apply_major_profile(profile: Dictionary, fallback_id: String = "undeclared
 	major_exam_difficulty = float(profile.get("exam_difficulty", 1.0))
 
 func _start_new_game():
+	if text_reveal_tween:
+		text_reveal_tween.kill()
+		text_reveal_tween = null
 	event_text.clear()
+	event_text.visible_characters = -1
 	text_line_count = 0
 	_append("[color=#6ec6ff]══════ 大学四年 ══════[/color]\n\n")
 	_clear_choices()
@@ -2138,6 +2555,7 @@ func _serialize_state() -> Dictionary:
 	var info = get_date_info()
 	return {
 		"player_name": player_name, "player_gender": player_gender,
+		"player_origin_region": player_origin_region,
 		"university_tier": university_tier,
 		"university_name": university_name,
 		"major_id": major_id,
@@ -2171,6 +2589,7 @@ func _serialize_state() -> Dictionary:
 func _load_from_save(data: Dictionary):
 	player_name = data.get("player_name", "你")
 	player_gender = data.get("player_gender", "male")
+	player_origin_region = data.get("player_origin_region", "")
 	university_tier = data.get("university_tier", "normal")
 	university_name = data.get("university_name", _default_university_name_from_tier(university_tier))
 	major_id = data.get("major_id", "undeclared")
@@ -2230,7 +2649,10 @@ func _load_from_save(data: Dictionary):
 	_clamp_all()
 	game_started = true; game_over = false
 	time_control_bar.visible = true; next_btn.visible = false
-	event_text.clear(); text_line_count = 0
+	if text_reveal_tween:
+		text_reveal_tween.kill()
+		text_reveal_tween = null
+	event_text.clear(); event_text.visible_characters = -1; text_line_count = 0
 
 	var info = get_date_info()
 	_append("[color=#6ec6ff]══════ 大学四年 ══════[/color]\n\n")
@@ -2288,6 +2710,7 @@ func _translate_tag(tag: String) -> String:
 		"roommate_night_snacker": "夜宵舍友", "roommate_anime_voice": "二次元舍友",
 		"roommate_coupon_master": "省钱舍友", "roommate_romance_advisor": "恋爱军师舍友",
 		"roommate_top_roommate": "极品舍友", "rare_top_roommate": "宿舍隐藏SSR",
+		"player_from_north": "来自北方", "player_from_south": "来自南方",
 	}
 	return t.get(tag, tag)
 
@@ -2602,13 +3025,68 @@ func _style_choice_btn(btn: Button):
 # ══════════════════════════════════════════════
 #           文本工具
 # ══════════════════════════════════════════════
+func _wrap_text_effect(text: String, tag_name: String, params: String = "") -> String:
+	if text == "" or tag_name == "":
+		return text
+	var opening = "[" + tag_name
+	var clean_params = params.strip_edges()
+	if clean_params != "":
+		opening += " " + clean_params
+	opening += "]"
+	return "%s%s[/%s]" % [opening, text, tag_name]
+
+func _append_soft(text: String, params: String = "span=0.26 delay=0.012 distance=10 rise=2.2"):
+	_append(_wrap_text_effect(text, "soft", params))
+
+func _append_marked(text: String, params: String = "strength=0.1 speed=1.6 phase=0.16"):
+	var marked = _wrap_text_effect(text, "mark", params)
+	_append(_wrap_text_effect(marked, "soft", "span=0.28 delay=0.012 distance=8 rise=1.8"))
+
+func _format_story_passage(text: String) -> String:
+	var lines = text.split("\n", false)
+	if lines.size() <= 1:
+		return text
+
+	var title_line = lines[0].strip_edges()
+	var body_lines: Array[String] = []
+	for i in range(1, lines.size()):
+		var line = lines[i].strip_edges()
+		if line == "":
+			continue
+		body_lines.append(line)
+
+	if body_lines.is_empty():
+		return title_line + "\n"
+	return "%s\n\n%s\n" % [title_line, "\n".join(body_lines)]
+
 func _append(text: String):
 	text_line_count += text.count("\n") + 1
 	if text_line_count > max_text_lines:
+		if text_reveal_tween:
+			text_reveal_tween.kill()
 		event_text.clear()
+		event_text.visible_characters = -1
 		event_text.append_text("[color=#555]... 较早的内容已省略 ...[/color]\n\n")
 		text_line_count = 5
+	var start_visible = event_text.get_total_character_count()
+	if event_text.visible_characters >= 0:
+		start_visible = event_text.visible_characters
+	if text_reveal_tween:
+		text_reveal_tween.kill()
 	event_text.append_text(text)
+	var end_visible = event_text.get_total_character_count()
+	if end_visible <= start_visible:
+		event_text.visible_characters = -1
+		return
+	event_text.visible_characters = start_visible
+	var reveal_chars = end_visible - start_visible
+	var duration = clamp(float(reveal_chars) * 0.034, 0.24, 2.2)
+	text_reveal_tween = create_tween()
+	text_reveal_tween.tween_property(event_text, "visible_characters", end_visible, duration).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
+	text_reveal_tween.finished.connect(func():
+		event_text.visible_characters = -1
+		text_reveal_tween = null
+	)
 
 func _clear_choices():
 	for child in choices_container.get_children():

@@ -198,6 +198,15 @@ texture_normal = SubResource("AtlasTexture_phone")
 ignore_texture_size = true
 stretch_mode = 5
 
+[node name="ProfileBtn" type="Button" parent="TimeControlBar" unique_id=272465694]
+custom_minimum_size = Vector2(78, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.9, 0.96, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
+text = "Profile"
+
 [node name="VSeparator2" type="VSeparator" parent="TimeControlBar" unique_id=285384388]
 layout_mode = 2
 

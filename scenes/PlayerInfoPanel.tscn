@@ -1,0 +1,366 @@
+[gd_scene format=3 uid="uid://bvn8x7y2qm3pk"]
+
+[ext_resource type="Script" path="res://scripts/PlayerInfoPanel.gd" id="1_info"]
+
+[node name="PlayerInfoPanel" type="CanvasLayer"]
+layer = 150
+script = ExtResource("1_info")
+
+[node name="Overlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.01, 0.02, 0.05, 0.86)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 24
+
+[node name="Shell" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainVBox" type="VBoxContainer" parent="MarginContainer/Shell"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="HeaderPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+
+[node name="HeaderMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="HeaderRow" type="HBoxContainer" parent="MarginContainer/Shell/MainVBox/HeaderPanel/HeaderMargin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="IdentityBlock" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/HeaderPanel/HeaderMargin/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="HeaderEyebrow" type="Label" parent="MarginContainer/Shell/MainVBox/HeaderPanel/HeaderMargin/HeaderRow/IdentityBlock"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "角色档案"
+
+[node name="HeaderTitle" type="Label" parent="MarginContainer/Shell/MainVBox/HeaderPanel/HeaderMargin/HeaderRow/IdentityBlock"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "档案"
+
+[node name="HeaderSub" type="Label" parent="MarginContainer/Shell/MainVBox/HeaderPanel/HeaderMargin/HeaderRow/IdentityBlock"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Loading"
+autowrap_mode = 2
+
+[node name="Actions" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/HeaderPanel/HeaderMargin/HeaderRow"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HintLabel" type="Label" parent="MarginContainer/Shell/MainVBox/HeaderPanel/HeaderMargin/HeaderRow/Actions"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "I 键 / ESC"
+horizontal_alignment = 2
+
+[node name="CloseBtn" type="Button" parent="MarginContainer/Shell/MainVBox/HeaderPanel/HeaderMargin/HeaderRow/Actions"]
+custom_minimum_size = Vector2(118, 42)
+layout_mode = 2
+text = "关闭"
+
+[node name="Divider" type="ColorRect" parent="MarginContainer/Shell/MainVBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.18, 0.24, 0.34, 0.8)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/Shell/MainVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ContentMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 28
+
+[node name="ContentVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 18
+
+[node name="QuickStatsPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox"]
+layout_mode = 2
+
+[node name="QuickStatsMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/QuickStatsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="QuickStatsVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/QuickStatsPanel/QuickStatsMargin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="QuickStatsTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/QuickStatsPanel/QuickStatsMargin/QuickStatsVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "核心概览"
+
+[node name="QuickStatsGrid" type="GridContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/QuickStatsPanel/QuickStatsMargin/QuickStatsVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 4
+
+[node name="BodyColumns" type="HBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 18
+
+[node name="LeftColumn" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.08
+theme_override_constants/separation = 18
+
+[node name="RightColumn" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.22
+theme_override_constants/separation = 18
+
+[node name="BasicInfoPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/BasicInfoPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/BasicInfoPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/BasicInfoPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "基本信息"
+
+[node name="InfoGrid" type="GridContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/BasicInfoPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="ProgressPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/ProgressPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/ProgressPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/ProgressPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "进度状态"
+
+[node name="ProgressContent" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/ProgressPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TalentsPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TalentsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TalentsPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TalentsPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "天赋"
+
+[node name="TalentsFlow" type="FlowContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TalentsPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+
+[node name="TagsPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TagsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TagsPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TagsPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "标签"
+
+[node name="TagsFlow" type="FlowContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TagsPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+
+[node name="StoryPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/StoryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/StoryPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/StoryPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "剧情进展"
+
+[node name="StoryContent" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/StoryPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AcademicPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/AcademicPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/AcademicPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/AcademicPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "学业情况"
+
+[node name="AcademicContent" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/AcademicPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DormPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DormPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DormPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DormPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "宿舍成员"
+
+[node name="RoommatesContent" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DormPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RelationshipsPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/RelationshipsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/RelationshipsPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/RelationshipsPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "人际关系"
+
+[node name="RelationshipsContent" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/RelationshipsPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DataPanel" type="PanelContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn"]
+layout_mode = 2
+
+[node name="SectionMargin" type="MarginContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DataPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SectionVBox" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DataPanel/SectionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DataPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "详细数据"
+
+[node name="RawDataContent" type="VBoxContainer" parent="MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DataPanel/SectionMargin/SectionVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
