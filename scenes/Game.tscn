@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bs4uhhtvcp7vj" path="res://scripts/Game.gd" id="1_ibkli"]
 [ext_resource type="Texture2D" uid="uid://balo6r1cxcihr" path="res://images/backgrounds/dorm_room_day.png" id="2_bg"]
+[ext_resource type="Script" uid="uid://b1phefp5ybb0r" path="res://scripts/CampusMap.gd" id="3_campus_map"]
+[ext_resource type="Texture2D" uid="uid://couc8drhwnm3" path="res://images/phone_icons/phone.png" id="4_phone_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background_window"]
 bg_color = Color(0.03, 0.04, 0.06, 0.16)
@@ -21,15 +23,6 @@ shadow_size = 20
 content_margin_left = 12.0
 content_margin_right = 12.0
 bg_color = Color(0.08, 0.09, 0.12, 0.78)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_hover"]
-content_margin_left = 12.0
-content_margin_right = 12.0
-bg_color = Color(0.2, 0.23, 0.3, 0.9)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -63,19 +56,9 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_phone_normal"]
-bg_color = Color(0.2, 0.3, 0.45, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_phone_hover"]
-bg_color = Color(0.32, 0.4, 0.53, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
+[sub_resource type="AtlasTexture" id="AtlasTexture_phone"]
+atlas = ExtResource("4_phone_icon")
+region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_event_text"]
 content_margin_left = 15.0
@@ -101,7 +84,7 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
-[node name="GameRoot" type="VBoxContainer" unique_id=370035806]
+[node name="GameRoot" type="VBoxContainer" unique_id=1212339641]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -110,54 +93,71 @@ grow_vertical = 2
 theme_override_constants/separation = 6
 script = ExtResource("1_ibkli")
 
-[node name="BackgroundWindow" type="PanelContainer" parent="." unique_id=370035809]
+[node name="BackgroundWindow" type="PanelContainer" parent="." unique_id=1186921009]
 top_level = true
 z_index = -20
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_background_window")
 
-[node name="SceneBackground" type="TextureRect" parent="BackgroundWindow" unique_id=370035807]
+[node name="SceneBackground" type="TextureRect" parent="BackgroundWindow" unique_id=617386077]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SceneBackgroundShade" type="ColorRect" parent="BackgroundWindow" unique_id=370035808]
+[node name="SceneBackgroundShade" type="ColorRect" parent="BackgroundWindow" unique_id=1283143177]
 layout_mode = 2
 mouse_filter = 2
 color = Color(0.01, 0.015, 0.03, 0.5)
 
-[node name="StatusBar" type="Button" parent="." unique_id=-559839232]
-custom_minimum_size = Vector2(0, 36)
+[node name="StatusBar" type="PanelContainer" parent="." unique_id=1966547894]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_status_normal")
+
+[node name="StatusMargin" type="MarginContainer" parent="StatusBar" unique_id=495792086]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="StatusVBox" type="VBoxContainer" parent="StatusBar/StatusMargin" unique_id=1651679711]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StatusHint" type="Label" parent="StatusBar/StatusMargin/StatusVBox" unique_id=12381822]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
 theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("StyleBoxFlat_status_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_status_hover")
-text = "准备开始"
-alignment = 0
+text = "准备开始新的一天"
+autowrap_mode = 2
 
-[node name="TimeControlBar" type="HBoxContainer" parent="." unique_id=2147483647]
+[node name="DayProgress" type="ProgressBar" parent="StatusBar/StatusMargin/StatusVBox" unique_id=300088419]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+
+[node name="TimeControlBar" type="HBoxContainer" parent="." unique_id=1829996257]
 visible = false
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="PauseBtn" type="Button" parent="TimeControlBar" unique_id=983868169]
+[node name="PauseBtn" type="Button" parent="TimeControlBar" unique_id=1876304598]
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_pause_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_pause_hover")
-text = "▶ 开始"
+text = "开始"
 
-[node name="VSeparator" type="VSeparator" parent="TimeControlBar" unique_id=610775300]
+[node name="VSeparator" type="VSeparator" parent="TimeControlBar" unique_id=645846296]
 layout_mode = 2
 
-[node name="Speed1xBtn" type="Button" parent="TimeControlBar" unique_id=264525983]
+[node name="Speed1xBtn" type="Button" parent="TimeControlBar" unique_id=282133543]
 custom_minimum_size = Vector2(50, 36)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
@@ -166,7 +166,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
 text = " 1x "
 
-[node name="Speed2xBtn" type="Button" parent="TimeControlBar" unique_id=1425150943]
+[node name="Speed2xBtn" type="Button" parent="TimeControlBar" unique_id=1151653704]
 custom_minimum_size = Vector2(50, 36)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
@@ -175,7 +175,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
 text = " 2x "
 
-[node name="Speed4xBtn" type="Button" parent="TimeControlBar" unique_id=11696039]
+[node name="Speed4xBtn" type="Button" parent="TimeControlBar" unique_id=2103304173]
 custom_minimum_size = Vector2(50, 36)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
@@ -184,40 +184,70 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
 text = " 4x "
 
-[node name="SpeedLabel" type="Label" parent="TimeControlBar" unique_id=509036280]
+[node name="SpeedLabel" type="Label" parent="TimeControlBar" unique_id=1941861155]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
 theme_override_font_sizes/font_size = 14
 text = " 1x "
 
-[node name="PhoneBtn" type="Button" parent="TimeControlBar" unique_id=434557618]
-custom_minimum_size = Vector2(50, 36)
+[node name="PhoneBtn" type="TextureButton" parent="TimeControlBar" unique_id=432073483]
+custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
-theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("StyleBoxFlat_phone_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_phone_hover")
-text = " 📱 "
+tooltip_text = "手机"
+texture_normal = SubResource("AtlasTexture_phone")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="DateLabel" type="Label" parent="TimeControlBar" unique_id=690034625]
+[node name="VSeparator2" type="VSeparator" parent="TimeControlBar" unique_id=285384388]
+layout_mode = 2
+
+[node name="TopStatusInfo" type="HBoxContainer" parent="TimeControlBar" unique_id=1800439253]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="MoneyInfo" type="Label" parent="TimeControlBar/TopStatusInfo" unique_id=75602435]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "生活费: ¥2,000"
+
+[node name="GpaInfo" type="Label" parent="TimeControlBar/TopStatusInfo" unique_id=1770867193]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "绩点: --"
+
+[node name="StudyInfo" type="Label" parent="TimeControlBar/TopStatusInfo" unique_id=244812350]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "学习: 65"
+
+[node name="CreditsInfo" type="Label" parent="TimeControlBar/TopStatusInfo" unique_id=21168467]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "学分: 0/150"
+
+[node name="DateLabel" type="Label" parent="TimeControlBar" unique_id=1858693335]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.72, 0.78, 1)
 theme_override_font_sizes/font_size = 14
-text = "大一 9月1日 周一 | 开学季"
+text = "日期"
 horizontal_alignment = 2
 
-[node name="MainHBox" type="HBoxContainer" parent="." unique_id=1073741823]
+[node name="MainHBox" type="HBoxContainer" parent="." unique_id=993001991]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="LeftPanel" type="VBoxContainer" parent="MainHBox" unique_id=265745945]
+[node name="LeftPanel" type="VBoxContainer" parent="MainHBox" unique_id=615564599]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
 
-[node name="EventText" type="RichTextLabel" parent="MainHBox/LeftPanel" unique_id=1786217271]
+[node name="EventText" type="RichTextLabel" parent="MainHBox/LeftPanel" unique_id=1714752636]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -227,83 +257,85 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_event_text")
 bbcode_enabled = true
 scroll_following = true
 
-[node name="ChoicesContainer" type="VBoxContainer" parent="MainHBox/LeftPanel" unique_id=1222359295]
+[node name="ChoicesContainer" type="VBoxContainer" parent="MainHBox/LeftPanel" unique_id=1553769099]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="NextButton" type="Button" parent="MainHBox/LeftPanel" unique_id=809245152]
+[node name="NextButton" type="Button" parent="MainHBox/LeftPanel" unique_id=1586175151]
 visible = false
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
-text = "下一年"
+text = "下一步"
 
-[node name="RightPanel" type="PanelContainer" parent="MainHBox" unique_id=572370504]
+[node name="RightPanel" type="PanelContainer" parent="MainHBox" unique_id=1620602194]
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.2
 theme_override_styles/panel = SubResource("StyleBoxFlat_right_panel")
 
-[node name="RightScroll" type="ScrollContainer" parent="MainHBox/RightPanel" unique_id=409219832]
+[node name="RightScroll" type="ScrollContainer" parent="MainHBox/RightPanel" unique_id=1755641480]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="RightContent" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll" unique_id=119810568]
+[node name="RightContent" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll" unique_id=984238742]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="InfoHeader" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=2107903699]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
-theme_override_font_sizes/font_size = 18
-text = "玩家名 · 大一
-9月1日 周一
-开学季 | 第1天"
-
-[node name="HSeparator1" type="HSeparator" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=633324297]
+[node name="CampusMapPanel" type="PanelContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1094877103]
+custom_minimum_size = Vector2(400, 300)
 layout_mode = 2
 
-[node name="GpaRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1523960740]
+[node name="CampusMap" type="Control" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel" unique_id=1334639374]
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("3_campus_map")
+
+[node name="HSeparator1" type="HSeparator" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=2129482212]
+layout_mode = 2
+
+[node name="GpaRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=843166224]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="GpaNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow" unique_id=168657287]
+[node name="GpaNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow" unique_id=17939999]
 layout_mode = 2
 
-[node name="GpaName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow" unique_id=651168479]
+[node name="GpaName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow" unique_id=1194188983]
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
-text = "GPA"
+text = "绩点"
 
-[node name="GpaValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow" unique_id=2014166639]
+[node name="GpaValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow" unique_id=205264775]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
 theme_override_font_sizes/font_size = 15
-text = "— / 4.00"
+text = "-- / 4.00"
 horizontal_alignment = 2
 
-[node name="GpaSubValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow" unique_id=116662001]
+[node name="GpaSubValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/GpaRow" unique_id=868471523]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.72, 0.82, 1)
 theme_override_font_sizes/font_size = 12
-text = "本学期学力: 65/100"
+text = "学习: 65/100"
 autowrap_mode = 2
 
-[node name="SocialRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=775022934]
+[node name="SocialRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1414261681]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="SocialNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow" unique_id=1960540600]
+[node name="SocialNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow" unique_id=1154199723]
 layout_mode = 2
 
-[node name="SocialName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow" unique_id=1181514702]
+[node name="SocialName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow" unique_id=581320025]
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "社交"
 
-[node name="SocialValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow" unique_id=1813978394]
+[node name="SocialValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow" unique_id=562560957]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.6, 0.3, 1)
@@ -311,26 +343,26 @@ theme_override_font_sizes/font_size = 15
 text = "40"
 horizontal_alignment = 2
 
-[node name="SocialBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow" unique_id=1558039711]
+[node name="SocialBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/SocialRow" unique_id=535856020]
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 40.0
 show_percentage = false
 
-[node name="AbilityRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1858500070]
+[node name="AbilityRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=615887730]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="AbilityNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow" unique_id=591615964]
+[node name="AbilityNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow" unique_id=103171852]
 layout_mode = 2
 
-[node name="AbilityName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow" unique_id=1224655642]
+[node name="AbilityName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow" unique_id=1125320029]
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "能力"
 
-[node name="AbilityValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow" unique_id=1630726418]
+[node name="AbilityValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow" unique_id=1753380769]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.6, 0.9, 0.3, 1)
@@ -338,26 +370,26 @@ theme_override_font_sizes/font_size = 15
 text = "20"
 horizontal_alignment = 2
 
-[node name="AbilityBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow" unique_id=431125401]
+[node name="AbilityBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/AbilityRow" unique_id=544222690]
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 20.0
 show_percentage = false
 
-[node name="MoneyRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=988909386]
+[node name="MoneyRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=230505129]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="MoneyNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow" unique_id=419854971]
+[node name="MoneyNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow" unique_id=954909064]
 layout_mode = 2
 
-[node name="MoneyName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow" unique_id=1624278688]
+[node name="MoneyName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow" unique_id=1383028277]
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "生活费"
 
-[node name="MoneyValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow" unique_id=79110369]
+[node name="MoneyValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow" unique_id=1537287044]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
@@ -365,19 +397,19 @@ theme_override_font_sizes/font_size = 15
 text = "¥2,000"
 horizontal_alignment = 2
 
-[node name="MentalRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1529129720]
+[node name="MentalRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1883367038]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="MentalNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow" unique_id=1719181753]
+[node name="MentalNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow" unique_id=733971990]
 layout_mode = 2
 
-[node name="MentalName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow" unique_id=2049004706]
+[node name="MentalName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow" unique_id=2098554046]
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "心理"
 
-[node name="MentalValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow" unique_id=1001626513]
+[node name="MentalValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow" unique_id=432205913]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.8, 0.5, 1, 1)
@@ -385,26 +417,26 @@ theme_override_font_sizes/font_size = 15
 text = "70"
 horizontal_alignment = 2
 
-[node name="MentalBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow" unique_id=1017336929]
+[node name="MentalBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/MentalRow" unique_id=1929594149]
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 70.0
 show_percentage = false
 
-[node name="HealthRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=89404033]
+[node name="HealthRow" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=92925867]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="HealthNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow" unique_id=1891888556]
+[node name="HealthNameRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow" unique_id=1189218984]
 layout_mode = 2
 
-[node name="HealthName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow" unique_id=746245765]
+[node name="HealthName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow" unique_id=75953558]
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "健康"
 
-[node name="HealthValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow" unique_id=1770081857]
+[node name="HealthValue" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow" unique_id=1975796738]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.9, 0.3, 0.35, 1)
@@ -412,17 +444,17 @@ theme_override_font_sizes/font_size = 15
 text = "80"
 horizontal_alignment = 2
 
-[node name="HealthBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow" unique_id=1824831353]
+[node name="HealthBar" type="ProgressBar" parent="MainHBox/RightPanel/RightScroll/RightContent/HealthRow" unique_id=201905269]
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 80.0
 show_percentage = false
 
-[node name="HSeparator2" type="HSeparator" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1712668953]
+[node name="HSeparator2" type="HSeparator" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=325425232]
 layout_mode = 2
 
-[node name="TagsLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1530785600]
+[node name="TagsLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=410344070]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.62, 0.68, 1)
 theme_override_font_sizes/font_size = 13

@@ -203,17 +203,36 @@ var last_auto_save_day: int = 0
 var last_settled_semester_key: String = ""
 var in_overdraft: bool = false
 
+# ========== 进度条动画 ==========
+var bar_tween: Tween = null
+var bar_color_tween: Tween = null
+var bar_fill_style: StyleBoxFlat = null
+var bar_shimmer_panel: Panel = null
+var bar_shimmer_tween: Tween = null
+var bar_last_target_value: float = 0.0
+var bar_dot_indicators: Array = []
+var bar_phase_color: Color = Color(0.22, 0.58, 0.88, 1)
+var bar_target_phase_color: Color = Color(0.22, 0.58, 0.88, 1)
+
 # ========== 节点引用（直接绑定场景节点）==========
 @onready var event_text: RichTextLabel         = $MainHBox/LeftPanel/EventText
 @onready var choices_container: VBoxContainer  = $MainHBox/LeftPanel/ChoicesContainer
 @onready var next_btn: Button                  = $MainHBox/LeftPanel/NextButton
-@onready var status_bar: Button                = $StatusBar
+@onready var status_bar: PanelContainer        = $StatusBar
+@onready var status_hint: Label                = $StatusBar/StatusMargin/StatusVBox/StatusHint
+@onready var day_progress_bar: ProgressBar     = $StatusBar/StatusMargin/StatusVBox/DayProgress
+var week_hint_label: Label
 @onready var time_control_bar: HBoxContainer   = $TimeControlBar
 @onready var pause_btn: Button                 = $TimeControlBar/PauseBtn
 @onready var speed_label: Label                = $TimeControlBar/SpeedLabel
 @onready var date_label: Label                 = $TimeControlBar/DateLabel
 @onready var tags_label: Label                 = $MainHBox/RightPanel/RightScroll/RightContent/TagsLabel
-@onready var info_header: Label                = $MainHBox/RightPanel/RightScroll/RightContent/InfoHeader
+
+# 顶部状态栏信息显示
+var money_info_label: Label
+var gpa_info_label: Label
+var study_info_label: Label
+var credits_info_label: Label
 
 # 速度按钮（场景中固定3个）
 var speed_buttons: Array = []
@@ -266,6 +285,7 @@ func _ready():
 	_load_all_events()
 	_load_flavor_texts()
 	_bind_scene_nodes()
+	_setup_status_bar_ui()
 	_apply_styles()
 	_build_roommate_overlay()
 
@@ -308,6 +328,9 @@ func _ready():
 		RelationshipManager.init_all_npcs()
 		_start_new_game()
 
+	if has_node("MainHBox/LeftPanel/CampusMapPanel/CampusMap"):
+		$MainHBox/LeftPanel/CampusMapPanel/CampusMap.setup(self)
+
 func _bind_scene_nodes():
 	speed_buttons = [
 		$TimeControlBar/Speed1xBtn,
@@ -334,11 +357,133 @@ func _bind_scene_nodes():
 	(speed_buttons[1] as Button).pressed.connect(set_speed.bind(2.0))
 	(speed_buttons[2] as Button).pressed.connect(set_speed.bind(4.0))
 	$TimeControlBar/PhoneBtn.pressed.connect(func(): PhoneSystem.toggle_phone())
+	
+	# 绑定顶部状态栏信息标签
+	money_info_label = $TimeControlBar/TopStatusInfo/MoneyInfo
+	gpa_info_label = $TimeControlBar/TopStatusInfo/GpaInfo
+	study_info_label = $TimeControlBar/TopStatusInfo/StudyInfo
+	credits_info_label = $TimeControlBar/TopStatusInfo/CreditsInfo
+
+func _setup_status_bar_ui():
+	if status_bar:
+		status_bar.visible = true
+		status_bar.custom_minimum_size = Vector2(0, 56)
+		status_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var panel_s = StyleBoxFlat.new()
+		panel_s.bg_color = Color(0.08, 0.1, 0.14, 0.92)
+		panel_s.border_width_left = 1
+		panel_s.border_width_top = 1
+		panel_s.border_width_right = 1
+		panel_s.border_width_bottom = 1
+		panel_s.border_color = Color(0.28, 0.34, 0.42, 0.95)
+		panel_s.set_corner_radius_all(8)
+		panel_s.content_margin_left = 10
+		panel_s.content_margin_top = 8
+		panel_s.content_margin_right = 10
+		panel_s.content_margin_bottom = 8
+		status_bar.add_theme_stylebox_override("panel", panel_s)
+
+	if status_hint:
+		status_hint.visible = false
+
+	if day_progress_bar:
+		day_progress_bar.custom_minimum_size = Vector2(0, 32)
+		day_progress_bar.max_value = 7.0
+		day_progress_bar.value = 0.0
+		day_progress_bar.show_percentage = false
+		day_progress_bar.clip_contents = true
+
+		# ── 背景样式：内凹深色底 ──
+		var status_bg = StyleBoxFlat.new()
+		status_bg.bg_color = Color(0.06, 0.07, 0.10, 1)
+		status_bg.set_corner_radius_all(7)
+		status_bg.border_width_left = 1
+		status_bg.border_width_top = 1
+		status_bg.border_width_right = 1
+		status_bg.border_width_bottom = 1
+		status_bg.border_color = Color(0.15, 0.17, 0.22, 0.6)
+		day_progress_bar.add_theme_stylebox_override("background", status_bg)
+
+		# ── 填充样式：带圆角的渐变蓝 ──
+		bar_fill_style = StyleBoxFlat.new()
+		bar_fill_style.bg_color = Color(0.22, 0.58, 0.88, 1)
+		bar_fill_style.set_corner_radius_all(7)
+		day_progress_bar.add_theme_stylebox_override("fill", bar_fill_style)
+
+		# ── 星期刻度点指示器 ──
+		for i in range(6):
+			var dot = ColorRect.new()
+			dot.custom_minimum_size = Vector2(2, 10)
+			dot.size = Vector2(2, 10)
+			dot.color = Color(0.4, 0.45, 0.55, 0.35)
+			dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			dot.anchor_top = 0.5
+			dot.anchor_bottom = 0.5
+			dot.offset_top = -5
+			dot.offset_bottom = 5
+			dot.anchor_left = 0.0
+			dot.anchor_right = 0.0
+			day_progress_bar.add_child(dot)
+			bar_dot_indicators.append(dot)
+
+		# ── 扫光层 (shimmer) ──
+		bar_shimmer_panel = Panel.new()
+		bar_shimmer_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bar_shimmer_panel.custom_minimum_size = Vector2(60, 0)
+		bar_shimmer_panel.anchor_top = 0.0
+		bar_shimmer_panel.anchor_bottom = 1.0
+		bar_shimmer_panel.anchor_left = 0.0
+		bar_shimmer_panel.anchor_right = 0.0
+		bar_shimmer_panel.offset_left = -80
+		bar_shimmer_panel.offset_right = -20
+		bar_shimmer_panel.offset_top = 0
+		bar_shimmer_panel.offset_bottom = 0
+		bar_shimmer_panel.modulate = Color(1, 1, 1, 0)
+		var shimmer_style = StyleBoxFlat.new()
+		shimmer_style.bg_color = Color(1, 1, 1, 0.08)
+		shimmer_style.set_corner_radius_all(7)
+		bar_shimmer_panel.add_theme_stylebox_override("panel", shimmer_style)
+		day_progress_bar.add_child(bar_shimmer_panel)
+
+		# ── 周文本标签 ──
+		week_hint_label = Label.new()
+		week_hint_label.text = "第0天"
+		week_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		week_hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		week_hint_label.add_theme_font_size_override("font_size", 13)
+		week_hint_label.add_theme_color_override("font_color", Color(0.92, 0.95, 1.0, 0.95))
+		week_hint_label.add_theme_constant_override("shadow_offset_x", 1)
+		week_hint_label.add_theme_constant_override("shadow_offset_y", 1)
+		week_hint_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.5))
+		week_hint_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		week_hint_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		day_progress_bar.add_child(week_hint_label)
+
+		# 初始布局刻度点
+		_update_bar_dot_positions()
+
+func _update_bar_dot_positions():
+	if not day_progress_bar or bar_dot_indicators.is_empty():
+		return
+	await get_tree().process_frame
+	var bar_width = day_progress_bar.size.x
+	if bar_width <= 0:
+		bar_width = 400.0
+	for i in range(bar_dot_indicators.size()):
+		var dot = bar_dot_indicators[i] as ColorRect
+		var frac = float(i + 1) / 7.0
+		dot.anchor_left = frac
+		dot.anchor_right = frac
+		dot.offset_left = -1
+		dot.offset_right = 1
 
 func _apply_styles():
 	add_theme_constant_override("separation", 6)
 
 	_style_main_btn(next_btn)
+
+	# 注意：进度条样式已在 _setup_status_bar_ui 中完成，这里不再重复设置
+	# day_progress_bar 的 background 和 fill 样式已经在上面配好了
 
 	for attr in progress_bars:
 		var bar = progress_bars[attr] as ProgressBar
@@ -1635,7 +1780,7 @@ func _update_time_display():
 			_year_cn(info.year), info.month, info.day,
 			info.weekday_name, info.phase]
 
-	for i in speed_buttons.size():
+	for i in range(speed_buttons.size()):
 		if i < available_speeds.size():
 			if available_speeds[i] == time_speed:
 				speed_buttons[i].add_theme_color_override("font_color", Color(1, 0.9, 0.3))
@@ -2179,13 +2324,22 @@ func update_ui():
 		else:
 			money_val.add_theme_color_override("font_color", Color(1, 0.85, 0.2, 1))
 
-	# 更新右侧顶部信息
-	if game_started and info_header:
-		var info = get_date_info()
-		info_header.text = "%s · 大%s\n%d月%d日 %s\n%s | 第%d天" % [
-			player_name, _year_cn(info.year),
-			info.month, info.day, info.weekday_name,
-			info.phase, day_index + 1]
+	# 更新顶部状态栏信息
+	if game_started:
+		if money_info_label:
+			money_info_label.text = "生活费: ¥%s" % _format_money(living_money)
+		
+		if gpa_info_label:
+			if semester_records.is_empty():
+				gpa_info_label.text = "绩点: --"
+			else:
+				gpa_info_label.text = "绩点: %.2f" % gpa
+		
+		if study_info_label:
+			study_info_label.text = "学习: %d" % int(round(study_points))
+		
+		if credits_info_label:
+			credits_info_label.text = "学分: %d/%d" % [earned_credits, major_required_credits]
 
 	if tags_label:
 		if tags.size() > 0:
@@ -2202,13 +2356,219 @@ func _update_status_bar_text():
 	if not status_bar:
 		return
 	if not game_started:
-		status_bar.text = "  准备开始"
+		if day_progress_bar:
+			day_progress_bar.value = 0.0
+		if week_hint_label:
+			week_hint_label.text = "第0天"
 		return
+	
 	var info = get_date_info()
-	var gpa_text = "—" if semester_records.is_empty() else "%.2f" % gpa
-	status_bar.text = "  %s | %d月%d日 %s | %s | GPA:%s 学力:%.0f 社交:%.0f 能力:%.0f 生活费:¥%s 心理:%.0f 健康:%.0f" % [
-		player_name, info.month, info.day, info.weekday_name, info.phase,
-		gpa_text, study_points, social, ability, _format_money(living_money), mental, health]
+	var week_day = (info.weekday % 7) + 1  # 1-7，周一到周日
+	var target_value = float(week_day)
+	
+	if day_progress_bar:
+		# ── 平滑动画过渡进度条值 ──
+		if not is_equal_approx(target_value, bar_last_target_value):
+			# 检测是否跨周回退（例如从周日7跳回周一1）
+			var is_week_reset = target_value < bar_last_target_value and bar_last_target_value >= 6.0
+			bar_last_target_value = target_value
+			
+			if bar_tween and bar_tween.is_valid():
+				bar_tween.kill()
+			
+			if is_week_reset:
+				# 跨周：先快速冲到满，再从0弹到新值
+				bar_tween = create_tween()
+				bar_tween.tween_property(day_progress_bar, "value", 7.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+				bar_tween.tween_callback(func():
+					day_progress_bar.value = 0.0
+					# 新一周开始的闪烁效果
+					_bar_flash_new_week()
+				)
+				bar_tween.tween_property(day_progress_bar, "value", target_value, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			else:
+				# 正常递进：弹性过渡
+				bar_tween = create_tween()
+				bar_tween.tween_property(day_progress_bar, "value", target_value, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			
+			# 扫光动画（每次进度变化时触发）
+			_bar_trigger_shimmer()
+		
+		# ── 根据阶段变换进度条颜色 ──
+		var phase_color = _get_phase_bar_color(info)
+		if not phase_color.is_equal_approx(bar_target_phase_color):
+			bar_target_phase_color = phase_color
+			if bar_color_tween and bar_color_tween.is_valid():
+				bar_color_tween.kill()
+			bar_color_tween = create_tween()
+			bar_color_tween.tween_method(_lerp_bar_fill_color.bind(bar_fill_style.bg_color, phase_color), 0.0, 1.0, 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	
+	# ── 更新刻度点样式 ──
+	_update_bar_dots(week_day)
+	
+	if week_hint_label:
+		var hint_text = _build_week_hint(info, week_day)
+		week_hint_label.text = hint_text
+
+# ── 进度条颜色插值 ──
+func _lerp_bar_fill_color(t: float, from_color: Color, to_color: Color):
+	if bar_fill_style:
+		bar_fill_style.bg_color = from_color.lerp(to_color, t)
+
+# ── 根据游戏阶段返回进度条颜色 ──
+func _get_phase_bar_color(info: Dictionary) -> Color:
+	if info.get("is_exam", false):
+		return Color(0.9, 0.35, 0.35, 1)       # 考试周 - 紧张红
+	if info.get("is_review", false):
+		return Color(0.85, 0.65, 0.2, 1)        # 复习周 - 警醒橙
+	if info.get("is_military", false):
+		return Color(0.35, 0.7, 0.35, 1)        # 军训 - 军绿
+	if info.get("is_holiday", false):
+		return Color(0.4, 0.8, 0.55, 1)         # 假期 - 轻松绿
+	if info.get("is_weekend", false):
+		return Color(0.45, 0.7, 0.95, 1)        # 周末 - 浅蓝
+	return Color(0.22, 0.58, 0.88, 1)           # 日常 - 标准蓝
+
+# ── 扫光动画 ──
+func _bar_trigger_shimmer():
+	if not bar_shimmer_panel or not day_progress_bar:
+		return
+	
+	if bar_shimmer_tween and bar_shimmer_tween.is_valid():
+		bar_shimmer_tween.kill()
+	
+	var bar_width = day_progress_bar.size.x
+	if bar_width <= 0:
+		bar_width = 400.0
+	
+	bar_shimmer_panel.offset_left = -80
+	bar_shimmer_panel.offset_right = -20
+	bar_shimmer_panel.modulate = Color(1, 1, 1, 0)
+	
+	bar_shimmer_tween = create_tween()
+	bar_shimmer_tween.tween_property(bar_shimmer_panel, "modulate:a", 0.6, 0.1)
+	bar_shimmer_tween.parallel().tween_property(bar_shimmer_panel, "offset_left", bar_width + 20, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	bar_shimmer_tween.parallel().tween_property(bar_shimmer_panel, "offset_right", bar_width + 80, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	bar_shimmer_tween.parallel().tween_property(bar_shimmer_panel, "modulate:a", 0.0, 0.5).set_delay(0.15)
+
+# ── 新一周闪烁 ──
+func _bar_flash_new_week():
+	if not bar_fill_style:
+		return
+	var original = bar_fill_style.bg_color
+	var flash = Color(1, 1, 1, 0.9)
+	var tw = create_tween()
+	tw.tween_method(func(t: float):
+		if bar_fill_style:
+			bar_fill_style.bg_color = flash.lerp(original, t)
+	, 0.0, 1.0, 0.3).set_trans(Tween.TRANS_SINE)
+
+# ── 更新刻度点样式（已过的变亮/未过的变暗）──
+func _update_bar_dots(current_weekday: int):
+	for i in range(bar_dot_indicators.size()):
+		var dot = bar_dot_indicators[i] as ColorRect
+		var day_boundary = i + 1  # 第1-6条分割线
+		if day_boundary < current_weekday:
+			# 已经过去的 - 亮色细线
+			dot.color = Color(0.7, 0.8, 0.95, 0.5)
+			dot.custom_minimum_size.x = 1
+			dot.size.x = 1
+		elif day_boundary == current_weekday:
+			# 当前位置 - 高亮
+			dot.color = Color(1.0, 1.0, 1.0, 0.7)
+			dot.custom_minimum_size.x = 2
+			dot.size.x = 2
+		else:
+			# 还没到的 - 暗色
+			dot.color = Color(0.3, 0.35, 0.45, 0.3)
+			dot.custom_minimum_size.x = 1
+			dot.size.x = 1
+
+
+func _get_day_progress_percent() -> float:
+	if not game_started or day_interval <= 0.0:
+		return 0.0
+	return clampf(day_timer / day_interval, 0.0, 1.0) * 100.0
+
+
+func _build_week_hint(info: Dictionary, week_day: int) -> String:
+	var weekday_names = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+	var day_name = weekday_names[week_day - 1] if week_day >= 1 and week_day <= 7 else "本周"
+	
+	if waiting_for_choice:
+		return "%s · 事件中" % day_name
+	if not time_running:
+		return "%s · 已暂停" % day_name
+	
+	# 根据阶段和星期给出提示
+	if info.get("is_exam", false):
+		return "%s · 考试周，稳住心态" % day_name
+	if info.get("is_review", false):
+		return "%s · 复习周，图书馆见" % day_name
+	if info.get("is_military", false):
+		return "%s · 军训中" % day_name
+	if info.get("is_holiday", false):
+		return "%s · %s，好好休息" % [day_name, info.phase]
+	
+	# 工作日和周末的不同提示
+	if week_day <= 5:  # 周一到周五
+		if week_day == 1:
+			return "周一 · 新的一周开始了"
+		elif week_day == 5:
+			return "周五 · 坚持到周末"
+		else:
+			return "%s · 日常上课中" % day_name
+	else:  # 周末
+		if "in_relationship" in tags:
+			return "%s · 周末约会时间" % day_name
+		return "%s · 周末放松一下" % day_name
+
+func _build_status_hint(info: Dictionary) -> String:
+	if waiting_for_choice:
+		return "事件发生中，时间暂停。先做出选择，再看看今天会走向哪里。"
+	if not time_running:
+		return "时间已暂停。你可以整理状态，准备好后继续推进今天。"
+
+	var progress := _get_day_progress_percent()
+	var progress_text := "今天刚开始"
+	if progress >= 95.0:
+		progress_text = "今天快结束了"
+	elif progress >= 70.0:
+		progress_text = "今天已经过半"
+	elif progress >= 35.0:
+		progress_text = "今天正在推进中"
+
+	if info.get("is_holiday", false):
+		return "%s，这段时间是%s，节奏可以慢一点。" % [progress_text, info.phase]
+	if info.get("is_exam", false):
+		return "%s，考试周压力最大，稳住心态最重要。" % progress_text
+	if info.get("is_review", false):
+		return "%s，复习周适合把重心放回图书馆和课程。" % progress_text
+	if info.get("is_military", false):
+		return "%s，军训阶段更看重体力和适应节奏。" % progress_text
+	if info.get("is_weekend", false):
+		if "in_relationship" in tags:
+			return "%s，周末可以陪陪恋人，也别忘了留点时间给自己。" % progress_text
+		return "%s，周末适合休整、社交，或者把欠下的学习补回来。" % progress_text
+
+	var visual_hour := int(floor(clampf(day_timer / max(day_interval, 0.001), 0.0, 1.0) * 24.0))
+	if visual_hour <= 6:
+		return "%s，宿舍还很安静，先把状态养回来。" % progress_text
+	if visual_hour == 7:
+		return "%s，先去食堂吃点东西，今天才算正式开始。" % progress_text
+	if visual_hour <= 11:
+		return "%s，这会儿通常在上课，稳住节奏比硬冲更重要。" % progress_text
+	if visual_hour <= 13:
+		return "%s，午间是喘口气的窗口，别把自己绷得太紧。" % progress_text
+	if visual_hour <= 16:
+		return "%s，下午课容易走神，撑过去今天就很扎实。" % progress_text
+	if visual_hour == 17:
+		return "%s，傍晚活动一下，能把一天的疲惫卸掉不少。" % progress_text
+	if visual_hour <= 21:
+		if study_points >= 60.0:
+			return "%s，晚上的你更适合继续自习，把优势滚起来。" % progress_text
+		return "%s，晚上别只硬扛，休息好明天会更稳。" % progress_text
+	return "%s，夜深了，今天到这里也已经很不错。" % progress_text
 
 # ══════════════════════════════════════════════
 #            UI 样式工具
