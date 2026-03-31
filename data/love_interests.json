@@ -1,0 +1,492 @@
+{
+  "version": "2.0",
+  "description": "可攻略女性角色定义",
+  
+  "characters": {
+	"lin_zhiyi": {
+	  "role_id": "lin_zhiyi",
+	  "display_name": "林知意",
+	  "nickname": "图书馆女孩",
+	  "gender": "女",
+	  "age": 19,
+	  "major": "英语系",
+	  "grade": 1,
+	  
+	  "appearance": {
+		"hair": "黑色长发",
+		"style": "简约文艺",
+		"distinctive": "总是坐在图书馆靠窗的位置"
+	  },
+	  
+	  "personality": {
+		"tags": ["安静", "学霸", "英语好", "温柔", "内敛"],
+		"mbti": "INFJ",
+		"description": "安静而优秀的女孩，喜欢阅读和写作。表面冷淡但内心温暖，对认定的人会很用心。"
+	  },
+	  
+	  "meet_condition": {
+		"action": "library",
+		"probability": 0.25,
+		"available_from_year": 1,
+		"available_from_day": 7,
+		"description": "在图书馆学习时有概率偶遇"
+	  },
+	  
+	  "core_conflict": {
+		"title": "她要出国",
+		"description": "林知意从大一开始就准备出国留学，这是她的梦想。你们的感情面临着异地甚至异国的考验。",
+		"emotion_tone": "温暖而克制"
+	  },
+	  
+	  "player_route": "学业型",
+	  
+	  "story_arc": {
+		"phases": [
+		  {
+			"phase": "MET",
+			"name": "偶遇期",
+			"duration_days": "30-60",
+			"description": "图书馆总坐在同一片区域。第一次互动是帮她捡书签。加微信她犹豫了一下才同意。微信里客气，回复句号结尾。"
+		  },
+		  {
+			"phase": "FAMILIAR",
+			"name": "熟悉期",
+			"duration_days": "60-120",
+			"description": "开始偶尔一起占座。她分享英语学习资料。考试周一起待到闭馆同路回宿舍。当晚微信：'今天谢谢你等我'。"
+		  },
+		  {
+			"phase": "AMBIGUOUS",
+			"name": "暧昧期",
+			"duration_days": "90-180",
+			"description": "有了固定'约定座位'。她开始说不那么客气的话。从室友口中得知她在准备托福。一次她心情不好，校园里走了很久，她说'有时候觉得未来好远'。"
+		  },
+		  {
+			"phase": "CONFESSION",
+			"name": "分支点",
+			"description": "她说决定申请出国。选项A: 支持她→'克制线'。选项B: 表白→'挽留线'。选项C: 疏远→'遗憾线'。"
+		  },
+		  {
+			"phase": "DATING",
+			"name": "在一起后",
+			"description": "克制线——保持比朋友多一点的关系，毕业前她在机场发了很长的微信。挽留线——在一起了但异地压力大，需持续高好感维持。"
+		  }
+		]
+	  },
+	  
+	  "endings": {
+		"restraint": {
+		  "name": "克制线结局",
+		  "condition": "支持她出国，保持暧昧但未表白",
+		  "description": "你们保持着比朋友多一点的关系。毕业那天，她在机场给你发了很长的微信。你们都知道，有些感情不需要一个名分。"
+		},
+		"long_distance": {
+		  "name": "挽留线结局",
+		  "condition": "表白成功，维持异地关系",
+		  "description": "你们在一起了，但异地压力很大。需要持续的高好感度来维持。结局取决于你们的坚持。"
+		},
+		"regret": {
+		  "name": "遗憾线结局",
+		  "condition": "选择疏远",
+		  "description": "你们越来越少说话。毕业典礼上远远对视了一眼，然后各自走向不同的方向。"
+		}
+	  },
+	  
+	  "preferences": {
+		"likes": ["安静的环境", "英语文学", "手写书签", "图书馆靠窗座位", "白噪音"],
+		"dislikes": ["吵闹", "过于热情", "不认真学习的人"],
+		"gift_preferences": ["书籍", "手写卡片", "茶叶"]
+	  },
+	  
+	  "message_style": {
+		"reply_speed": "慢，半天到一天",
+		"reply_style": "句号结尾，简洁但走心",
+		"voice_message": false,
+		"emoji_usage": "很少"
+	  }
+	},
+	
+	"su_xiaowan": {
+	  "role_id": "su_xiaowan",
+	  "display_name": "苏小晚",
+	  "nickname": "辩论社女生",
+	  "gender": "女",
+	  "age": 19,
+	  "major": "新闻传播",
+	  "grade": 1,
+	  
+	  "appearance": {
+		"hair": "马尾",
+		"style": "活力运动风",
+		"distinctive": "说话声音很大，手势丰富"
+	  },
+	  
+	  "personality": {
+		"tags": ["强势", "外向", "反差萌", "直率", "热情"],
+		"mbti": "ENTP",
+		"description": "辩论社的活跃分子，表面强势自信，内心其实有脆弱的一面。对朋友很仗义，但也会情绪化。"
+	  },
+	  
+	  "meet_condition": {
+		"action": "club_activity",
+		"probability": 0.60,
+		"available_from_year": 1,
+		"available_from_day": 0,
+		"description": "加入社团招新时60%概率触发",
+		"requirement": "选择加入社团"
+	  },
+	  
+	  "core_conflict": {
+		"title": "性格反差",
+		"description": "她强势的外表下隐藏着脆弱。你们经常因为小事争吵，价值观和未来规划也有分歧。",
+		"emotion_tone": "热烈而冲突"
+	  },
+	  
+	  "player_route": "社交型",
+	  
+	  "story_arc": {
+		"phases": [
+		  {
+			"phase": "MET",
+			"name": "碰撞期",
+			"duration_days": "30-60",
+			"description": "社团活动总意见不合。她当面怼你但事后微信解释。第一感觉'这人好烦但好有意思'。"
+		  },
+		  {
+			"phase": "FAMILIAR",
+			"name": "了解期",
+			"duration_days": "60-120",
+			"description": "社团聚餐她喝多了说了家里的事。发现她强势是自我保护。她叫你外号，你叫她'苏大嘴'。"
+		  },
+		  {
+			"phase": "AMBIGUOUS",
+			"name": "心动期",
+			"duration_days": "90-150",
+			"description": "社团比赛搭档，天天排练。一次排练很晚她靠你肩膀睡着了。室友起哄。她吃醋但死不承认。"
+		  },
+		  {
+			"phase": "DATING",
+			"name": "交往期",
+			"description": "表白或她先表白。在一起后经常吵架（价值观/时间分配/未来规划）。吵完冷战需要主动哄。和好时她说'我其实特别怕你不理我'。"
+		  }
+		]
+	  },
+	  
+	  "endings": {
+		"passionate": {
+		  "name": "热烈结局",
+		  "condition": "成功维持关系，度过磨合期",
+		  "description": "你们学会了如何相处。虽然还是会吵架，但都知道对方不会离开。大三她要去大城市实习你要考研，你们决定一起面对。"
+		},
+		"breakup": {
+		  "name": "分手结局",
+		  "condition": "冲突无法调和",
+		  "description": "最后一次大吵之后，她说'我们算了吧'。你看着她的背影，想起第一次社团招新时她塞给你报名表的样子。"
+		}
+	  },
+	  
+	  "preferences": {
+		"likes": ["辩论", "热闹", "美食", "游戏", "被认可"],
+		"dislikes": ["被忽视", "虚伪", "过于严肃"],
+		"gift_preferences": ["游戏皮肤", "美食", "有趣的文创"]
+	  },
+	  
+	  "message_style": {
+		"reply_speed": "秒回",
+		"reply_style": "语音条轰炸，表情包多",
+		"voice_message": true,
+		"emoji_usage": "很多"
+	  }
+	},
+	
+	"chen_yutong": {
+	  "role_id": "chen_yutong",
+	  "display_name": "陈雨桐",
+	  "nickname": "隔壁班女生",
+	  "gender": "女",
+	  "age": 19,
+	  "major": "工商管理",
+	  "grade": 1,
+	  
+	  "appearance": {
+		"hair": "棕色中长发",
+		"style": "温柔知性",
+		"distinctive": "总是带着淡淡的微笑"
+	  },
+	  
+	  "personality": {
+		"tags": ["热情", "温柔", "慢热", "细腻", "体贴"],
+		"mbti": "ISFJ",
+		"description": "对所有人都很热情，让人分不清是不是特别。其实内心很细腻，只是不善于表达特别的感情。"
+	  },
+	  
+	  "meet_condition": {
+		"action": "auto",
+		"probability": 1.0,
+		"available_from_year": 1,
+		"available_from_day": 0,
+		"description": "开局自动认识"
+	  },
+	  
+	  "core_conflict": {
+		"title": "暗恋不自知",
+		"description": "你们一直是朋友，但你开始在意她。她似乎对所有人都一样好，你分不清自己是不是特别。",
+		"emotion_tone": "细水长流"
+	  },
+	  
+	  "player_route": "平衡型",
+	  
+	  "story_arc": {
+		"phases": [
+		  {
+			"phase": "MET",
+			"name": "朋友期",
+			"duration_days": "0-180",
+			"description": "开局就认识，她对所有人都热情，分不清对你是不是特别。给很多人分享笔记不止你一个。经常一起吃饭但都好几个人一起。"
+		  },
+		  {
+			"phase": "FAMILIAR",
+			"name": "暗恋期",
+			"duration_days": "180-300",
+			"description": "开始在意她跟别人聊天。某天看到她和一个男生走很近。日常行动出现干扰项'刷她朋友圈'（浪费时段无实际效果）。室友问'你是不是喜欢人家'。"
+		  },
+		  {
+			"phase": "AMBIGUOUS",
+			"name": "抉择点",
+			"description": "得知那个男生是高中同学不是男朋友。但她好像对另一个学长有好感。选项A: 表白（50%成功率取决于之前互动积累）。选项B: 继续当朋友→'温水线'。选项C: 退出→好感度缓慢降但心理恢复。"
+		  },
+		  {
+			"phase": "DATING",
+			"name": "交往期",
+			"description": "表白成功：她说'我也不确定但愿意试试'，进展慢需耐心但最踏实。表白失败：她说'我把你当很好的朋友'，触发扎心独白。"
+		  }
+		]
+	  },
+	  
+	  "endings": {
+		"slow_burn": {
+		  "name": "细水长流结局",
+		  "condition": "表白成功，耐心经营",
+		  "description": "她说'我也不确定但愿意试试'。进展很慢，需要很多耐心，但这是最踏实的感情。"
+		},
+		"friendzone": {
+		  "name": "朋友结局",
+		  "condition": "表白失败，选择继续做朋友",
+		  "description": "她说'我把你当很好的朋友'。大四毕业如果还是朋友有隐藏事件——她终于承认，其实她也曾经心动过。"
+		},
+		"drift": {
+		  "name": "渐行渐远结局",
+		  "condition": "表白失败，选择疏远",
+		  "description": "你们慢慢疏远了。毕业典礼上她过来抱了你一下，什么都没说。"
+		}
+	  },
+	  
+	  "preferences": {
+		"likes": ["烘焙", "电影", "温柔的人", "稳定的关系"],
+		"dislikes": ["突然的表白", "压力", "不确定感"],
+		"gift_preferences": ["手工饼干", "电影票", "花"]
+	  },
+	  
+	  "message_style": {
+		"reply_speed": "中等，几小时",
+		"reply_style": "温柔体贴，经常用'~'",
+		"voice_message": false,
+		"emoji_usage": "适中"
+	  }
+	},
+	
+	"zhou_yiran": {
+	  "role_id": "zhou_yiran",
+	  "display_name": "周一然",
+	  "nickname": "打工女孩",
+	  "gender": "女",
+	  "age": 20,
+	  "major": "会计",
+	  "grade": 2,
+	  
+	  "appearance": {
+		"hair": "短发",
+		"style": "干练简约",
+		"distinctive": "手上经常有创可贴"
+	  },
+	  
+	  "personality": {
+		"tags": ["独立", "坚强", "现实", "内敛", "自尊"],
+		"mbti": "ISTJ",
+		"description": "同时打两份工的坚强女孩。表面冷淡，其实内心渴望被理解。对金钱敏感，不喜欢被施舍。"
+	  },
+	  
+	  "meet_condition": {
+		"action": "part_time_job",
+		"probability": 0.30,
+		"available_from_year": 2,
+		"available_from_day": 0,
+		"description": "兼职打工时30%概率遇到"
+	  },
+	  
+	  "core_conflict": {
+		"title": "家境差异",
+		"description": "请她吃太贵的她不舒服。帮她太多她觉得被施舍。正确做法是'一起省钱但用心'。生活费管理变成情感决策。",
+		"emotion_tone": "现实而坚韧"
+	  },
+	  
+	  "player_route": "打工型",
+	  
+	  "story_arc": {
+		"phases": [
+		  {
+			"phase": "MET",
+			"name": "相遇期",
+			"duration_days": "0-30",
+			"description": "兼职第一天，店长让一个女生带你。她扫了你一眼，面无表情地说：'跟我来，先学收银。'动作很利索，解释也简洁。你注意到她的手上有几个细小的创可贴。"
+		  },
+		  {
+			"phase": "FAMILIAR",
+			"name": "了解期",
+			"duration_days": "30-90",
+			"description": "发现她同时打两份工。朋友圈很少更新。一次她发烧还来上班你替她顶班。她开始卸下防备。"
+		  },
+		  {
+			"phase": "AMBIGUOUS",
+			"name": "心动期",
+			"duration_days": "90-180",
+			"description": "开始分享便当。发工资一起吃了一顿'好的'，她说'这是我这学期最开心的一顿饭'。送她到宿舍楼下她回头看了你一眼。"
+		  },
+		  {
+			"phase": "DATING",
+			"name": "交往期",
+			"description": "核心冲突（经济差距）：请她吃太贵的她不舒服。帮她太多她觉得被施舍。正确做法是'一起省钱但用心'。"
+		  }
+		]
+	  },
+	  
+	  "endings": {
+		"mutual_growth": {
+		  "name": "共同成长结局",
+		  "condition": "尊重她的独立性，一起努力",
+		  "description": "她拿到了奖学金，你比她先哭了。你们证明了，不同世界的人也可以在一起。"
+		},
+		"breakup": {
+		  "name": "分手结局",
+		  "condition": "经济差距处理不当",
+		  "description": "她说'我们不是一个世界的人'。你看着她离开的背影，想起她第一次对你笑的样子。"
+		}
+	  },
+	  
+	  "preferences": {
+		"likes": ["省钱", "实用", "真诚", "被尊重"],
+		"dislikes": ["铺张浪费", "被施舍", "虚伪的关心"],
+		"gift_preferences": ["实用的东西", "自己做的便当", "省钱攻略"]
+	  },
+	  
+	  "message_style": {
+		"reply_speed": "慢，有时不回",
+		"reply_style": "简洁，不是不想是真在忙",
+		"voice_message": false,
+		"emoji_usage": "很少"
+	  }
+	},
+	
+	"shen_yingshuang": {
+	  "role_id": "shen_yingshuang",
+	  "display_name": "沈映霜",
+	  "nickname": "考研战友",
+	  "gender": "女",
+	  "age": 21,
+	  "major": "法学",
+	  "grade": 3,
+	  
+	  "appearance": {
+		"hair": "黑色直发",
+		"style": "朴素简单",
+		"distinctive": "总是带着保温杯"
+	  },
+	  
+	  "personality": {
+		"tags": ["专注", "内敛", "战友", "坚韧", "理性"],
+		"mbti": "INTJ",
+		"description": "考研自习室遇到的战友。话不多，但很有默契。你们互相监督，互相鼓励，在压力中产生了特殊的感情。"
+	  },
+	  
+	  "meet_condition": {
+		"action": "postgrad_study",
+		"probability": 0.50,
+		"available_from_year": 3,
+		"available_from_day": 0,
+		"description": "选择考研路线后50%概率在考研自习室遇到",
+		"requirement": "选择考研路线"
+	  },
+	  
+	  "core_conflict": {
+		"title": "同为考研人",
+		"description": "你们都是考研人，感情是奢侈品。考研结果决定一切：都考上了→最甜结局；一人上一人没上→复杂的情感抉择。",
+		"emotion_tone": "互相支撑"
+	  },
+	  
+	  "player_route": "考研型",
+	  
+	  "story_arc": {
+		"phases": [
+		  {
+			"phase": "MET",
+			"name": "战友期",
+			"duration_days": "0-60",
+			"description": "大三选择考研路线后50%概率在考研自习室遇到。她头都没抬。发现考同一个学校同一个专业。第一次说话是借橡皮。"
+		  },
+		  {
+			"phase": "FAMILIAR",
+			"name": "默契期",
+			"duration_days": "60-120",
+			"description": "约定互相监督进度。她在你打盹时敲桌子。一起吃自习室外面的煎饼。一次模考她没考好你看到她眼圈红了。"
+		  },
+		  {
+			"phase": "AMBIGUOUS",
+			"name": "暧昧期",
+			"duration_days": "很短，也许只有两周",
+			"description": "某天夜里一起从自习室出来。她突然说'如果考完了我们去吃一顿好的吧'。你知道不只是一顿饭的意思。但都默契不挑明怕影响复习。"
+		  },
+		  {
+			"phase": "DATING",
+			"name": "考研结果后",
+			"description": "考研结果决定一切：都考上了→最甜结局，复试结束那天她抱了你。你上她没上→她消失三天回来说'恭喜你'，再没提那顿饭。她上你没上→她来安慰你但你没办法面对。都没上→抱头痛哭然后一起决定二战或工作。"
+		  }
+		]
+	  },
+	  
+	  "endings": {
+		"both_pass": {
+		  "name": "双双上岸结局",
+		  "condition": "都考上研究生",
+		  "description": "最甜结局。复试结束那天，她在校门口抱了你。你们约定研究生三年要一起努力。"
+		},
+		"player_pass": {
+		  "name": "独自上岸结局",
+		  "condition": "你考上，她没考上",
+		  "description": "她消失了三天，回来说'恭喜你'，再没提那顿饭。你知道，有些路只能一个人走。"
+		},
+		"she_passes": {
+		  "name": "她上岸结局",
+		  "condition": "她考上，你没考上",
+		  "description": "她来安慰你，但你没办法面对。你说'恭喜'，然后转身离开。"
+		},
+		"both_fail": {
+		  "name": "共同面对结局",
+		  "condition": "都没考上",
+		  "description": "你们在自习室抱头痛哭。然后一起决定二战，或者一起找工作。无论如何，你们会一起面对。"
+		}
+	  },
+	  
+	  "preferences": {
+		"likes": ["专注", "目标明确", "互相支持", "煎饼"],
+		"dislikes": ["分心", "不确定性", "浪费时间"],
+		"gift_preferences": ["复习资料", "保温杯", "鼓励的便签"]
+	  },
+	  
+	  "message_style": {
+		"reply_speed": "慢，学习时很少看手机",
+		"reply_style": "简洁有力，经常鼓励你",
+		"voice_message": false,
+		"emoji_usage": "很少"
+	  }
+	}
+  }
+}

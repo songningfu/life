@@ -60,17 +60,6 @@ corner_radius_bottom_left = 5
 atlas = ExtResource("4_phone_icon")
 region = Rect2(0, 0, 64, 64)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_event_text"]
-content_margin_left = 15.0
-content_margin_top = 12.0
-content_margin_right = 15.0
-content_margin_bottom = 12.0
-bg_color = Color(0.06, 0.07, 0.1, 0.78)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_current_card"]
 content_margin_left = 18.0
 content_margin_top = 16.0
@@ -88,6 +77,17 @@ corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 shadow_color = Color(0, 0, 0, 0.2)
 shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_event_text"]
+content_margin_left = 15.0
+content_margin_top = 12.0
+content_margin_right = 15.0
+content_margin_bottom = 12.0
+bg_color = Color(0.06, 0.07, 0.1, 0.78)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_right_panel"]
 content_margin_left = 14.0
@@ -223,7 +223,7 @@ theme_override_colors/font_color = Color(0.86, 0.9, 0.96, 1)
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
-text = "Profile"
+text = "档案"
 
 [node name="VSeparator2" type="VSeparator" parent="TimeControlBar" unique_id=285384388]
 layout_mode = 2
@@ -295,7 +295,7 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.74, 0.88, 1)
 theme_override_font_sizes/font_size = 13
-text = "当前内容"
+text = "阶段播报"
 
 [node name="CurrentText" type="RichTextLabel" parent="MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox" unique_id=123905775]
 layout_mode = 2
@@ -303,7 +303,6 @@ size_flags_vertical = 3
 theme_override_colors/default_color = Color(0.95, 0.96, 0.98, 1)
 theme_override_font_sizes/normal_font_size = 20
 bbcode_enabled = true
-scroll_active = true
 
 [node name="ChoicesContainer" type="VBoxContainer" parent="MainHBox/LeftPanel" unique_id=1553769099]
 layout_mode = 2
@@ -327,9 +326,9 @@ scroll_following = true
 
 [node name="NextButton" type="Button" parent="MainHBox/LeftPanel" unique_id=1586175151]
 visible = false
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-text = "下一步"
+text = "下一步 ▶"
 
 [node name="RightPanel" type="PanelContainer" parent="MainHBox" unique_id=1620602194]
 custom_minimum_size = Vector2(280, 0)

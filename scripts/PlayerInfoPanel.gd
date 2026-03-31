@@ -259,7 +259,10 @@ func _populate_progress():
 
 func _populate_talents():
 	_clear(talents_flow)
-	var talents = TalentSystem.get_talents()
+	var talent_module: TalentModule = ModuleManager.get_module("talent")
+	var talents = []
+	if talent_module:
+		talents = talent_module.get_talents()
 	if talents.is_empty():
 		talents_flow.add_child(_make_empty_label("暂无天赋数据"))
 		return

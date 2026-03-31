@@ -135,3 +135,22 @@ func get_date_info_from_data(data: Dictionary) -> Dictionary:
 			phase = entry[2]
 			break
 	return {"year": year, "phase": phase}
+
+# ==================== 临时元数据存储（用于pending_game_init） ====================
+
+var _temp_store: Dictionary = {}
+
+## 设置临时数据（用于角色创建到游戏场景的过渡）
+func store_temp(key: String, value: Variant) -> void:
+	if value == null:
+		_temp_store.erase(key)
+	else:
+		_temp_store[key] = value
+
+## 获取临时数据
+func get_temp(key: String, default: Variant = null) -> Variant:
+	return _temp_store.get(key, default)
+
+## 检查是否有指定临时数据
+func has_temp(key: String) -> bool:
+	return _temp_store.has(key)

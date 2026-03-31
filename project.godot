@@ -18,12 +18,12 @@ config/icon="res://icon.svg"
 [autoload]
 
 SaveManager="*res://scripts/SaveManager.gd"
+AudioManager="*res://scripts/AudioManager.gd"
 NamePool="*res://scripts/NamePool.gd"
+ModuleManager="*res://scripts/core/ModuleManager.gd"
+ModLoader="*res://scripts/core/ModLoader.gd"
 RelationshipManager="*res://scripts/RelationshipManager.gd"
 WechatSystem="*res://scripts/WechatSystem.gd"
-PhoneSystem="*res://scenes/PhoneUI.tscn"
-AudioManager="*res://scripts/AudioManager.gd"
-TalentSystem="*res://scripts/TalentSystem.gd"
 
 [display]
 

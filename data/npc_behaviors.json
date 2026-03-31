@@ -1,0 +1,398 @@
+{
+  "version": "2.0",
+  "description": "NPC主动行为定义 - 包括邀请、消息、朋友圈等",
+  
+  "npcs": {
+	"roommate_gamer": {
+	  "role_id": "roommate_gamer",
+	  "display_name": "游戏室友",
+	  "personality": "gamer",
+	  
+	  "active_behaviors": [
+		{
+		  "id": "invite_game_afternoon",
+		  "time_slot": "afternoon",
+		  "action": "打游戏",
+		  "invite_chance": 0.30,
+		  "min_affinity": 10,
+		  "message": "来两把？",
+		  "accept_effect": {"mental": 3, "social": 2, "study_points": -2},
+		  "reject_effect": {"affinity": -1}
+		},
+		{
+		  "id": "invite_game_evening",
+		  "time_slot": "evening",
+		  "action": "开黑",
+		  "invite_chance": 0.40,
+		  "min_affinity": 15,
+		  "message": "今晚开黑吗？缺个辅助。",
+		  "accept_effect": {"mental": 4, "social": 2, "study_points": -2},
+		  "reject_effect": {"affinity": -1}
+		},
+		{
+		  "id": "invite_food",
+		  "time_slot": "evening",
+		  "action": "叫外卖",
+		  "invite_chance": 0.20,
+		  "min_affinity": 15,
+		  "message": "叫外卖吗？一起凑单。",
+		  "accept_effect": {"mental": 2, "social": 1, "living_money": -15},
+		  "reject_effect": {}
+		}
+	  ],
+	  
+	  "affinity_milestones": {
+		"30": {
+		  "message": "主动借你零食",
+		  "unlock": "borrow_snacks"
+		},
+		"55": {
+		  "message": "跟你聊心事",
+		  "unlock": "deep_talk",
+		  "trigger_event": "roommate_gamer_deep_talk"
+		},
+		"80": {
+		  "message": "关键时刻帮你",
+		  "unlock": "emergency_help"
+		}
+	  },
+	  
+	  "outgoing_messages": [
+		{"message": "今晚开黑吗？", "time_slot": "evening", "probability": 0.25},
+		{"message": "新游戏出了，试试？", "time_slot": "afternoon", "probability": 0.15},
+		{"message": "[游戏截图]这操作秀不秀？", "time_slot": "evening", "probability": 0.20},
+		{"message": "饿了吗？叫外卖", "time_slot": "evening", "probability": 0.15},
+		{"message": "明天有课吗？帮我答到", "time_slot": "night", "probability": 0.10}
+	  ],
+	  
+	  "moments": [
+		{"text": "五杀了！！！", "trigger": "game_win"},
+		{"text": "这游戏没法玩了，队友太坑", "trigger": "game_lose"},
+		{"text": "新皮肤真香", "trigger": "random"},
+		{"text": "今晚通宵，明天请假", "trigger": "night_game"},
+		{"text": "有人一起排位吗？", "trigger": "random"}
+	  ]
+	},
+	
+	"roommate_studious": {
+	  "role_id": "roommate_studious",
+	  "display_name": "学霸室友",
+	  "personality": "studious",
+	  
+	  "active_behaviors": [
+		{
+		  "id": "invite_class_morning",
+		  "time_slot": "morning",
+		  "action": "一起上课",
+		  "invite_chance": 0.40,
+		  "min_affinity": 15,
+		  "message": "今天有课，一起去？",
+		  "accept_effect": {"study_points": 1, "social": 1},
+		  "reject_effect": {"affinity": -1}
+		},
+		{
+		  "id": "invite_library_evening",
+		  "time_slot": "evening",
+		  "action": "图书馆占座",
+		  "invite_chance": 0.30,
+		  "min_affinity": 20,
+		  "message": "去图书馆吗？帮你占座。",
+		  "accept_effect": {"study_points": 3, "social": 1},
+		  "reject_effect": {}
+		},
+		{
+		  "id": "invite_study",
+		  "time_slot": "afternoon",
+		  "action": "一起自习",
+		  "invite_chance": 0.25,
+		  "min_affinity": 25,
+		  "message": "下午自习吗？可以互相监督。",
+		  "accept_effect": {"study_points": 4, "social": 1},
+		  "reject_effect": {}
+		}
+	  ],
+	  
+	  "affinity_milestones": {
+		"30": {
+		  "message": "分享笔记给你",
+		  "unlock": "share_notes"
+		},
+		"55": {
+		  "message": "帮你划重点",
+		  "unlock": "exam_help",
+		  "trigger_event": "roommate_studious_exam_help"
+		},
+		"80": {
+		  "message": "推荐保研/考研资料",
+		  "unlock": "postgrad_guidance"
+		}
+	  },
+	  
+	  "outgoing_messages": [
+		{"message": "今天作业交了没？", "time_slot": "morning", "probability": 0.20},
+		{"message": "这题你会吗？", "time_slot": "afternoon", "probability": 0.25},
+		{"message": "明天要交的报告写完了吗？", "time_slot": "evening", "probability": 0.20},
+		{"message": "图书馆闭馆了，回宿舍吗？", "time_slot": "evening", "probability": 0.15},
+		{"message": "周末去自习吗？", "time_slot": "night", "probability": 0.10}
+	  ],
+	  
+	  "moments": [
+		{"text": "今天效率很高，完成了计划", "trigger": "study_complete"},
+		{"text": "这本书推荐，对专业很有帮助", "trigger": "random"},
+		{"text": "考试周，一起加油", "trigger": "exam_week"},
+		{"text": "发现一个新的学习方法", "trigger": "random"},
+		{"text": "早睡早起身体好", "trigger": "random"}
+	  ]
+	},
+	
+	"roommate_quiet": {
+	  "role_id": "roommate_quiet",
+	  "display_name": "安静室友",
+	  "personality": "quiet",
+	  
+	  "active_behaviors": [
+		{
+		  "id": "quiet_company",
+		  "time_slot": "evening",
+		  "action": "安静陪伴",
+		  "invite_chance": 0.15,
+		  "min_affinity": 20,
+		  "message": "...（沉默地看着你，示意你坐）",
+		  "accept_effect": {"mental": 3},
+		  "reject_effect": {}
+		}
+	  ],
+	  
+	  "affinity_milestones": {
+		"40": {
+		  "message": "偶尔跟你说几句话",
+		  "unlock": "occasional_talk"
+		},
+		"70": {
+		  "message": "说出金句",
+		  "unlock": "golden_quote",
+		  "trigger_event": "roommate_quiet_wisdom"
+		}
+	  },
+	  
+	  "outgoing_messages": [
+		{"message": "...", "time_slot": "evening", "probability": 0.10},
+		{"message": "嗯", "time_slot": "any", "probability": 0.15},
+		{"message": "谢谢", "time_slot": "any", "probability": 0.10},
+		{"message": "晚安", "time_slot": "night", "probability": 0.20}
+	  ],
+	  
+	  "moments": [
+		{"text": "...", "trigger": "random"},
+		{"text": "今天天气不错", "trigger": "random"},
+		{"text": "有时候，沉默比说话更有力量", "trigger": "random"},
+		{"text": "独处是一种能力", "trigger": "random"}
+	  ]
+	},
+	
+	"debate_senior": {
+	  "role_id": "debate_senior",
+	  "display_name": "辩论学长",
+	  "personality": "senior",
+	  
+	  "active_behaviors": [
+		{
+		  "id": "senior_guide",
+		  "time_slot": "afternoon",
+		  "action": "请教问题",
+		  "invite_chance": 0.25,
+		  "min_affinity": 5,
+		  "message": "最近怎么样？有什么困惑可以聊聊。",
+		  "accept_effect": {"ability": 3, "social": 2},
+		  "reject_effect": {}
+		}
+	  ],
+	  
+	  "affinity_milestones": {
+		"30": {
+		  "message": "推荐你参加比赛",
+		  "unlock": "competition_invite"
+		},
+		"60": {
+		  "message": "介绍实习机会",
+		  "unlock": "internship_intro"
+		}
+	  },
+	  
+	  "outgoing_messages": [
+		{"message": "最近学习怎么样？", "time_slot": "afternoon", "probability": 0.20},
+		{"message": "有个比赛，要不要试试？", "time_slot": "any", "probability": 0.15},
+		{"message": "周末有个讲座，一起去？", "time_slot": "any", "probability": 0.10}
+	  ],
+	  
+	  "moments": [
+		{"text": "辩论的魅力在于思辨", "trigger": "random"},
+		{"text": "又一个学弟学妹获奖了，欣慰", "trigger": "random"},
+		{"text": "毕业在即，珍惜当下", "trigger": "graduation"}
+	  ]
+	},
+	
+	"tech_senior": {
+	  "role_id": "tech_senior",
+	  "display_name": "技术学长",
+	  "personality": "senior",
+	  
+	  "active_behaviors": [
+		{
+		  "id": "tech_help",
+		  "time_slot": "evening",
+		  "action": "技术交流",
+		  "invite_chance": 0.20,
+		  "min_affinity": 5,
+		  "message": "有个项目，有兴趣一起做吗？",
+		  "accept_effect": {"ability": 4, "social": 1},
+		  "reject_effect": {}
+		}
+	  ],
+	  
+	  "affinity_milestones": {
+		"40": {
+		  "message": "教你编程",
+		  "unlock": "coding_lesson"
+		},
+		"70": {
+		  "message": "推荐你进实验室",
+		  "unlock": "lab_intro"
+		}
+	  },
+	  
+	  "outgoing_messages": [
+		{"message": "代码写得怎么样？", "time_slot": "evening", "probability": 0.15},
+		{"message": "有个bug帮我看看？", "time_slot": "any", "probability": 0.20},
+		{"message": "新出的技术框架了解一下", "time_slot": "any", "probability": 0.10}
+	  ],
+	  
+	  "moments": [
+		{"text": "debug了一晚上，终于解决了", "trigger": "coding"},
+		{"text": "推荐一个开源项目", "trigger": "random"},
+		{"text": "代码如诗", "trigger": "random"}
+	  ]
+	},
+	
+	"union_minister": {
+	  "role_id": "union_minister",
+	  "display_name": "学生会部长",
+	  "personality": "leader",
+	  
+	  "active_behaviors": [
+		{
+		  "id": "union_task",
+		  "time_slot": "afternoon",
+		  "action": "学生会工作",
+		  "invite_chance": 0.30,
+		  "min_affinity": 10,
+		  "message": "有个活动需要你帮忙。",
+		  "accept_effect": {"ability": 2, "social": 3},
+		  "reject_effect": {"affinity": -2}
+		}
+	  ],
+	  
+	  "affinity_milestones": {
+		"35": {
+		  "message": "给你更多责任",
+		  "unlock": "more_responsibility"
+		},
+		"65": {
+		  "message": "推荐你当部长",
+		  "unlock": "minister_recommendation"
+		}
+	  },
+	  
+	  "outgoing_messages": [
+		{"message": "明天的会议记得来", "time_slot": "any", "probability": 0.25},
+		{"message": "这个策划案改一下", "time_slot": "afternoon", "probability": 0.20},
+		{"message": "活动准备得怎么样了？", "time_slot": "any", "probability": 0.15}
+	  ],
+	  
+	  "moments": [
+		{"text": "活动圆满结束，大家辛苦了", "trigger": "event_complete"},
+		{"text": "学生工作虽然累，但很有意义", "trigger": "random"},
+		{"text": "招新季，期待新面孔", "trigger": "recruitment"}
+	  ]
+	},
+	
+	"counselor": {
+	  "role_id": "counselor",
+	  "display_name": "辅导员",
+	  "personality": "authority",
+	  
+	  "active_behaviors": [
+		{
+		  "id": "counselor_check",
+		  "time_slot": "morning",
+		  "action": "谈话",
+		  "invite_chance": 0.10,
+		  "min_affinity": 0,
+		  "message": "来我办公室一趟。",
+		  "accept_effect": {"mental": -2},
+		  "reject_effect": {"affinity": -5}
+		}
+	  ],
+	  
+	  "outgoing_messages": [
+		{"message": "请同学们注意考勤", "time_slot": "morning", "probability": 0.30},
+		{"message": "期末考试时间已公布", "time_slot": "any", "probability": 0.25},
+		{"message": "有问题的同学可以来办公室找我", "time_slot": "afternoon", "probability": 0.15}
+	  ],
+	  
+	  "moments": [
+		{"text": "同学们要注意身体，别熬夜", "trigger": "random"},
+		{"text": "学业重要，但心理健康更重要", "trigger": "random"},
+		{"text": "毕业季，祝大家前程似锦", "trigger": "graduation"}
+	  ]
+	}
+  },
+  
+  "rejection_penalties": {
+	"description": "连续拒绝同一NPC邀请的惩罚",
+	"threshold": 3,
+	"effects": {
+	  "invite_frequency_decrease": 0.5,
+	  "affinity_decay_per_day": 1,
+	  "trigger_message": "你最近好忙啊..."
+	}
+  },
+  
+  "drift_mechanics": {
+	"description": "长时间不互动的消失感机制",
+	"drift_threshold_days": 30,
+	"severe_drift_threshold_days": 45,
+	"effects": {
+	  "day_30": {
+		"message": "你看了看和XX的聊天记录，上次对话还是两个月前",
+		"spark_decay": 10,
+		"affinity_decay": 5
+	  },
+	  "day_45": {
+		"message": "你们不知不觉间疏远了",
+		"phase_regression": true,
+		"spark_decay": 20
+	  }
+	}
+  },
+  
+  "graduation_departure": {
+	"description": "大四毕业季NPC离开机制",
+	"trigger_day": 1095,
+	"effects": {
+	  "close_friend": {
+		"min_affinity": 70,
+		"trigger_event": "farewell_event",
+		"message": "XX即将离开，触发专属告别事件"
+	  },
+	  "casual_friend": {
+		"min_affinity": 30,
+		"message": "XX发了条朋友圈：'再见了这座城市。'"
+	  },
+	  "acquaintance": {
+		"max_affinity": 29,
+		"message": "你收到了XX的群发微信：'毕业快乐，常联系。'"
+	  }
+	}
+  }
+}

@@ -1,0 +1,361 @@
+{
+  "version": "2.0",
+  "description": "大学四年行动定义数据",
+  "actions": [
+	{
+	  "id": "attend_class",
+	  "name": "上课",
+	  "description": "去教室听课，最基础的学生日常",
+	  "category": "基础",
+	  "time_slots": ["morning", "afternoon"],
+	  "phases": ["开学季", "上学期日常", "下学期日常", "上学期复习周", "下学期复习周"],
+	  "effects": {
+		"study_points": {"min": 3, "max": 5},
+		"social": {"min": 0, "max": 1},
+		"mental": {"min": -1, "max": 0}
+	  },
+	  "cost": 0,
+	  "event_pool": "class_events",
+	  "is_default": true,
+	  "can_skip": true,
+	  "skip_effects": {
+		"study_points": {"min": -2, "max": -1},
+		"mental": {"min": 2, "max": 4}
+	  }
+	},
+	{
+	  "id": "self_study",
+	  "name": "自习",
+	  "description": "独自学习，枯燥但高效",
+	  "category": "基础",
+	  "time_slots": ["morning", "afternoon", "evening"],
+	  "phases": ["开学季", "军训", "上学期日常", "下学期日常", "上学期复习周", "下学期复习周", "上学期考试周", "下学期考试周"],
+	  "effects": {
+		"study_points": {"min": 4, "max": 6},
+		"mental": {"min": -1, "max": 0}
+	  },
+	  "cost": 0,
+	  "event_pool": "study_events"
+	},
+	{
+	  "id": "library",
+	  "name": "去图书馆",
+	  "description": "在图书馆学习，可能偶遇NPC",
+	  "category": "基础",
+	  "time_slots": ["morning", "afternoon", "evening"],
+	  "phases": ["开学季", "上学期日常", "下学期日常", "上学期复习周", "下学期复习周", "上学期考试周", "下学期考试周"],
+	  "effects": {
+		"study_points": {"min": 3, "max": 4},
+		"ability": {"min": 0, "max": 1}
+	  },
+	  "cost": 0,
+	  "event_pool": "library_events",
+	  "special": {
+		"npc_encounter_chance": 0.15,
+		"unlock_knowledge_events": true
+	  }
+	},
+	{
+	  "id": "exercise",
+	  "name": "锻炼",
+	  "description": "运动健身，保持身体健康",
+	  "category": "基础",
+	  "time_slots": ["morning", "afternoon", "evening"],
+	  "phases": ["开学季", "军训", "上学期日常", "下学期日常", "寒假", "暑假"],
+	  "effects": {
+		"health": {"min": 3, "max": 5},
+		"mental": {"min": 1, "max": 3}
+	  },
+	  "cost": 0,
+	  "event_pool": "exercise_events",
+	  "sub_options": [
+		{"id": "running", "name": "跑步", "bonus": {"health": 1}},
+		{"id": "basketball", "name": "打篮球", "bonus": {"social": 1}},
+		{"id": "swimming", "name": "游泳", "bonus": {"health": 2, "mental": 1}}
+	  ]
+	},
+	{
+	  "id": "rest",
+	  "name": "休息",
+	  "description": "摸鱼放松，恢复身心",
+	  "category": "基础",
+	  "time_slots": ["morning", "afternoon", "evening"],
+	  "phases": ["开学季", "军训", "上学期日常", "下学期日常", "寒假", "暑假", "寒假前"],
+	  "effects": {
+		"health": {"min": 2, "max": 2},
+		"mental": {"min": 3, "max": 3},
+		"study_points": {"min": -1, "max": -1}
+	  },
+	  "cost": 0,
+	  "event_pool": "rest_events"
+	},
+	{
+	  "id": "part_time_job",
+	  "name": "兼职",
+	  "description": "打工赚钱，但会消耗健康",
+	  "category": "基础",
+	  "time_slots": ["afternoon", "evening"],
+	  "phases": ["开学季", "上学期日常", "下学期日常", "寒假", "暑假"],
+	  "effects": {
+		"living_money": {"min": 30, "max": 80},
+		"health": {"min": -2, "max": -1},
+		"ability": {"min": 0, "max": 1}
+	  },
+	  "cost": 0,
+	  "event_pool": "job_events",
+	  "sub_options": [
+		{"id": "tutor", "name": "家教", "bonus": {"living_money": 10, "study_points": 1}},
+		{"id": "waiter", "name": "服务员", "bonus": {"living_money": 5, "social": 1}},
+		{"id": "delivery", "name": "外卖员", "bonus": {"living_money": 15, "health": -1}}
+	  ]
+	},
+	{
+	  "id": "dorm_chat",
+	  "name": "宿舍闲聊",
+	  "description": "和室友聊天放松",
+	  "category": "基础",
+	  "time_slots": ["evening"],
+	  "phases": ["开学季", "军训", "上学期日常", "下学期日常", "上学期复习周", "下学期复习周"],
+	  "effects": {
+		"mental": {"min": 2, "max": 2},
+		"social": {"min": 1, "max": 1}
+	  },
+	  "cost": 0,
+	  "event_pool": "dorm_events"
+	},
+	{
+	  "id": "club_activity",
+	  "name": "社团活动",
+	  "description": "参加社团活动，提升社交和能力",
+	  "category": "基础",
+	  "time_slots": ["afternoon", "evening"],
+	  "phases": ["开学季", "上学期日常", "下学期日常"],
+	  "effects": {
+		"ability": {"min": 2, "max": 2},
+		"social": {"min": 3, "max": 3}
+	  },
+	  "cost": 0,
+	  "conditions": {
+		"has_flag": "joined_club"
+	  },
+	  "event_pool": "club_events"
+	},
+	{
+	  "id": "hangout_eat",
+	  "name": "找人吃饭",
+	  "description": "约认识的人一起吃饭",
+	  "category": "社交",
+	  "time_slots": ["afternoon", "evening"],
+	  "phases": ["开学季", "上学期日常", "下学期日常", "寒假前"],
+	  "effects": {
+		"social": {"min": 2, "max": 2},
+		"mental": {"min": 2, "max": 3}
+	  },
+	  "cost": 20,
+	  "conditions": {
+		"min_living_money": 20,
+		"has_relationship": "acquaintance"
+	  },
+	  "event_pool": "social_eat_events",
+	  "requires_target": true
+	},
+	{
+	  "id": "hangout_game",
+	  "name": "找人打游戏",
+	  "description": "约游戏室友好感≥朋友的人开黑",
+	  "category": "社交",
+	  "time_slots": ["afternoon", "evening"],
+	  "phases": ["开学季", "上学期日常", "下学期日常", "寒假", "暑假"],
+	  "effects": {
+		"mental": {"min": 3, "max": 3},
+		"social": {"min": 1, "max": 2},
+		"study_points": {"min": -2, "max": -1}
+	  },
+	  "cost": 0,
+	  "conditions": {
+		"has_relationship_level": "friend",
+		"role_personality": "gamer"
+	  },
+	  "event_pool": "social_game_events",
+	  "requires_target": true
+	},
+	{
+	  "id": "hangout_study",
+	  "name": "找人自习",
+	  "description": "约学霸室友好感≥朋友的人一起学习",
+	  "category": "社交",
+	  "time_slots": ["morning", "afternoon", "evening"],
+	  "phases": ["开学季", "上学期日常", "下学期日常", "上学期复习周", "下学期复习周"],
+	  "effects": {
+		"study_points": {"min": 5, "max": 7},
+		"mental": {"min": 1, "max": 2}
+	  },
+	  "cost": 0,
+	  "conditions": {
+		"has_relationship_level": "friend",
+		"role_personality": "studious"
+	  },
+	  "event_pool": "social_study_events",
+	  "requires_target": true
+	},
+	{
+	  "id": "ask_senior",
+	  "name": "找学长请教",
+	  "description": "向认识的学长请教问题",
+	  "category": "社交",
+	  "time_slots": ["afternoon", "evening"],
+	  "phases": ["开学季", "上学期日常", "下学期日常"],
+	  "effects": {
+		"ability": {"min": 3, "max": 5},
+		"study_points": {"min": 1, "max": 2}
+	  },
+	  "cost": 0,
+	  "conditions": {
+		"has_relationship": "acquaintance",
+		"role_type": "senior"
+	  },
+	  "event_pool": "senior_events",
+	  "requires_target": true
+	},
+	{
+	  "id": "competition_prep",
+	  "name": "准备竞赛",
+	  "description": "为学科竞赛做准备",
+	  "category": "特殊",
+	  "time_slots": ["morning", "afternoon", "evening"],
+	  "phases": ["上学期日常", "下学期日常"],
+	  "effects": {
+		"ability": {"min": 4, "max": 4},
+		"study_points": {"min": 2, "max": 2},
+		"mental": {"min": -1, "max": 0}
+	  },
+	  "cost": 0,
+	  "conditions": {
+		"min_year": 2,
+		"min_ability": 40
+	  },
+	  "event_pool": "competition_events",
+	  "unlocks": ["competition_storyline"]
+	},
+	{
+	  "id": "internship_interview",
+	  "name": "实习面试",
+	  "description": "参加实习面试",
+	  "category": "特殊",
+	  "time_slots": ["morning", "afternoon"],
+	  "phases": ["下学期日常"],
+	  "effects": {
+		"ability": {"min": 2, "max": 3},
+		"mental": {"min": -2, "max": -1}
+	  },
+	  "cost": 0,
+	  "conditions": {
+		"min_year": 3,
+		"min_semester": 2,
+		"min_ability": 50
+	  },
+	  "event_pool": "internship_events",
+	  "unlocks": ["internship_storyline"]
+	},
+	{
+	  "id": "postgrad_study",
+	  "name": "考研复习",
+	  "description": "全力准备考研",
+	  "category": "特殊",
+	  "time_slots": ["morning", "afternoon", "evening"],
+	  "phases": ["上学期日常", "下学期日常", "上学期复习周", "下学期复习周"],
+	  "effects": {
+		"study_points": {"min": 6, "max": 6},
+		"mental": {"min": -2, "max": -1},
+		"health": {"min": -1, "max": 0}
+	  },
+	  "cost": 0,
+	  "conditions": {
+		"min_year": 3,
+		"has_flag": "chose_postgrad"
+	  },
+	  "event_pool": "postgrad_events"
+	},
+	{
+	  "id": "side_business",
+	  "name": "摆摊做生意",
+	  "description": "尝试创业赚钱",
+	  "category": "特殊",
+	  "time_slots": ["afternoon", "evening"],
+	  "phases": ["上学期日常", "下学期日常", "寒假", "暑假"],
+	  "effects": {
+		"living_money": {"min": 50, "max": 150},
+		"ability": {"min": 2, "max": 2},
+		"social": {"min": 1, "max": 2}
+	  },
+	  "cost": 20,
+	  "conditions": {
+		"min_ability": 30,
+		"min_social": 40,
+		"min_living_money": 50
+	  },
+	  "event_pool": "business_events"
+	},
+	{
+	  "id": "chat_up",
+	  "name": "搭讪",
+	  "description": "主动认识新的人（天生社牛天赋专属）",
+	  "category": "特殊",
+	  "time_slots": ["morning", "afternoon", "evening"],
+	  "phases": ["开学季", "上学期日常", "下学期日常"],
+	  "effects": {
+		"social": {"min": 3, "max": 3},
+		"mental": {"min": 1, "max": 2}
+	  },
+	  "cost": 0,
+	  "conditions": {
+		"has_talent": "social_butterfly"
+	  },
+	  "event_pool": "chat_up_events"
+	}
+  ],
+  "schedule_templates": {
+	"default": {
+	  "name": "默认",
+	  "description": "平衡的学习生活",
+	  "morning": "attend_class",
+	  "afternoon": "attend_class",
+	  "evening": "self_study"
+	},
+	"study_mode": {
+	  "name": "卷王模式",
+	  "description": "全力学习",
+	  "morning": "attend_class",
+	  "afternoon": "library",
+	  "evening": "self_study"
+	},
+	"social_mode": {
+	  "name": "社交达人",
+	  "description": "广交朋友",
+	  "morning": "attend_class",
+	  "afternoon": "club_activity",
+	  "evening": "hangout_eat"
+	},
+	"work_mode": {
+	  "name": "打工人",
+	  "description": "赚钱为主",
+	  "morning": "attend_class",
+	  "afternoon": "part_time_job",
+	  "evening": "rest"
+	},
+	"health_mode": {
+	  "name": "养生模式",
+	  "description": "保持健康",
+	  "morning": "exercise",
+	  "afternoon": "attend_class",
+	  "evening": "rest"
+	},
+	"postgrad_mode": {
+	  "name": "考研冲刺",
+	  "description": "全力考研",
+	  "morning": "postgrad_study",
+	  "afternoon": "postgrad_study",
+	  "evening": "library"
+	}
+  }
+}

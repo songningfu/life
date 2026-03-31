@@ -1,0 +1,246 @@
+{
+  "version": "2.0",
+  "description": "可发送消息模板 - 按NPC和关系阶段分类",
+  
+  "daily_limit": 3,
+  "description_daily_limit": "玩家每天主动发消息上限3条，被动回复不限",
+  
+  "templates": {
+	"roommate_gamer": {
+	  "acquaintance": [
+		{"id": "rg_1", "text": "在吗", "effects": {"affinity": 1}},
+		{"id": "rg_2", "text": "晚上回来吗", "effects": {"affinity": 1}},
+		{"id": "rg_3", "text": "借个充电器", "effects": {"affinity": 1}}
+	  ],
+	  "friend": [
+		{"id": "rg_4", "text": "今晚开黑吗", "effects": {"affinity": 2}, "unlock_action": "hangout_game"},
+		{"id": "rg_5", "text": "新游戏出了", "effects": {"affinity": 2, "mental": 1}},
+		{"id": "rg_6", "text": "饿了吗", "effects": {"affinity": 1}},
+		{"id": "rg_7", "text": "明天帮我答到", "effects": {"affinity": 1}},
+		{"id": "rg_8", "text": "[表情包]", "effects": {"affinity": 1, "mental": 1}}
+	  ],
+	  "close_friend": [
+		{"id": "rg_9", "text": "出来喝酒", "effects": {"affinity": 3, "mental": 2}},
+		{"id": "rg_10", "text": "有心事", "effects": {"affinity": 3}, "unlock_dialogue": "deep_talk"},
+		{"id": "rg_11", "text": "谢谢你上次帮我", "effects": {"affinity": 2}},
+		{"id": "rg_12", "text": "最近怎么样", "effects": {"affinity": 2}}
+	  ]
+	},
+	
+	"roommate_studious": {
+	  "acquaintance": [
+		{"id": "rs_1", "text": "今天有课吗", "effects": {"affinity": 1}},
+		{"id": "rs_2", "text": "作业交了没", "effects": {"affinity": 1}},
+		{"id": "rs_3", "text": "借支笔", "effects": {"affinity": 1}}
+	  ],
+	  "friend": [
+		{"id": "rs_4", "text": "一起去图书馆吗", "effects": {"affinity": 2}, "unlock_action": "hangout_study"},
+		{"id": "rs_5", "text": "这题你会吗", "effects": {"affinity": 2, "study_points": 1}},
+		{"id": "rs_6", "text": "笔记借我抄抄", "effects": {"affinity": 1, "study_points": 1}},
+		{"id": "rs_7", "text": "考试重点是什么", "effects": {"affinity": 2}},
+		{"id": "rs_8", "text": "明天有课吗", "effects": {"affinity": 1}}
+	  ],
+	  "close_friend": [
+		{"id": "rs_9", "text": "一起自习吗", "effects": {"affinity": 3, "study_points": 2}},
+		{"id": "rs_10", "text": "考研准备得怎么样", "effects": {"affinity": 2}},
+		{"id": "rs_11", "text": "推荐几本书", "effects": {"affinity": 2, "ability": 1}},
+		{"id": "rs_12", "text": "谢谢你帮我", "effects": {"affinity": 2}}
+	  ]
+	},
+	
+	"roommate_quiet": {
+	  "acquaintance": [
+		{"id": "rq_1", "text": "在吗", "effects": {"affinity": 1}},
+		{"id": "rq_2", "text": "明天几点熄灯", "effects": {"affinity": 1}}
+	  ],
+	  "friend": [
+		{"id": "rq_3", "text": "最近好吗", "effects": {"affinity": 1}},
+		{"id": "rq_4", "text": "晚上吃什么", "effects": {"affinity": 1}},
+		{"id": "rq_5", "text": "明天有课吗", "effects": {"affinity": 1}}
+	  ],
+	  "close_friend": [
+		{"id": "rq_6", "text": "想聊聊吗", "effects": {"affinity": 2}, "unlock_dialogue": "rare_talk"},
+		{"id": "rq_7", "text": "谢谢你", "effects": {"affinity": 2}},
+		{"id": "rq_8", "text": "晚安", "effects": {"affinity": 1, "mental": 1}}
+	  ]
+	},
+	
+	"debate_senior": {
+	  "acquaintance": [
+		{"id": "ds_1", "text": "学长好", "effects": {"affinity": 1}},
+		{"id": "ds_2", "text": "有个问题想请教", "effects": {"affinity": 1}}
+	  ],
+	  "friend": [
+		{"id": "ds_3", "text": "最近有比赛吗", "effects": {"affinity": 2}},
+		{"id": "ds_4", "text": "能帮我看看这个辩题吗", "effects": {"affinity": 2, "ability": 1}},
+		{"id": "ds_5", "text": "周末有活动吗", "effects": {"affinity": 1}}
+	  ],
+	  "close_friend": [
+		{"id": "ds_6", "text": "想跟您聊聊未来规划", "effects": {"affinity": 3, "ability": 2}},
+		{"id": "ds_7", "text": "推荐些书吧", "effects": {"affinity": 2, "ability": 1}},
+		{"id": "ds_8", "text": "谢谢您一直以来的帮助", "effects": {"affinity": 3}}
+	  ]
+	},
+	
+	"tech_senior": {
+	  "acquaintance": [
+		{"id": "ts_1", "text": "学长好", "effects": {"affinity": 1}},
+		{"id": "ts_2", "text": "有个技术问题", "effects": {"affinity": 1}}
+	  ],
+	  "friend": [
+		{"id": "ts_3", "text": "这个bug怎么解决", "effects": {"affinity": 2, "ability": 1}},
+		{"id": "ts_4", "text": "推荐个学习路线", "effects": {"affinity": 2, "ability": 1}},
+		{"id": "ts_5", "text": "有项目需要帮忙吗", "effects": {"affinity": 2}}
+	  ],
+	  "close_friend": [
+		{"id": "ts_6", "text": "想跟您做项目", "effects": {"affinity": 3, "ability": 3}},
+		{"id": "ts_7", "text": "职业规划想请教您", "effects": {"affinity": 3, "ability": 2}},
+		{"id": "ts_8", "text": "谢谢您教我", "effects": {"affinity": 2}}
+	  ]
+	},
+	
+	"union_minister": {
+	  "acquaintance": [
+		{"id": "um_1", "text": "部长好", "effects": {"affinity": 1}},
+		{"id": "um_2", "text": "明天的会议", "effects": {"affinity": 1}}
+	  ],
+	  "friend": [
+		{"id": "um_3", "text": "这个策划案", "effects": {"affinity": 2}},
+		{"id": "um_4", "text": "活动准备得怎么样了", "effects": {"affinity": 1}},
+		{"id": "um_5", "text": "需要我做什么", "effects": {"affinity": 2}}
+	  ],
+	  "close_friend": [
+		{"id": "um_6", "text": "想承担更多工作", "effects": {"affinity": 3, "ability": 2}},
+		{"id": "um_7", "text": "感谢您的栽培", "effects": {"affinity": 3}},
+		{"id": "um_8", "text": "有个想法跟您汇报", "effects": {"affinity": 2, "ability": 1}}
+	  ]
+	},
+	
+	"counselor": {
+	  "acquaintance": [
+		{"id": "c_1", "text": "老师好", "effects": {"affinity": 1}},
+		{"id": "c_2", "text": "想请教个问题", "effects": {"affinity": 1}}
+	  ],
+	  "friend": [
+		{"id": "c_3", "text": "最近有点困惑", "effects": {"affinity": 2, "mental": 1}},
+		{"id": "c_4", "text": "想申请", "effects": {"affinity": 1}},
+		{"id": "c_5", "text": "谢谢老师", "effects": {"affinity": 1}}
+	  ],
+	  "close_friend": [
+		{"id": "c_6", "text": "想跟您聊聊", "effects": {"affinity": 2, "mental": 2}},
+		{"id": "c_7", "text": "感谢您的指导", "effects": {"affinity": 2}},
+		{"id": "c_8", "text": "毕业规划想请教", "effects": {"affinity": 2, "ability": 1}}
+	  ]
+	}
+  },
+  
+  "context_sensitive_messages": {
+	"description": "根据游戏情境动态生成的消息",
+	
+	"exam_week": [
+	  {"id": "ctx_exam_1", "text": "复习得怎么样", "effects": {"affinity": 1}},
+	  {"id": "ctx_exam_2", "text": "一起复习吗", "effects": {"affinity": 2, "study_points": 1}},
+	  {"id": "ctx_exam_3", "text": "加油", "effects": {"affinity": 1, "mental": 1}}
+	],
+	
+	"holiday": [
+	  {"id": "ctx_holiday_1", "text": "假期快乐", "effects": {"affinity": 1}},
+	  {"id": "ctx_holiday_2", "text": "回家了吗", "effects": {"affinity": 1}},
+	  {"id": "ctx_holiday_3", "text": "开学见", "effects": {"affinity": 1}}
+	],
+	
+	"birthday": [
+	  {"id": "ctx_bday_1", "text": "生日快乐", "effects": {"affinity": 3}},
+	  {"id": "ctx_bday_2", "text": "送你个小礼物", "effects": {"affinity": 4, "living_money": -20}}
+	],
+	
+	"low_mental": [
+	  {"id": "ctx_sad_1", "text": "最近还好吗", "effects": {"affinity": 2}},
+	  {"id": "ctx_sad_2", "text": "想聊聊吗", "effects": {"affinity": 2, "mental": 1}},
+	  {"id": "ctx_sad_3", "text": "我陪你", "effects": {"affinity": 3, "mental": 2}}
+	]
+  },
+  
+  "reply_delay_config": {
+	"description": "NPC回复延迟配置",
+	
+	"roommate_gamer": {
+	  "base_delay_minutes": 5,
+	  "random_range": 10,
+	  "style": "秒回型"
+	},
+	"roommate_studious": {
+	  "base_delay_minutes": 30,
+	  "random_range": 60,
+	  "style": "学习型"
+	},
+	"roommate_quiet": {
+	  "base_delay_minutes": 120,
+	  "random_range": 240,
+	  "style": "慢回型"
+	},
+	"debate_senior": {
+	  "base_delay_minutes": 60,
+	  "random_range": 120,
+	  "style": "学长型"
+	},
+	"tech_senior": {
+	  "base_delay_minutes": 45,
+	  "random_range": 90,
+	  "style": "技术型"
+	},
+	"union_minister": {
+	  "base_delay_minutes": 20,
+	  "random_range": 40,
+	  "style": "工作型"
+	},
+	"counselor": {
+	  "base_delay_minutes": 180,
+	  "random_range": 360,
+	  "style": "老师型"
+	},
+	"lin_zhiyi": {
+	  "base_delay_minutes": 360,
+	  "random_range": 720,
+	  "style": "慢热型"
+	},
+	"su_xiaowan": {
+	  "base_delay_minutes": 1,
+	  "random_range": 5,
+	  "style": "秒回型"
+	},
+	"chen_yutong": {
+	  "base_delay_minutes": 60,
+	  "random_range": 180,
+	  "style": "温柔型"
+	},
+	"zhou_yiran": {
+	  "base_delay_minutes": 240,
+	  "random_range": 480,
+	  "style": "忙碌型"
+	},
+	"shen_yingshuang": {
+	  "base_delay_minutes": 480,
+	  "random_range": 720,
+	  "style": "考研型"
+	}
+  },
+  
+  "anxiety_mechanic": {
+	"description": "等待回复的焦虑感机制",
+	"trigger_delay_minutes": 60,
+	"anxiety_effect": {"mental": -1},
+	"relief_effect": {"mental": 2},
+	"message_waiting": "你又看了一眼手机...",
+	"message_received": "终于收到回复了！"
+  },
+  
+  "read_receipt_mechanic": {
+	"description": "已读不回机制",
+	"trigger_chance_low_affinity": 0.3,
+	"trigger_chance_negative_flag": 0.7,
+	"effect": {"affinity": -2},
+	"warning_message": "对方已读但未回复...",
+	"consequence_message": "继续发消息可能会让对方反感"
+  }
+}

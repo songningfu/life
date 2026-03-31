@@ -1,7 +1,6 @@
 extends Control
 
 # 分页式角色创建系统
-
 var current_page: int = 1
 var total_pages: int = 6
 
@@ -82,16 +81,42 @@ const MAJOR_OPTIONS = [
 	{"id": "marketing", "name": "市场营销", "required_credits": 145, "exam_difficulty": 0.92, "desc": "整体偏灵活，属于相对好毕业的一类。"},
 ]
 
+# ==================== 本地天赋池（fallback用） ====================
+const GOOD_TALENTS: Array = [
+	{"id": "optimist", "name": "乐天派", "desc": "天生心态好，每天心理自然恢复+0.15", "icon": "☀️", "color": "#f0c040", "type": "good"},
+	{"id": "study_gifted", "name": "学霸体质", "desc": "学习效率极高，学习点日常增长×1.4", "icon": "📖", "color": "#4db8e6", "type": "good"},
+	{"id": "social_butterfly", "name": "天生社牛", "desc": "自带亲和力，所有社交收益×1.3，解锁'搭讪'行动", "icon": "🤝", "color": "#ff9933", "type": "good"},
+	{"id": "craftsman", "name": "手艺人", "desc": "动手能力出众，能力成长×1.3", "icon": "🔧", "color": "#99e64d", "type": "good"},
+	{"id": "iron_body", "name": "铁打身板", "desc": "体质过硬，所有健康损失减半", "icon": "💪", "color": "#e64d56", "type": "good"},
+	{"id": "frugal", "name": "省钱达人", "desc": "精打细算，每日消费降低30%", "icon": "💰", "color": "#e6d94d", "type": "good"},
+	{"id": "lucky", "name": "好运来", "desc": "欧皇体质，正面事件触发概率+25%", "icon": "🍀", "color": "#50c878", "type": "good"},
+	{"id": "big_heart", "name": "大心脏", "desc": "心理韧性极强，心理值保底不低于15", "icon": "❤️", "color": "#ff6b9d", "type": "good"},
+]
+
+const BAD_TALENTS: Array = [
+	{"id": "glass_heart", "name": "玻璃心", "desc": "情绪敏感，所有心理负面效果×1.5", "icon": "💔", "color": "#c0392b", "type": "bad"},
+	{"id": "weak_body", "name": "体弱多病", "desc": "容易生病，所有健康损失×1.5", "icon": "🤒", "color": "#a0522d", "type": "bad"},
+	{"id": "social_phobia", "name": "社恐", "desc": "害怕社交，所有社交收益×0.6", "icon": "😰", "color": "#7f8c8d", "type": "bad"},
+	{"id": "procrastinator", "name": "拖延症", "desc": "总是拖到最后，学习点日常增长×0.6", "icon": "🐌", "color": "#95a5a6", "type": "bad"},
+	{"id": "spendthrift", "name": "月光族", "desc": "花钱没数，每日消费增加40%", "icon": "🛍️", "color": "#e74c3c", "type": "bad"},
+	{"id": "unlucky", "name": "倒霉蛋", "desc": "走路踩狗屎，负面事件触发概率+30%", "icon": "🌧️", "color": "#636e72", "type": "bad"},
+	{"id": "insomnia", "name": "失眠体质", "desc": "越忙越睡不着，考试/复习周心理每天额外-0.3", "icon": "🌙", "color": "#6c5ce7", "type": "bad"},
+	{"id": "directionless", "name": "路痴", "desc": "方向感为零，迟到类事件触发概率翻倍", "icon": "🗺️", "color": "#b2bec3", "type": "bad"},
+]
+
 func _ready():
+	# ★ 关键修复：确保模块已加载
+	ModuleManager.ensure_modules_loaded()
+	
 	_init_pages()
 	_init_progress_dots()
 	_style_all()
 	_bind_events()
 	_build_intro_overlay()
 	
-	if SaveManager.has_meta("pending_char_creation_slot"):
-		save_slot = SaveManager.get_meta("pending_char_creation_slot")
-		SaveManager.set_meta("pending_char_creation_slot", null)
+	if SaveManager.has_temp("pending_char_creation_slot"):
+		save_slot = SaveManager.get_temp("pending_char_creation_slot")
+		SaveManager.store_temp("pending_char_creation_slot", null)
 	
 	_show_page(1)
 	_start_intro()
@@ -112,7 +137,7 @@ func _build_intro_overlay():
 	intro_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	intro_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(intro_overlay)
-
+	
 	intro_label = RichTextLabel.new()
 	intro_label.bbcode_enabled = true
 	intro_label.fit_content = true
@@ -127,7 +152,7 @@ func _build_intro_overlay():
 	intro_label.offset_right = 410
 	intro_label.offset_bottom = 170
 	intro_overlay.add_child(intro_label)
-
+	
 	intro_hint = Label.new()
 	intro_hint.text = "点击屏幕继续..."
 	intro_hint.add_theme_color_override("font_color", Color(0.34, 0.36, 0.4))
@@ -136,7 +161,7 @@ func _build_intro_overlay():
 	intro_hint.offset_left = -190
 	intro_hint.offset_top = -48
 	intro_overlay.add_child(intro_hint)
-
+	
 	intro_overlay.gui_input.connect(_on_intro_input)
 
 func _start_intro():
@@ -149,7 +174,6 @@ func _start_intro():
 		"[center]那个夏天很长，\n长得像一卷被阳光晒得发白的胶片。\n\n查分，等待，失眠，\n把未来想了很多遍，\n却还是不知道\n下一幕会从哪里开始。[/center]",
 		"[center]原来所谓长大，\n不是终于变得无所不能。\n\n而是有一天，\n轮到你一个人站在岔路口，\n看着天色渐暗，\n然后轻声对自己说:\n\n往前走吧。[/center]",
 	]
-
 	intro_phase = 0
 	intro_active = true
 	intro_overlay.visible = true
@@ -170,12 +194,12 @@ func _on_intro_input(event: InputEvent):
 		(event is InputEventKey and event.pressed):
 		intro_phase += 1
 		if intro_phase < intro_texts.size():
-			var current_phase = intro_phase
+			var current_idx = intro_phase
 			var tw = create_tween()
 			tw.tween_property(intro_label, "modulate:a", 0.0, 0.25)
 			tw.tween_callback(func():
-				if current_phase < intro_texts.size():
-					_show_intro_text(intro_texts[current_phase])
+				if current_idx < intro_texts.size():
+					_show_intro_text(intro_texts[current_idx])
 			)
 		else:
 			intro_active = false
@@ -196,29 +220,27 @@ func _init_progress_dots():
 	]
 
 func _style_all():
-	# 所有页面统一处理
+	# Page1 & Page2
 	for i in range(2):
 		var title = pages[i].get_node("VBox/Title")
-		title.add_theme_font_size_override("font_size", 36)
-		title.add_theme_color_override("font_color", colors.accent)
-		
+		if title:
+			title.add_theme_font_size_override("font_size", 36)
+			title.add_theme_color_override("font_color", colors.accent)
 		var subtitle = pages[i].get_node("VBox/Subtitle")
-		subtitle.add_theme_font_size_override("font_size", 16)
-		subtitle.add_theme_color_override("font_color", colors.dim)
+		if subtitle:
+			subtitle.add_theme_font_size_override("font_size", 16)
+			subtitle.add_theme_color_override("font_color", colors.dim)
 	
-	# 第3页和第4页 - 尝试两种路径
+	# Page3~Page6 - 尝试两种路径
 	for i in range(2, 6):
-		var title
-		var subtitle
-		# 尝试VBox路径
+		var title: Label = null
+		var subtitle: Label = null
 		if pages[i].has_node("VBox/Title"):
 			title = pages[i].get_node("VBox/Title")
 			subtitle = pages[i].get_node("VBox/Subtitle")
-		# 尝试ScrollContainer路径
 		elif pages[i].has_node("ScrollContainer/VBox/Title"):
 			title = pages[i].get_node("ScrollContainer/VBox/Title")
 			subtitle = pages[i].get_node("ScrollContainer/VBox/Subtitle")
-		
 		if title:
 			title.add_theme_font_size_override("font_size", 36)
 			title.add_theme_color_override("font_color", colors.accent)
@@ -231,7 +253,6 @@ func _style_all():
 	_style_input(name_input)
 	
 	_style_btn($PageContainer/Page1_Name/VBox/NextBtn, colors.accent)
-	
 	_style_btn($PageContainer/Page2_Gender/VBox/GenderButtons/MaleBtn, Color(0.3, 0.5, 0.8))
 	_style_btn($PageContainer/Page2_Gender/VBox/GenderButtons/FemaleBtn, Color(0.8, 0.3, 0.5))
 	$PageContainer/Page2_Gender/VBox/GenderButtons/MaleBtn.add_theme_font_size_override("font_size", 32)
@@ -242,14 +263,13 @@ func _style_all():
 	_style_btn($PageContainer/Page2_Gender/VBox/NavButtons/NextBtn, colors.accent)
 	
 	_build_background_list()
-	
 	_style_btn($PageContainer/Page3_Background/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
 	_style_btn($PageContainer/Page3_Background/ScrollContainer/VBox/NavButtons/NextBtn, colors.accent)
-
+	
 	_build_university_list()
 	_style_btn($PageContainer/Page4_University/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
 	_style_btn($PageContainer/Page4_University/ScrollContainer/VBox/NavButtons/NextBtn, colors.accent)
-
+	
 	_build_major_list()
 	_style_btn($PageContainer/Page5_Major/ScrollContainer/VBox/NavButtons/BackBtn, Color(0.3, 0.32, 0.38))
 	_style_btn($PageContainer/Page5_Major/ScrollContainer/VBox/NavButtons/NextBtn, colors.accent)
@@ -400,19 +420,17 @@ func _show_page(page: int):
 	for i in range(total_pages):
 		pages[i].visible = (i == page - 1)
 	_update_progress_dots()
-	
 	var tw = create_tween()
 	tw.tween_property(pages[page - 1], "modulate:a", 1.0, 0.3).from(0.0)
 
 func _next_page():
 	if current_page == 1:
-		var name = $PageContainer/Page1_Name/VBox/NameInput.text.strip_edges()
-		if name.length() == 0:
+		var input_name = $PageContainer/Page1_Name/VBox/NameInput.text.strip_edges()
+		if input_name.length() == 0:
 			return
-		player_name = name
+		player_name = input_name
 	if current_page == 5 and selected_major_profile.is_empty():
 		return
-	
 	if current_page < total_pages:
 		_show_page(current_page + 1)
 
@@ -460,8 +478,7 @@ func _on_bg_selected(bg_id: String):
 
 func _update_bg_selection():
 	for id in bg_buttons:
-		var btn = bg_buttons[id]
-		_style_select_card(btn, id == selected_background)
+		_style_select_card(bg_buttons[id], id == selected_background)
 
 func _on_university_selected(tier: String, school_name: String):
 	selected_university_tier = tier
@@ -470,8 +487,7 @@ func _on_university_selected(tier: String, school_name: String):
 
 func _update_university_selection():
 	for tier in university_buttons:
-		var btn = university_buttons[tier]
-		_style_select_card(btn, tier == selected_university_tier)
+		_style_select_card(university_buttons[tier], tier == selected_university_tier)
 
 func _on_major_selected(major_id: String):
 	selected_major_id = major_id
@@ -483,24 +499,21 @@ func _on_major_selected(major_id: String):
 
 func _update_major_selection():
 	for id in major_buttons:
-		var btn = major_buttons[id]
-		_style_select_card(btn, id == selected_major_id)
-
-func _major_summary(major: Dictionary) -> String:
-	return str(major.get("desc", ""))
+		_style_select_card(major_buttons[id], id == selected_major_id)
 
 func _render_major_page():
 	var list = $PageContainer/Page5_Major/ScrollContainer/VBox/MajorList
 	for child in list.get_children():
 		child.queue_free()
 	major_buttons.clear()
-
+	
 	var start_index = major_page_index * MAJORS_PER_PAGE
 	var end_index = mini(start_index + MAJORS_PER_PAGE, MAJOR_OPTIONS.size())
+	
 	for i in range(start_index, end_index):
 		var major = MAJOR_OPTIONS[i]
 		var btn = Button.new()
-		btn.text = "%s\n%s" % [major.get("name", ""), _major_summary(major)]
+		btn.text = "%s\n%s" % [major.get("name", ""), major.get("desc", "")]
 		btn.custom_minimum_size = Vector2(420, 82)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -510,13 +523,12 @@ func _render_major_page():
 		list.add_child(btn)
 		major_buttons[major.get("id", "")] = btn
 		_style_select_card(btn, false)
-
+	
 	var page_label = $PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/PageLabel
 	var total_major_pages = int(ceil(float(MAJOR_OPTIONS.size()) / float(MAJORS_PER_PAGE)))
 	page_label.text = "第 %d / %d 组" % [major_page_index + 1, total_major_pages]
 	$PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/PrevPageBtn.visible = major_page_index > 0
 	$PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/NextPageBtn.visible = major_page_index < total_major_pages - 1
-
 	_update_major_selection()
 
 func _prev_major_page():
@@ -534,20 +546,55 @@ func _next_major_page():
 
 func _tier_str(t: String) -> String:
 	match t:
-		"985":
-			return "985高校"
-		"normal":
-			return "普通一本"
-		"low":
-			return "二本院校"
-		_:
-			return "大学"
+		"985": return "985高校"
+		"normal": return "普通一本"
+		"low": return "二本院校"
+		_: return "大学"
 
+# ==================== ★ 核心修复：天赋抽取 ★ ====================
 func _roll_talents():
-	current_talents = TalentSystem.roll_talents()
+	# 尝试通过模块系统抽取
+	var talent_module: TalentModule = null
+	if ModuleManager:
+		talent_module = ModuleManager.get_module("talent") as TalentModule
+	
+	if talent_module:
+		current_talents = talent_module.roll_talents()
+		print("[CharacterCreation] 通过TalentModule抽取天赋成功")
+	else:
+		# Fallback：本地抽取
+		print("[CharacterCreation] TalentModule未找到，使用本地抽取")
+		current_talents = _local_roll_talents()
+	
 	_display_talents()
 	$PageContainer/Page6_Talent/ScrollContainer/VBox/RollBtn.text = "重新抽取"
 	$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.text = ""
+
+## 本地天赋抽取（fallback）
+func _local_roll_talents() -> Array:
+	var good_count: int
+	var bad_count: int
+	if randf() < 0.70:
+		good_count = 1
+		bad_count = 2
+	else:
+		good_count = 2
+		bad_count = 1
+	
+	var good_pool: Array = GOOD_TALENTS.duplicate()
+	good_pool.shuffle()
+	var bad_pool: Array = BAD_TALENTS.duplicate()
+	bad_pool.shuffle()
+	
+	var result: Array = []
+	for i in range(good_count):
+		if i < good_pool.size():
+			result.append(good_pool[i].duplicate())
+	for i in range(bad_count):
+		if i < bad_pool.size():
+			result.append(bad_pool[i].duplicate())
+	result.shuffle()
+	return result
 
 func _display_talents():
 	var list = $PageContainer/Page6_Talent/ScrollContainer/VBox/TalentList
@@ -557,7 +604,7 @@ func _display_talents():
 	for t in current_talents:
 		var card = PanelContainer.new()
 		var s = StyleBoxFlat.new()
-		var is_good = t["type"] == "good"
+		var is_good = t.get("type", "bad") == "good"
 		s.bg_color = Color(0.12, 0.17, 0.24) if is_good else Color(0.14, 0.16, 0.2)
 		s.border_width_left = 4
 		s.border_color = colors.accent_bright if is_good else colors.bad
@@ -571,19 +618,19 @@ func _display_talents():
 		var hbox = HBoxContainer.new()
 		hbox.add_theme_constant_override("separation", 14)
 		card.add_child(hbox)
-
+		
 		var vbox = VBoxContainer.new()
 		vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		hbox.add_child(vbox)
 		
 		var name_lbl = Label.new()
-		name_lbl.text = "%s  [%s]" % [t["name"], "增益" if is_good else "减益"]
+		name_lbl.text = "%s  [%s]" % [t.get("name", "未知天赋"), "增益" if is_good else "减益"]
 		name_lbl.add_theme_font_size_override("font_size", 20)
 		name_lbl.add_theme_color_override("font_color", colors.accent_bright if is_good else Color(0.82, 0.87, 0.94))
 		vbox.add_child(name_lbl)
 		
 		var desc_lbl = Label.new()
-		desc_lbl.text = t["desc"]
+		desc_lbl.text = t.get("desc", "")
 		desc_lbl.add_theme_font_size_override("font_size", 14)
 		desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.72, 0.76))
 		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -597,9 +644,18 @@ func _start_game():
 		$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.add_theme_color_override("font_color", colors.accent_bright)
 		return
 	
-	TalentSystem.set_talents(current_talents)
+	# ★ 修复：同步天赋到TalentModule
+	var talent_module: TalentModule = null
+	if ModuleManager:
+		talent_module = ModuleManager.get_module("talent") as TalentModule
+	if talent_module:
+		talent_module.set_talents(current_talents)
+	else:
+		print("[CharacterCreation] 警告：TalentModule未找到，天赋将通过init_data传递")
+	
 	NamePool.init_new_game()
-	SaveManager.set_meta("pending_game_init", {
+	
+	SaveManager.store_temp("pending_game_init", {
 		"player_name": player_name,
 		"player_gender": selected_gender,
 		"save_slot": save_slot,
@@ -611,4 +667,5 @@ func _start_game():
 		"major_profile": selected_major_profile.duplicate(true),
 		"talents": current_talents.duplicate(true),
 	})
+	
 	get_tree().change_scene_to_file("res://scenes/Game.tscn")

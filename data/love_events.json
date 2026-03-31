@@ -1,0 +1,519 @@
+{
+  "version": "2.0",
+  "description": "恋爱事件数据 - 五位角色的完整故事线",
+  
+  "first_meet": {
+	"lin_zhiyi": {
+	  "id": "lzy_first_meet",
+	  "title": "图书馆的书签",
+	  "text": "你在图书馆找位子，看到靠窗的位置旁边掉了一张书签。\n你捡起来——是一张手写的英文书签，字迹很漂亮。\n旁边的女生抬起头，愣了一下，轻声说了句'谢谢'。\n她的眼睛很亮。",
+	  "phase": "MET",
+	  "choices": [
+		{
+		  "text": "'这个书签很好看，你自己做的？'",
+		  "effects": {"spark": 8, "affinity": 5},
+		  "followup": "她有点意外你会多问一句，笑了笑说'嗯，闲着没事写的'。\n你们聊了几句就各自看书了。但你注意到她翻页的频率变慢了。"
+		},
+		{
+		  "text": "递过去就继续找位子",
+		  "effects": {"spark": 3, "affinity": 3},
+		  "followup": "她接过书签说了声谢谢。你坐到了几排之外。\n后来你抬头的时候，发现她正好也在看这边。"
+		}
+	  ]
+	},
+	
+	"su_xiaowan": {
+	  "id": "sxw_first_meet",
+	  "title": "社团招新的'碰撞'",
+	  "text": "辩论社的摊位前围了不少人。一个扎马尾的女生正在慷慨陈词地'安利'新生加入。\n你走过去随便翻了翻宣传单，她立刻转过来——\n'同学！你看起来就很适合辩论！来试试！'\n你还没开口，她已经把报名表塞你手里了。",
+	  "phase": "MET",
+	  "choices": [
+		{
+		  "text": "'你这拉人方式也太强硬了吧...'",
+		  "effects": {"spark": 5, "affinity": 3},
+		  "followup": "她挑了下眉毛：'看吧，你已经在跟我辩了。天赋！'\n周围的人都笑了。你不得不承认她挺有意思的。"
+		},
+		{
+		  "text": "'行，我试试'",
+		  "effects": {"spark": 3, "affinity": 5},
+		  "followup": "她眼睛一亮：'爽快！我叫苏小晚，以后就是队友了！'\n她伸出手来跟你握手，力气比你想象中大。"
+		},
+		{
+		  "text": "放下报名表走了",
+		  "effects": {"spark": 0, "affinity": 0},
+		  "followup": "你走出几步，听到她在后面喊：'想好了再来找我！'\n你没回头，但忍不住笑了一下。",
+		  "note": "即使走了后续社团行动仍有概率遇到"
+		}
+	  ]
+	},
+	
+	"chen_yutong": {
+	  "id": "cyt_first_meet",
+	  "title": "隔壁班的女生",
+	  "text": "开学第一天，你在找教室的时候迷路了。\n一个女生主动过来问你：'你是工商管理的新生吧？我带你过去。'\n她笑起来眼睛弯弯的，让人觉得很亲切。\n'我叫陈雨桐，隔壁班的。以后常一起玩啊！'",
+	  "phase": "MET",
+	  "auto_trigger": true,
+	  "day": 0,
+	  "effects": {"affinity": 10}
+	},
+	
+	"zhou_yiran": {
+	  "id": "zyr_first_meet",
+	  "title": "便利店新同事",
+	  "text": "兼职第一天，店长让一个女生带你。\n她扫了你一眼，面无表情地说：'跟我来，先学收银。'\n动作很利索，解释也简洁。你注意到她的手上有几个细小的创可贴。\n一个小时后她终于问了你一句：'你是哪个学校的？'\n听到校名之后她稍微放松了一点：'我也是。'",
+	  "phase": "MET",
+	  "choices": [
+		{
+		  "text": "'你做了多久了？很熟练'",
+		  "effects": {"spark": 3, "affinity": 5},
+		  "followup": "'快一年了。'她顿了顿，'习惯就好。'\n她没再多说，但教你的时候更耐心了一点。"
+		},
+		{
+		  "text": "认真学，少说话",
+		  "effects": {"spark": 2, "affinity": 6},
+		  "followup": "你安静地跟着她做。下班前她主动说了句'你学得挺快的'。\n从她的语气听得出来，这算是很高的评价了。"
+		}
+	  ]
+	},
+	
+	"shen_yingshuang": {
+	  "id": "sys_first_meet",
+	  "title": "考研自习室的橡皮",
+	  "text": "考研自习室里人头攒动。你找到一个角落的位置坐下。\n旁边的女生头都没抬，专注地看着眼前的书。\n你发现考的是同一个学校同一个专业。\n第一次说话是你铅笔断了，问她借橡皮。\n她默默递过来，什么都没说。",
+	  "phase": "MET",
+	  "choices": [
+		{
+		  "text": "'谢谢，你也考这个学校？'",
+		  "effects": {"spark": 3, "affinity": 3},
+		  "followup": "她点点头，终于看了你一眼。\n'加油。'她说。然后继续低头看书。\n但你注意到，她把书往你这边挪了挪，像是给你让出更多空间。"
+		},
+		{
+		  "text": "默默用完还回去",
+		  "effects": {"spark": 2, "affinity": 2},
+		  "followup": "你把橡皮轻轻放回她桌上。\n她微微点头，算是回应。\n这就是你们第一次交流的全部。"
+		}
+	  ]
+	}
+  },
+  
+  "familiar_events": {
+	"lin_zhiyi": [
+	  {
+		"id": "lzy_share_materials",
+		"title": "学习资料",
+		"text": "你在图书馆遇到林知意，她主动问你：'你在准备四级吗？我有一些资料可以分享给你。'\n她的资料整理得很详细，还有她自己的笔记。",
+		"conditions": {"phase": "FAMILIAR"},
+		"effects": {"spark": 3, "affinity": 4, "study_points": 2},
+		"followup": "'这个笔记...是你自己整理的？'\n'嗯，闲着没事。'她淡淡地说。\n但你发现她的耳朵有点红。"
+	  },
+	  {
+		"id": "lzy_closing_time",
+		"title": "闭馆同路",
+		"text": "考试周，你在图书馆待到闭馆。\n收拾东西的时候发现林知意也在。\n'你也这么晚？'她问。\n'嗯，复习不完。'\n'一起走吧，正好同路。'",
+		"conditions": {"phase": "FAMILIAR", "phase_name": "上学期复习周"},
+		"effects": {"spark": 5, "affinity": 3, "mental": 2},
+		"followup": "夜路上你们聊了很多。她比白天话多。\n到宿舍楼下，她说：'今天谢谢你陪我走回来。'\n你愣了一下，明明是她陪你。\n当晚微信，她发来一句：'明天图书馆见？'"
+	  }
+	],
+	
+	"su_xiaowan": [
+	  {
+		"id": "sxw_drunk_truth",
+		"title": "社团聚餐",
+		"text": "社团聚餐，苏小晚喝了不少。\n你扶她去洗手间，她在走廊上突然停下来说：\n'你知道我为什么总怼你吗？因为...你让我想起一个人。'\n她的眼眶有点红。",
+		"conditions": {"phase": "FAMILIAR"},
+		"choices": [
+		  {
+			"text": "'谁？'",
+			"effects": {"spark": 4, "affinity": 5},
+			"followup": "'我哥。'她苦笑，'他也总让着我。'\n你突然理解了她强势外表下的脆弱。"
+		  },
+		  {
+			"text": "'别说了，我送你回去'",
+			"effects": {"spark": 2, "affinity": 3},
+			"followup": "她看着你，欲言又止。\n第二天她像什么都没发生，但你注意到她对你态度软了很多。"
+		  }
+		]
+	  },
+	  {
+		"id": "sxw_nickname",
+		"title": "外号",
+		"text": "'喂，苏大嘴！'\n你脱口而出。\n社团的人都愣住了。\n苏小晚转过头，眯起眼睛：'你叫我什么？'",
+		"conditions": {"phase": "FAMILIAR"},
+		"choices": [
+		  {
+			"text": "'苏...苏学姐？'",
+			"effects": {"spark": 2, "mental": -1},
+			"followup": "她翻了个白眼，但嘴角在笑。\n'算了，苏大嘴就苏大嘴吧。那你以后就是我小弟了。'"
+		  },
+		  {
+			"text": "'苏大嘴啊，怎么了？'",
+			"effects": {"spark": 5, "affinity": 4},
+			"followup": "她愣了一下，然后笑了。\n'行啊你，敢这么叫我。那你以后就是我...朋友了。'\n她顿了顿，像是在找一个合适的词。"
+		  }
+		]
+	  }
+	],
+	
+	"chen_yutong": [
+	  {
+		"id": "cyt_notes",
+		"title": "笔记",
+		"text": "你上课走神，没记全笔记。\n下课后陈雨桐过来：'我看你没记全，我的借你抄吧。'\n她的笔记工整漂亮，还有不同颜色的标注。",
+		"conditions": {"phase": "FAMILIAR"},
+		"effects": {"spark": 2, "affinity": 3, "study_points": 1},
+		"followup": "'你总是这么热心吗？'\n'啊？'她愣了一下，'没有啊，就是...看你没记全。'\n她把笔记塞给你，快步走了。\n你注意到她的脸有点红。"
+	  },
+	  {
+		"id": "cyt_lunch",
+		"title": "食堂",
+		"text": "中午在食堂遇到陈雨桐。\n'一个人？一起吗？'她问。\n你们端着餐盘找位子，她一直在说话，讲她室友的趣事。",
+		"conditions": {"phase": "FAMILIAR"},
+		"effects": {"spark": 3, "affinity": 3, "mental": 2},
+		"followup": "'你话好多。'你说。\n'啊，是不是太吵了？'她有点慌。\n'没有，挺可爱的。'\n她愣住了，然后低下头扒饭，耳朵红透了。"
+	  }
+	],
+	
+	"zhou_yiran": [
+	  {
+		"id": "zyr_sick",
+		"title": "发烧",
+		"text": "周一然今天脸色很差，但还是来上班了。\n你摸了摸她的额头，很烫。\n'你发烧了，回去休息吧，我帮你顶班。'",
+		"conditions": {"phase": "FAMILIAR"},
+		"effects": {"spark": 5, "affinity": 6},
+		"followup": "她看着你，眼眶有点红。\n'为什么？'她问。\n'什么为什么？'\n'为什么对我这么好？'\n你愣住了，不知道该怎么回答。"
+	  },
+	  {
+		"id": "zyr_defend",
+		"title": "维护",
+		"text": "一个难缠的客人对周一然态度很差。\n你忍不住上前：'不好意思，她是我同事，有什么问题跟我说。'\n客人骂骂咧咧地走了。",
+		"conditions": {"phase": "FAMILIAR"},
+		"effects": {"spark": 4, "affinity": 5},
+		"followup": "'你不用这样的。'她说。\n'我想这样。'\n她看着你，很久没说话。\n下班的时候，她主动说：'一起吃个饭？我请。'"
+	  }
+	],
+	
+	"shen_yingshuang": [
+	  {
+		"id": "sys_supervise",
+		"title": "监督",
+		"text": "你在自习室打盹，头一点一点。\n突然有人敲了敲桌子。\n你抬头，沈映霜面无表情地看着你：'这才几点？'",
+		"conditions": {"phase": "FAMILIAR"},
+		"effects": {"spark": 2, "affinity": 3, "study_points": 1},
+		"followup": "'对不起...'\n'不用对不起我，对不起你自己。'\n她说完坐下，但把一包薄荷糖推到你桌上。\n'醒醒脑。'"
+	  },
+	  {
+		"id": "sys_pancake",
+		"title": "煎饼",
+		"text": "晚上十点半，你们一起从自习室出来。\n'饿了吗？'她问。\n'有点。'\n'我知道有个地方的煎饼很好吃。'",
+		"conditions": {"phase": "FAMILIAR"},
+		"effects": {"spark": 4, "affinity": 4, "mental": 2},
+		"followup": "路边摊的煎饼，她加了两根火腿肠。\n'你吃得完吗？'\n'今天模考不错，奖励自己。'她难得笑了。\n'你呢？考得怎么样？'\n你们第一次聊考试以外的话题。"
+	  }
+	]
+  },
+  
+  "ambiguous_events": {
+	"lin_zhiyi": [
+	  {
+		"id": "lzy_earphone",
+		"title": "一副耳机",
+		"text": "你发现今天忘带耳机了，图书馆的白噪音让你有点烦躁。\n林知意注意到你一直在左右看，默默摘下一只耳机递过来。\n'分你一只？我在听白噪音。'\n你戴上的时候，一股淡淡的洗衣液味道飘过来。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"choices": [
+		  {
+			"text": "安静地一起听着",
+			"effects": {"spark": 10, "mental": 5},
+			"followup": "你们就这样共用一副耳机自习了一下午。\n耳机线的长度刚好让你们靠得比平时近一点。\n谁都没提起这件事，但你知道你会记住今天。"
+		  },
+		  {
+			"text": "'没事，我扛得住'",
+			"effects": {"spark": 2},
+			"followup": "她'哦'了一声，把耳机收回去了。\n你有点后悔。"
+		  }
+		]
+	  },
+	  {
+		"id": "lzy_tofel",
+		"title": "托福",
+		"text": "你从室友口中得知，林知意在准备托福。\n也就是说，她打算出国。\n你看着图书馆里她的背影，心情复杂。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"effects": {"spark": 3, "mental": -2},
+		"followup": "那天晚上，你在微信上问她：'听说你在准备出国？'\n过了很久，她回：'嗯。'\n只有一个字。但你感觉到，她有很多话没说。"
+	  },
+	  {
+		"id": "lzy_night_walk",
+		"title": "夜谈",
+		"text": "一次她心情不好，你陪她校园里走了很久。\n'有时候觉得未来好远。'她说。\n'什么意思？'\n'就是...不知道以后会怎么样。'",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"choices": [
+		  {
+			"text": "'不管以后怎么样，现在我在。'",
+			"effects": {"spark": 8, "affinity": 5},
+			"followup": "她停下脚步，看着你。\n路灯下，她的眼睛很亮。\n'你...'她欲言又止。\n最后只是说：'谢谢你。'"
+		  },
+		  {
+			"text": "'别想太多，会好的'",
+			"effects": {"spark": 4, "affinity": 3},
+			"followup": "她点点头，继续走。\n但你感觉到，你们之间有什么东西不一样了。"
+		  }
+		]
+	  }
+	],
+	
+	"su_xiaowan": [
+	  {
+		"id": "sxw_sleep",
+		"title": "睡着了",
+		"text": "社团比赛临近，你们天天排练到很晚。\n一次排练结束，你坐在椅子上休息。\n感觉肩膀一沉，苏小晚靠着你睡着了。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"effects": {"spark": 8, "mental": 3},
+		"followup": "你不敢动，怕吵醒她。\n她的呼吸很轻，头发蹭着你的脖子，有点痒。\n室友进来看到，起哄：'哦哟！'\n她猛地惊醒，脸通红：'不是你们想的那样！'\n但她没否认靠着你睡着这件事。"
+	  },
+	  {
+		"id": "sxw_jealous",
+		"title": "吃醋",
+		"text": "你和另一个女生说话，苏小晚走过来，语气不善：'聊得挺开心啊？'\n'就是普通同学...'\n'我又没说什么。'她转身就走。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"choices": [
+		  {
+			"text": "追上去解释",
+			"effects": {"spark": 6, "affinity": 4},
+			"followup": "'你吃醋了？'\n'谁吃醋了！'她瞪你。\n'你就是吃醋了。'\n'...闭嘴。'她脸红得厉害，但没有否认。"
+		  },
+		  {
+			"text": "让她冷静一下",
+			"effects": {"spark": -2, "affinity": -1},
+			"followup": "她一整天没理你。\n晚上收到她的消息：'我今天是不是有点过分？'\n你笑了，回：'是挺过分的。'\n'那...对不起？'"
+		  }
+		]
+	  }
+	],
+	
+	"chen_yutong": [
+	  {
+		"id": "cyt_photos",
+		"title": "朋友圈",
+		"text": "你开始频繁刷陈雨桐的朋友圈。\n她发的每条动态你都仔细看。\n今天她发了一张和男生的合照。\n你的心沉了一下。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"effects": {"mental": -3},
+		"followup": "室友问：'你是不是喜欢人家？'\n你嘴硬：'没有啊。'\n'那你盯着手机看半小时了。'\n你才发现，原来已经这么明显了。"
+	  },
+	  {
+		"id": "cyt_classmate",
+		"title": "高中同学",
+		"text": "你打听到，那个男生是陈雨桐的高中同学，不是男朋友。\n你松了口气，但随即又紧张起来。\n她好像对另一个学长有好感。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"effects": {"mental": -2},
+		"followup": "你开始犹豫。\n是表白，还是继续做朋友？\n还是...慢慢退出？\n无论哪个选择，都让你心跳加速。"
+	  }
+	],
+	
+	"zhou_yiran": [
+	  {
+		"id": "zyr_payday",
+		"title": "发工资",
+		"text": "发工资那天，周一然说：'一起吃顿好的？我请。'\n你们去了一家小餐馆。\n她点了两个菜，都是你喜欢的。\n'你怎么知道我喜欢吃这个？'\n'观察出来的。'她淡淡地说。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"effects": {"spark": 6, "affinity": 5, "mental": 3},
+		"followup": "'这是我这学期最开心的一顿饭。'她说。\n你看着她，突然很想握住她的手。\n但你忍住了。\n送她到宿舍楼下，她回头看了你一眼。\n那一眼，让你失眠了一整晚。"
+	  },
+	  {
+		"id": "zyr_expensive",
+		"title": "太贵了",
+		"text": "你想请周一然吃顿好的，去了一家比较贵的餐厅。\n她看着菜单，脸色变了。\n'我们换一家吧。'她说。\n'为什么？'\n'太贵了。'",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"choices": [
+		  {
+			"text": "'我请客，没关系'",
+			"effects": {"spark": -3, "affinity": -2},
+			"followup": "'我不是这个意思。'她站起来，'我不想让你觉得...'\n她没说完就走了。\n你意识到，你伤害了她的自尊。"
+		  },
+		  {
+			"text": "'好，听你的'",
+			"effects": {"spark": 5, "affinity": 4},
+			"followup": "你们换了一家便宜的小馆子。\n她明显放松了很多。\n'谢谢你。'她说。\n'谢什么？'\n'谢谢...理解我。'"
+		  }
+		]
+	  }
+	],
+	
+	"shen_yingshuang": [
+	  {
+		"id": "sys_cry",
+		"title": "没考好",
+		"text": "一次模考，沈映霜没考好。\n你看到她眼圈红了，但强忍着没哭。\n'没事，一次模考而已。'你说。\n'你不懂。'她声音有点抖。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"choices": [
+		  {
+			"text": "'我懂。我也怕考不上。'",
+			"effects": {"spark": 7, "affinity": 5, "mental": 2},
+			"followup": "她看着你，眼泪终于掉下来。\n'我以为...只有我一个人这样。'\n你们坐在自习室外面的台阶上，聊了很久。\n关于恐惧，关于压力，关于未来。"
+		  },
+		  {
+			"text": "'那下次努力就好了'",
+			"effects": {"spark": 2, "affinity": 1},
+			"followup": "她点点头，擦了擦眼睛。\n'嗯，我去学习了。'\n她转身进了自习室。\n你感觉，你们之间还有距离。"
+		  }
+		]
+	  },
+	  {
+		"id": "sys_dinner_invite",
+		"title": "那顿饭",
+		"text": "某天夜里一起从自习室出来。\n她突然说：'如果考完了，我们去吃一顿好的吧。'\n你愣住了。\n你知道，不只是一顿饭的意思。",
+		"conditions": {"phase": "AMBIGUOUS"},
+		"effects": {"spark": 10, "mental": 3},
+		"followup": "'好啊。'你说。\n她笑了笑，那是你第一次看到她这么放松的笑。\n'一言为定。'\n你们都默契地不挑明，怕影响复习。\n但那顿饭，成了你们共同的目标。"
+	  }
+	]
+  },
+  
+  "confession_events": {
+	"lin_zhiyi": {
+	  "id": "lzy_confession",
+	  "title": "决定",
+	  "text": "林知意告诉你，她决定申请出国了。\n'我已经想好了。'她说。\n'那...我们呢？'你问。\n她沉默了很久。",
+	  "choices": [
+		{
+		  "text": "'我支持你。不管你在哪里。'",
+		  "effects": {"spark": 5, "affinity": 8},
+		  "set_phase": "DATING",
+		  "set_route": "restraint",
+		  "followup": "克制线——你们保持着比朋友多一点的关系。毕业前她在机场发了很长的微信。"
+		},
+		{
+		  "text": "'能不能...为了我留下？'",
+		  "effects": {"spark": 3},
+		  "set_phase": "CONFESSION",
+		  "set_route": "plea",
+		  "followup": "挽留线——她看着你，眼眶红了。'我需要想想。'"
+		},
+		{
+		  "text": "'那...祝你一切顺利。'",
+		  "effects": {"spark": -10, "affinity": -5},
+		  "set_phase": "REGRET",
+		  "followup": "遗憾线——你们越来越少说话。毕业典礼上远远对视了一眼。"
+		}
+	  ]
+	},
+	
+	"su_xiaowan": {
+	  "id": "sxw_confession",
+	  "title": "表白",
+	  "text": "苏小晚把你叫到社团活动室。\n'我有话跟你说。'\n她深吸一口气：'我喜欢你。'\n你愣住了。\n'你不用现在回答，我只是...不想留遗憾。'",
+	  "choices": [
+		{
+		  "text": "'我也喜欢你。'",
+		  "effects": {"spark": 10, "affinity": 10},
+		  "set_phase": "DATING",
+		  "followup": "她瞪大眼睛，然后笑了。\n'真的？'\n'真的。'\n她冲过来抱住你。\n'你这个笨蛋，怎么不早说！'"
+		},
+		{
+		  "text": "'我需要想想'",
+		  "effects": {"spark": -5, "affinity": -3},
+		  "followup": "她的笑容僵住了。\n'哦...好。'\n她转身离开，背影有点落寞。\n你后悔了，但已经来不及。"
+		}
+	  ]
+	},
+	
+	"chen_yutong": {
+	  "id": "cyt_confession",
+	  "title": "表白",
+	  "text": "你决定向陈雨桐表白。\n'雨桐，我有话想对你说。'\n她看着你，眼神有点慌乱。\n'我...我喜欢你。不是朋友那种喜欢。'",
+	  "conditions": {"success_rate": 0.5},
+	  "choices": [
+		{
+		  "text": "等待她的回答",
+		  "effects": {},
+		  "branch": "random",
+		  "success": {
+			"effects": {"spark": 10, "affinity": 8},
+			"set_phase": "DATING",
+			"followup": "她愣了很久，然后笑了。\n'我也不确定...但愿意试试。'\n进展很慢，需要很多耐心，但这是最踏实的感情。"
+		  },
+		  "fail": {
+			"effects": {"spark": -5, "affinity": -3, "mental": -5},
+			"set_phase": "MET",
+			"followup": "她说：'对不起...我把你当很好的朋友。'\n你强笑着说'没关系'。\n但你知道，有些东西回不去了。"
+		  }
+		}
+	  ]
+	},
+	
+	"zhou_yiran": {
+	  "id": "zyr_confession",
+	  "title": "在一起",
+	  "text": "下班的路上，周一然突然停下。\n'我有话想说。'\n她看着你，眼神很认真。\n'我知道我们不一样。你不需要打工，我需要。但...我还是想问你，愿不愿意和我在一起？'",
+	  "choices": [
+		{
+		  "text": "'愿意。我们一起努力。'",
+		  "effects": {"spark": 10, "affinity": 10},
+		  "set_phase": "DATING",
+		  "followup": "她笑了，那是你见过的最美的笑容。\n'那说好了，一起努力。'\n你们的手第一次握在一起。"
+		},
+		{
+		  "text": "'我需要想想'",
+		  "effects": {"spark": -8, "affinity": -5},
+		  "followup": "她点点头，笑容有点勉强。\n'好，你想清楚。'\n但你感觉到，她已经在后退了。"
+		}
+	  ]
+	},
+	
+	"shen_yingshuang": {
+	  "id": "sys_confession",
+	  "title": "考研之后",
+	  "text": "考研结束那天，你们在考场外相遇。\n'考得怎么样？'你问。\n'还行。'她说。\n然后她看着你：'那顿饭...还算数吗？'",
+	  "choices": [
+		{
+		  "text": "'当然算数。'",
+		  "effects": {"spark": 10, "affinity": 8},
+		  "set_phase": "DATING",
+		  "followup": "她笑了。\n'那走吧，我饿了。'\n那顿饭吃了很久。\n你们聊了很多，关于考研，关于未来，关于彼此。\n最后她说：'其实...我早就喜欢你了。'"
+		}
+	  ]
+	}
+  },
+  
+  "dating_events": {
+	"common": [
+	  {
+		"id": "dating_date",
+		"title": "约会",
+		"text": "你们去约会了。",
+		"effects": {"spark": 3, "mental": 5, "living_money": -50}
+	  },
+	  {
+		"id": "dating_conflict",
+		"title": "争吵",
+		"text": "你们因为小事吵了一架。",
+		"effects": {"spark": -2, "conflict": 5},
+		"trigger_conflict": true
+	  },
+	  {
+		"id": "dating_reconcile",
+		"title": "和好",
+		"text": "你们和好了。",
+		"effects": {"spark": 5, "mental": 3, "conflict": -10}
+	  }
+	]
+  },
+  
+  "breakup_events": {
+	"common": [
+	  {
+		"id": "breakup_happen",
+		"title": "分手",
+		"text": "你们分手了。",
+		"effects": {"mental": -10, "spark": -50},
+		"set_phase": "BREAKUP"
+	  },
+	  {
+		"id": "drift_apart",
+		"title": "疏远",
+		"text": "你们不知不觉间疏远了。",
+		"effects": {"spark": -20, "affinity": -10},
+		"set_phase": "REGRET"
+	  }
+	]
+  }
+}

@@ -1,2391 +1,720 @@
-[
-  {
-	"id": "y1s1_roommate",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 10,
-	"text": "四个舍友都到齐后，宿舍终于慢慢安静下来。\n你站在自己床边，看着这几张刚认识却已经各有样子的脸，忽然有一种很具体的预感：大学不会再只是录取通知书、行李箱和报到流程，它已经变成这间五人宿舍里真实会发生的日子了。\n而今晚，大概就是这一切真正开始的地方。",
-	"choices": [
-	  {
-		"text": "主动搭话，尽量把第一晚的气氛带热",
-		"effects": {
-		  "social": 8,
-		  "mental": 5
-		},
-		"add_tags": [
-          "roommate_warm_opening",
-          "roommate_intro_done"
-		],
-		"result": "你先开了口，至少没让第一晚冷得太尴尬。哪怕有人不太理你，宿舍里那点生分也还是被你撕开了一个口子。"
-	  },
-	  {
-		"text": "边收拾边观察，把每个人的样子先记下来",
-		"effects": {
-		  "social": 5,
-		  "gpa": 3
-		},
-		"add_tags": [
-          "roommate_observer",
-          "roommate_intro_done"
-		],
-		"result": "你没有急着表现自己，只是安静地把每个人的样子、说话方式和进门顺序记在心里。后来回头想，这些细节就是宿线真正开始的地方。"
-	  },
-	  {
-		"text": "先把自己的位置安顿好，再慢慢融进去",
-		"effects": {
-		  "mental": 3
-		},
-		"add_tags": [
-          "roommate_slow_warm",
-          "roommate_intro_done"
-		],
-		"result": "你先把属于自己的那张床和桌子收拾妥当。等人都到齐时，宿舍已经有了热闹和沉默并存的味道，而你也正式成了其中一员。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_club_fair",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 10,
-	"text": "百团大战把操场挤成了集市。\n\n横幅、音响、传单和吆喝声混在一起，热闹得像节日。你手里刚接过第三张宣传单，第四个人已经把二维码怼到你面前：\"同学，加社团吗？\"",
-	"choices": [
-	  {
-		"text": "被辩论社吸引，走过去听了一会儿现场交锋",
-		"effects": {
-		  "social": 10,
-		  "ability": 5
-		},
-		"add_tags": [
-          "debate_club"
-		],
-		"result": "学长把报名表递给你：\"下周新生赛，敢不敢上？\"你签完名字时，手心有点热，心里却莫名兴奋。"
-	  },
-	  {
-		"text": "钻进技术社角落，盯着那台跑代码的电脑看",
-		"effects": {
-		  "ability": 10,
-		  "social": 3
-		},
-		"add_tags": [
-          "tech_club"
-		],
-		"result": "社长抬头只问了一句：\"会写吗？\"你说不会。他点点头：\"那就来学。\"短短几句话，反而让你更想试试。"
-	  },
-	  {
-		"text": "去学生会展台排队面试，想看看自己能不能撑住场面",
-		"effects": {
-		  "social": 12,
-		  "ability": 3
-		},
-		"add_tags": [
-          "student_union"
-		],
-		"result": "面试比你想的正式，问题一个接一个。结束时部长说：\"下周来开会。\"你这才意识到自己真的进了学生会。"
-	  },
-	  {
-		"text": "看了一圈，把传单折好塞包里：先不加",
-		"effects": {
-		  "mental": 5
-		},
-		"add_tags": [
-          "no_club"
-		],
-		"result": "你慢慢走回宿舍，耳边终于安静下来。室友问你报了什么，你笑着摇头：\"先把日子过明白再说。\""
-	  }
-	]
-  },
-  {
-	"id": "y1s1_military_start",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 22,
-	"requires": [
-      "roommate_intro_done"
-	],
-	"day_conditions": {
-	  "is_military": true
+{
+  "version": "2.0",
+  "description": "大学四年事件数据 - 按行动类型和阶段分类",
+  
+  "event_pools": {
+	"class_events": {
+	  "micro": ["class_micro_1", "class_micro_2", "class_micro_3", "class_micro_4", "class_micro_5"],
+	  "standard": ["class_standard_1", "class_standard_2"],
+	  "main": ["class_main_exam"]
 	},
-	"text": "军训第二天，宿舍里已经没人把它当成什么热血开场了。\n有人一边系腰带一边骂太阳，有人盯着镜子里的黑眼圈发呆，还有人昨晚跟着学长跑出去喝酒，今早坐在床边像灵魂刚回体。\n你忽然意识到，这两周的重点可能不是把动作练标准，而是谁能在操场上少受点罪。",
-	"choices": [
-	  {
-		"text": "先去站两天，摸清教官脾气再想办法",
-		"effects": {
-		  "social": 3,
-		  "health": -4,
-		  "mental": -2
-		},
-		"add_tags": [
-          "military_started",
-          "military_hardcarry"
-		],
-		"result": "你咬牙把最晒的那半天熬过去，回来时肩膀酸得像灌了铅。可也正因为硬撑过一轮，你很快摸清了教官点名、放人和抓偷懒的节奏。"
-	  },
-	  {
-		"text": "捂着太阳穴去医务点，先混个见习再说",
-		"effects": {
-		  "social": 2,
-		  "health": -1,
-		  "mental": 4
-		},
-		"add_tags": [
-          "military_started",
-          "military_fake_sick"
-		],
-		"result": "你把脸色演得半真半假，最后真被分去了操场边当见习。比起在队列里晒到发晕，这活轻松得多，也让你第一次有空把整片操场上的人都看个仔细。"
-	  },
-	  {
-		"text": "昨晚喝得太晚，只能硬着头皮去集合",
-		"effects": {
-		  "social": 4,
-		  "health": -7,
-		  "mental": -4,
-		  "living_money": -60
-		},
-		"add_tags": [
-          "military_started",
-          "military_night_drinker"
-		],
-		"result": "你脑袋发沉地站进队伍，太阳一晒，昨晚那点酒气和困意全往上翻。舍友在旁边憋笑，你却在心里默默想：今晚最好别再这么喝。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_military_girl_meet",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 24,
-	"requires": [
-      "military_started"
-	],
-	"day_conditions": {
-	  "is_military": true
+	"library_events": {
+	  "micro": ["lib_micro_1", "lib_micro_2", "lib_micro_3", "lib_micro_4"],
+	  "standard": ["lib_standard_1", "lib_standard_2"],
+	  "main": []
 	},
-	"text": "那天你又借口不舒服，被安排在操场边见习。\n正午的塑胶跑道被晒得发白，队伍里的人个个像快蒸熟一样。你正靠着树荫发呆，旁边忽然递来一瓶水。\n你抬头，看见一个穿着迷彩服的女生站在你面前。她看了你两秒，语气平平地说：\"装得挺像的。\"",
-	"choices": [
-	  {
-		"text": "嘴硬回她一句：\"那也得有人配合我演。\"",
-		"effects": {
-		  "social": 5,
-		  "mental": 4
-		},
-		"relationship_effects": {
-		  "crush_target": 12
-		},
-		"special_relations": {
-		  "crush_target": "crush"
-		},
-		"add_tags": [
-          "crush",
-          "military_girl_met"
-		],
-		"result": "她先是愣了一下，随即笑了，笑意很浅，却比太阳底下的风还让人记得住。你们顺着这句玩笑聊了下去，她没拆穿你，你也第一次认真记住了她。"
-	  },
-	  {
-		"text": "干脆承认：\"主要是不想晒，病倒了更亏。\"",
-		"effects": {
-		  "social": 3,
-		  "mental": 5
-		},
-		"relationship_effects": {
-		  "crush_target": 10
-		},
-		"special_relations": {
-		  "crush_target": "crush"
-		},
-		"add_tags": [
-          "crush",
-          "military_girl_met"
-		],
-		"result": "她拧开自己的水瓶，低声说了句\"倒也诚实\"，然后坐到了你旁边。你们没聊太久，可那种被看穿又没被讨厌的感觉，还是让你心里轻轻动了一下。"
-	  },
-	  {
-		"text": "装傻把话题岔开，顺势问她叫什么",
-		"effects": {
-		  "social": 6,
-		  "mental": 3
-		},
-		"relationship_effects": {
-		  "crush_target": 11
-		},
-		"special_relations": {
-		  "crush_target": "crush"
-		},
-		"add_tags": [
-          "crush",
-          "military_girl_met"
-		],
-		"result": "她看出你在转移话题，却还是报了名字。你把那两个字在心里默念了一遍，忽然觉得这场军训总算有了点值得期待的东西。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_military_night_shift",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 22,
-	"requires": [
-      "military_girl_met"
-	],
-	"day_conditions": {
-	  "is_military": true
+	"exercise_events": {
+	  "micro": ["exercise_micro_1", "exercise_micro_2", "exercise_micro_3"],
+	  "standard": ["exercise_standard_1"],
+	  "main": []
 	},
-	"text": "军训过半后，宿舍的人已经摸出了自己的生存方式。\n白天能请假就请假，混不上见习就硬撑；晚上训练一结束，谁起头说一句\"出去坐会儿\"，半个宿舍都会跟着溜去校外小馆子喝酒。\n问题是酒总是前一晚喝的，苦却要第二天早上吃。闹钟一响，宿舍很快分成了两种人：一种咬牙爬起来去操场，一种翻身继续睡，打算装死到底。",
-	"choices": [
-	  {
-		"text": "硬撑着去，至少别在点名时缺席",
-		"effects": {
-		  "social": 3,
-		  "health": -6,
-		  "mental": -4,
-		  "living_money": -80
-		},
-		"relationship_effects": {
-		  "crush_target": 6
-		},
-		"add_tags": [
-          "military_morning_resolved",
-          "military_hardcarry_morning"
-		],
-		"result": "你顶着宿醉站进队伍，整个人都像被太阳钉在地上。休息时她一眼就看出你状态不对，皱着眉把藿香正气水塞给你，嘴上说着\"活该\"，人却没走开。"
-	  },
-	  {
-		"text": "翻身继续睡，赌今天没人来查你",
-		"effects": {
-		  "social": -4,
-		  "mental": 5,
-		  "living_money": -80
-		},
-		"relationship_effects": {
-		  "crush_target": 4
-		},
-		"add_tags": [
-          "military_morning_resolved",
-          "military_skip_training"
-		],
-		"result": "你一觉睡到中午，手机里已经堆满了班长和舍友的消息。下午在宿舍楼下撞见她时，她只问了句\"睡醒了？\"语气淡淡的，却让你心虚得一句借口都编不顺。"
-	  },
-	  {
-		"text": "先装病混见习，再慢慢蹭去操场边",
-		"effects": {
-		  "social": 2,
-		  "health": -2,
-		  "mental": 4,
-		  "living_money": -50
-		},
-		"relationship_effects": {
-		  "crush_target": 8
-		},
-		"add_tags": [
-          "military_morning_resolved",
-          "military_fake_sick_master"
-		],
-		"result": "你熟门熟路地把流程走了一遍，又一次成功混成见习。别人还在太阳底下喊口号时，你已经坐到了操场边，而她也比前几天更自然地坐到了你旁边。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_military_bond",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 24,
-	"requires": [
-      "military_morning_resolved"
-	],
-	"day_conditions": {
-	  "is_military": true
+	"rest_events": {
+	  "micro": ["rest_micro_1", "rest_micro_2", "rest_micro_3", "rest_micro_4", "rest_micro_5"],
+	  "standard": ["rest_standard_1"],
+	  "main": []
 	},
-	"text": "军训后半段，你和她在操场边碰面的次数越来越多。\n你装病、见习、硬撑、睡过头，她几乎都看在眼里；她嘴上总说你不靠谱，可每次真有事，第一个看向的又总是你。\n那天下午队伍里有人差点中暑，场面一乱，所有人的真实反应都被照得很清楚。",
-	"choices": [
-	  {
-		"text": "第一时间过去扶人、拿水、找医务老师",
-		"effects": {
-		  "social": 8,
-		  "health": -2
-		},
-		"relationship_effects": {
-		  "crush_target": 10
-		},
-		"add_tags": [
-          "military_crush_bond"
-		],
-		"result": "你反应比谁都快，几乎没多想就冲了过去。她站在旁边看着你忙前忙后，等人安顿下来后，才低声说了一句：\"原来你也不是只会躲。\""
-	  },
-	  {
-		"text": "先招呼舍友一起搭手，自己留下来陪着",
-		"effects": {
-		  "social": 6,
-		  "mental": 2
-		},
-		"relationship_effects": {
-		  "crush_target": 8
-		},
-		"add_tags": [
-          "military_crush_bond"
-		],
-		"result": "你没逞英雄，而是很快把能帮忙的人都叫了过来。场面稳住后，她看你的眼神明显和之前不一样了，像是第一次把你从\"爱摸鱼的人\"和\"还挺靠谱的人\"放在了一起。"
-	  },
-	  {
-		"text": "先把自己的水递过去，安抚对方别慌",
-		"effects": {
-		  "social": 5
-		},
-		"relationship_effects": {
-		  "crush_target": 6
-		},
-		"add_tags": [
-          "military_crush_bond"
-		],
-		"result": "你没多说，只是先把水塞过去，让对方坐稳喘气。她站在一边帮你扶着人，等事情过去后忽然说：\"你认真起来的时候，和你平时一点都不像。\""
-	  }
-	]
-  },
-  {
-	"id": "y1s1_military_end",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 24,
-	"requires": [
-      "military_crush_bond"
-	],
-	"day_conditions": {
-	  "is_military": true
+	"job_events": {
+	  "micro": ["job_micro_1", "job_micro_2", "job_micro_3"],
+	  "standard": ["job_standard_1", "job_standard_2"],
+	  "main": ["job_main_promotion"]
 	},
-	"text": "汇演前一天，所有人终于难得认真起来。\n之前还能插科打诨的动作，到了最后反而没人想再敷衍。宿舍几个人一边骂军训折磨人，一边又不想在最后两天掉链子。\n而你比谁都清楚，自己突然想认真，不只是为了队伍走整齐。",
-	"choices": [
-	  {
-		"text": "这次认真走完，不想在她面前一直像个混子",
-		"effects": {
-		  "social": 5,
-		  "health": -4,
-		  "mental": 4
-		},
-		"relationship_effects": {
-		  "crush_target": 12
-		},
-		"add_tags": [
-          "military_finished",
-          "military_crush_locked"
-		],
-		"result": "那天你没请假，也没找借口，老老实实跟完整个队列。训练结束后，她看着你额头上的汗，轻轻挑了下眉：\"今天倒是没偷懒。\"明明只是句很轻的话，却让你记了一整晚。"
-	  },
-	  {
-		"text": "照样想混，但至少别拖队伍后腿",
-		"effects": {
-		  "social": 2,
-		  "mental": 3
-		},
-		"relationship_effects": {
-		  "crush_target": 7
-		},
-		"add_tags": [
-          "military_finished",
-          "military_crush_locked"
-		],
-		"result": "你还是没变成什么模范标兵，但至少没有再故意划水。她看得出来你在收着玩笑，走回宿舍区时还难得主动和你并肩聊了一路。"
-	  },
-	  {
-		"text": "最后两天还是去当见习，能躲就继续躲",
-		"effects": {
-		  "social": -2,
-		  "mental": 4
-		},
-		"relationship_effects": {
-		  "crush_target": 3
-		},
-		"add_tags": [
-          "military_finished"
-		],
-		"result": "你依旧把偷懒贯彻到了最后。她没说你什么，只是在解散时看了你一眼，像是有点无奈，又像是早就猜到你会这样。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_first_class",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 1,
-	"once": true,
-	"weight": 8,
-	"text": "第一节专业课，教授语速像开了二倍速。\n你一边记一边懵，下课看笔记，发现能完全看懂的不到三分之一。",
-	"choices": [
-	  {
-		"text": "抱着教材直奔图书馆：今天必须补回来",
-		"effects": {
-		  "gpa": 8,
-		  "health": -3,
-		  "mental": -3
-		},
-		"result": "你从晚饭后坐到闭馆，啃完了最难的两章。走出图书馆时头有点晕，但心里踏实了不少。"
-	  },
-	  {
-		"text": "硬着头皮去借笔记，顺便问问别人怎么学",
-		"effects": {
-		  "gpa": 5,
-		  "social": 5
-		},
-		"result": "隔壁班同学把笔记递给你，还耐心讲了思路。你们加了微信，第一次觉得\"求助\"并不丢人。"
-	  },
-	  {
-		"text": "先不管，告诉自己期末再冲刺也来得及",
-		"effects": {
-		  "gpa": -5,
-		  "mental": 3
-		},
-		"result": "你暂时松了口气，但几周后再回头看，空白的知识点已经越积越多。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_homesick",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 1,
-	"once": true,
-	"weight": 7,
-	"text": "十月的深夜，宿舍安静得只剩空调声。\n你翻到高中毕业照，忽然鼻子发酸——不知道是想家，还是想念那个已经回不去的夏天。",
-	"choices": [
-	  {
-		"text": "给妈妈打电话，哪怕只聊两分钟",
-		"effects": {
-		  "mental": 10
-		},
-		"result": "电话刚通，妈妈就问你是不是又熬夜了。你嘴硬说没有，听着她碎碎念，心却一点点安定下来。"
-	  },
-	  {
-		"text": "压低声音问室友：\"有人还醒着吗？\"",
-		"effects": {
-		  "mental": 5,
-		  "social": 5
-		},
-		"result": "黑暗里很快有人应声。你们聊家乡、聊食堂、聊军训糗事，聊着聊着全笑了。原来大家都在慢慢长大。"
-	  },
-	  {
-		"text": "把手机扣在枕头边，告诉自己扛一扛就过去",
-		"effects": {
-		  "mental": -8
-		},
-		"result": "你翻来覆去到凌晨三点才睡着。第二天起床时眼睛发胀，连阳光都显得刺眼。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_debate",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 1,
-	"once": true,
-	"weight": 8,
-	"requires": [
-      "debate_club"
-	],
-	"text": "辩论社新生赛当天，教室后排站满了人。\n你被分到四辩，负责最后总结。轮到你时，心跳快得像擂鼓。",
-	"choices": [
-	  {
-		"text": "提前打磨讲稿，反复模拟到嗓子发哑",
-		"effects": {
-		  "ability": 10,
-		  "social": 8,
-		  "health": -3
-		},
-		"add_tags": [
-          "debate_winner"
-		],
-		"result": "你最后三分钟的总结把全场气氛拉满。掌声响起来那一刻，你第一次体会到\"说服别人\"的力量。"
-	  },
-	  {
-		"text": "临场发挥，差不多就行",
-		"effects": {
-		  "ability": 3,
-		  "social": -3
-		},
-		"result": "你磕磕绊绊讲完了，但没抓住重点。赛后队友没说重话，只是沉默地收拾资料。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_tech_project",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 1,
-	"once": true,
-	"weight": 8,
-	"requires": [
-      "tech_club"
-	],
-	"text": "技术社准备做一个校园工具 App，学长把任务分下来时你有点发懵：\n\"这个模块你来。\"\n你盯着需求文档，发现好多词都没听过。",
-	"choices": [
-	  {
-		"text": "硬着头皮上，每天泡实验室啃代码",
-		"effects": {
-		  "ability": 15,
-		  "gpa": -5,
-		  "health": -5
-		},
-		"add_tags": [
-          "first_project"
-		],
-		"result": "你连续两周几乎都在修 bug。模块终于跑起来那一刻，你盯着屏幕傻笑了很久。学长只说了两个字：\"不错。\""
-	  },
-	  {
-		"text": "先旁观学习，不抢核心任务",
-		"effects": {
-		  "ability": 5
-		},
-		"result": "你把流程看明白了，也记了不少笔记。虽然没亲手扛模块，但至少不再对开发一头雾水。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_union_work",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 1,
-	"once": true,
-	"weight": 8,
-	"requires": [
-      "student_union"
-	],
-	"text": "迎新晚会预算临时告急，部长把你叫到一边：\n\"你去跑赞助，今天先联系十家。\"\n你看着名单，手心微微冒汗。",
-	"choices": [
-	  {
-		"text": "深呼吸，挨家挨户去谈，拒绝也继续",
-		"effects": {
-		  "ability": 8,
-		  "social": 10,
-		  "mental": -5
-		},
-		"add_tags": [
-          "sponsor_experience"
-		],
-		"result": "前三家都把你婉拒了。第四家店主听完方案后点了点头。拿到第一笔赞助时，你忽然懂了\"资源是谈出来的\"。"
-	  },
-	  {
-		"text": "找理由推给别人，自己躲到后勤岗",
-		"effects": {
-		  "social": -8
-		},
-		"result": "任务最后有人补上了，但部长对你明显冷了下来。你在群里发言，也很少再有人接话。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_final",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 2,
-	"once": true,
-	"weight": 10,
-	"text": "期末周到了。图书馆灯几乎通宵不灭，走廊里都是背书的人。\n你看着课表，发现还有三门没复习完。",
-	"choices": [
-	  {
-		"text": "连续熬夜猛冲，先过关再说",
-		"effects": {
-		  "gpa": 10,
-		  "health": -15,
-		  "mental": -10
-		},
-		"result": "你硬撑到最后一场考试结束，回宿舍倒头就睡了十几个小时。成绩出来——全过。代价也很明显。"
-	  },
-	  {
-		"text": "列计划表，稳扎稳打地复习",
-		"effects": {
-		  "gpa": 5,
-		  "health": -5,
-		  "mental": -3
-		},
-		"result": "有一门发挥一般，但整体平稳。你没被考试拖垮，身体也还顶得住。"
-	  },
-	  {
-		"text": "摆烂心态：能过就行",
-		"effects": {
-		  "gpa": -10,
-		  "mental": 5
-		},
-		"add_tags": [
-          "failed_exam"
-		],
-		"result": "你抱着侥幸进考场，最后擦线飘过一门。成绩单那一刻，心里只有一句：下次不能这样了。"
-	  }
-	]
-  },
-  {
-	"id": "y1s1_winter",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 1,
-	"phase": 3,
-	"once": true,
-	"weight": 10,
-	"text": "寒假刚到家，家里的饭香和暖气味一起扑过来。\n晚上高中同学群突然热闹起来：\"明天聚不聚？\"",
-	"choices": [
-	  {
-		"text": "去见老同学，看看大家这一学期都变成什么样了",
-		"effects": {
-		  "social": 8,
-		  "mental": 5,
-		  "living_money": -150
-		},
-		"result": "聚会从晚饭吃到深夜，大家轮流讲大学里的荒唐事和小成就。回家路上你忽然有点感慨：我们都在往前走。"
-	  },
-	  {
-		"text": "窝在家打游戏彻底放空",
-		"effects": {
-		  "mental": 8,
-		  "health": -3
-		},
-		"result": "你把闹钟关掉，日夜颠倒了几天。确实轻松，但假期像按了快进键，一眨眼就见底。"
-	  },
-	  {
-		"text": "找份寒假兼职，试试靠自己赚点钱",
-		"effects": {
-		  "ability": 5,
-		  "health": -5,
-		  "living_money": 800
-		},
-		"add_tags": [
-          "part_time_exp"
-		],
-		"result": "你在奶茶店站了半个月，学会了高峰期手不停杯不停。工资到账那一刻，你第一次真切感到\"钱来之不易\"。"
-	  },
-	  {
-		"text": "提前开卷下学期，先把难课摸一遍",
-		"effects": {
-		  "gpa": 8,
-		  "mental": -5
-		},
-		"result": "别人晒旅行照时，你在和教材死磕。过程挺枯燥，但你知道开学后会轻松很多。"
-	  }
-	]
-  },
-  {
-	"id": "y1s2_love",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 2,
-	"phase": 0,
-	"once": true,
-	"weight": 7,
-	"requires": [
-      "military_girl_met"
-	],
-	"text": "寒假回来后的第一周，你在选修课教室里又看见了她。\n军训时那些在操场边断断续续的闲聊、递过来的水、还有那句\"装得挺像的\"，忽然都顺着记忆一起冒了出来。她抬头看见你，先笑了一下：\"这次总不是来装病的吧？\"",
-	"choices": [
-	  {
-		"text": "顺势接话，约她下课后一起去吃饭",
-		"effects": {
-		  "social": 6,
-		  "mental": 5
-		},
-		"relationship_effects": {
-		  "crush_target": 8
-		},
-		"special_relations": {
-		  "crush_target": "crush"
-		},
-		"add_tags": [
-          "crush"
-		],
-		"result": "她没怎么犹豫就答应了。你们一路从军训糗事聊到寒假见闻，原本只停在操场边的关系，也终于开始往日常里延伸。"
-	  },
-	  {
-		"text": "先聊军训那段日子，把熟悉感慢慢接回来",
-		"effects": {
-		  "social": 4,
-		  "mental": 2
-		},
-		"relationship_effects": {
-		  "crush_target": 5
-		},
-		"special_relations": {
-		  "crush_target": "crush"
-		},
-		"add_tags": [
-          "crush"
-		],
-		"result": "你把话题从军训第一天、操场边的树荫聊到宿舍里那些离谱的喝酒夜。她听得一直在笑，气氛比你想象中还自然，像你们之间那根线根本没断过。"
-	  },
-	  {
-		"text": "嘴上还想装镇定，只在微信上慢慢靠近",
-		"effects": {
-		  "mental": -2,
-		  "gpa": 2
-		},
-		"relationship_effects": {
-		  "crush_target": 3
-		},
-		"special_relations": {
-		  "crush_target": "crush"
-		},
-		"add_tags": [
-          "crush"
-		],
-		"result": "你表面上没多说什么，回去后却忍不住点开和她的聊天框。消息一来一回，看起来比军训时克制，心里的在意却比那时更明显。"
-	  }
-	]
-  },
-  {
-	"id": "y1s2_love_develop",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 2,
-	"phase": 1,
-	"once": true,
-	"weight": 9,
-	"requires": [
-      "crush",
-      "military_girl_met"
-	],
-	"text": "你和 TA 聊天越来越自然。\n某天晚上，TA约你去操场散步。跑道边风很轻，天上的星星也很亮。",
-	"choices": [
-	  {
-		"text": "停下脚步，认真把心意说出来",
-		"effects": {
-		  "mental": 15
-		},
-		"relationship_effects": {
-		  "crush_target": 15
-		},
-		"special_relations": {
-		  "crush_target": "lover"
-		},
-		"add_tags": [
-          "in_relationship"
-		],
-		"result": "你说完那句\"我好像喜欢你\"后，时间像停了半秒。TA笑着点头：\"我也是。\"那一刻世界都亮了。"
-	  },
-	  {
-		"text": "把话咽回去，告诉自己再等等",
-		"effects": {
-		  "mental": -5
-		},
-		"relationship_effects": {
-		  "crush_target": 4
-		},
-		"special_relations": {
-		  "crush_target": "crush"
-		},
-		"result": "你们还是像以前一样并肩走着，但你心里那句话越来越重。关系没变坏，只是你有点遗憾。"
-	  }
-	]
-  },
-  {
-	"id": "y1s2_competition",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 2,
-	"semester": 2,
-	"phase": 1,
-	"once": true,
-	"weight": 6,
-	"conditions": {
-	  "ability": {
-		"min": 30
-	  }
+	"dorm_events": {
+	  "micro": ["dorm_micro_1", "dorm_micro_2", "dorm_micro_3", "dorm_micro_4"],
+	  "standard": ["dorm_standard_1", "dorm_standard_2", "dorm_standard_3"],
+	  "main": ["dorm_main_conflict"]
 	},
-	"text": "学校在组织大学生创新创业大赛，你的一个想法被老师看中了。",
-	"choices": [
-	  {
-		"text": "全力参赛",
-		"effects": {
-		  "ability": 15,
-		  "gpa": -8,
-		  "social": 5
-		},
-		"add_tags": [
-          "competition_exp"
-		],
-		"result": "你带领小组拿到了校级二等奖！简历上多了一笔。"
-	  },
-	  {
-		"text": "放弃专心学业",
-		"effects": {
-		  "gpa": 5
-		},
-		"result": "你把时间花在了课程上，成绩有所提升。"
-	  }
-	]
-  },
-  {
-	"id": "y1s2_final",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 2,
-	"phase": 2,
-	"once": true,
-	"weight": 9,
-	"text": "又到期末。你比上学期更熟悉流程，但课程难度明显上了台阶。\n复习清单一拉开，心里还是咯噔一下。",
-	"choices": [
-	  {
-		"text": "提前两周启动，按计划一点点啃",
-		"effects": {
-		  "gpa": 10,
-		  "health": -5,
-		  "mental": -3
-		},
-		"result": "过程很累，但节奏稳定。成绩出来时，你能明显看到自己比上学期更扎实了。"
-	  },
-	  {
-		"text": "和同学组队复习，互相抽问互相监督",
-		"effects": {
-		  "gpa": 8,
-		  "social": 5
-		},
-		"result": "你们把自习室当据点，轮流讲题。有人卡壳就现场救火，效率比单打独斗高得多。"
-	  },
-	  {
-		"text": "还是临时抱佛脚，考前冲一波",
-		"effects": {
-		  "gpa": -3,
-		  "mental": -5
-		},
-		"result": "考前几天你几乎没怎么睡，进考场脑子发空。成绩勉强撑住，但焦虑感留了下来。"
-	  }
-	]
-  },
-  {
-	"id": "y1s2_summer",
-	"type": "story",
-	"year_min": 1,
-	"year_max": 1,
-	"semester": 2,
-	"phase": 3,
-	"once": true,
-	"weight": 10,
-	"text": "大一结束，暑假像一大片空白页摊在你面前。\n你想了很久：这两个月，是放松，还是提前把未来推一把？",
-	"choices": [
-	  {
-		"text": "去大城市找实习，先看看真实职场",
-		"effects": {
-		  "ability": 15,
-		  "health": -8,
-		  "living_money": 400
-		},
-		"add_tags": [
-          "intern_y1"
-		],
-		"result": "你在小公司做了两个月杂活，节奏快、压力大，但第一次知道\"上班\"到底是什么感觉。"
-	  },
-	  {
-		"text": "报驾校把驾照拿下",
-		"effects": {
-		  "ability": 5,
-		  "mental": -5,
-		  "living_money": -800
-		},
-		"add_tags": [
-          "drivers_license"
-		],
-		"result": "你在训练场晒得满头汗，科目二还挂了一次。虽然折腾，但拿证那天还是很有成就感。"
-	  },
-	  {
-		"text": "和朋友出去旅行，给自己放个长假",
-		"effects": {
-		  "social": 10,
-		  "mental": 15,
-		  "living_money": -800
-		},
-		"result": "你们在陌生城市看日落、坐夜车、拍了很多照片。回想这个夏天，脑海里全是发光的片段。"
-	  },
-	  {
-		"text": "回家躺平充电，什么都先放一放",
-		"effects": {
-		  "health": 15,
-		  "mental": 10
-		},
-		"result": "你睡到自然醒，吃着家里饭，慢慢把一整年的疲惫卸下来。开学前照镜子，气色都好了不少。"
-	  }
-	]
-  },
-  {
-	"id": "y2_major_doubt",
-	"type": "story",
-	"year_min": 2,
-	"year_max": 2,
-	"semester": 1,
-	"phase": 1,
-	"once": true,
-	"weight": 8,
-	"text": "大二的专业课难度突然抬了一档。\n你盯着作业题发呆很久，第一次认真问自己：这条路，真的是我想走的吗？",
-	"choices": [
-	  {
-		"text": "去咨询转专业，把方向重新选一次",
-		"effects": {
-		  "gpa": -10,
-		  "mental": 10,
-		  "ability": 5
-		},
-		"add_tags": [
-          "changed_major"
-		],
-		"result": "你跑了好几趟教务处，填表、面谈、补材料，折腾整整一个月才办下来。虽然要补课，但你心里反而轻松了。"
-	  },
-	  {
-		"text": "不折腾了，咬牙把现在这条路走深",
-		"effects": {
-		  "gpa": 5,
-		  "mental": -5
-		},
-		"result": "你给自己订了更严格的学习计划。过程很累，但每次啃下难题时，你都能感觉到自己在变硬。"
-	  },
-	  {
-		"text": "主专业继续读，再加一个双学位给自己兜底",
-		"effects": {
-		  "ability": 10,
-		  "gpa": -5,
-		  "health": -8
-		},
-		"add_tags": [
-          "double_major"
-		],
-		"result": "课表被塞得密不透风，周末也很难真正休息。你知道这条路辛苦，但也确实让你多了一个选择。"
-	  }
-	]
-  },
-  {
-	"id": "y2_relationship_trouble",
-	"type": "story",
-	"year_min": 2,
-	"year_max": 3,
-	"once": true,
-	"weight": 7,
-	"requires": [
-      "in_relationship"
-	],
-	"text": "你和 TA 最近总在小事上起争执。\nTA说你越来越敷衍，你却觉得自己已经尽力平衡学业和感情。气氛一点点绷紧。",
-	"choices": [
-	  {
-		"text": "约 TA 坐下来好好聊，把问题摊开说",
-		"effects": {
-		  "mental": -5,
-		  "social": 5
-		},
-		"result": "这次谈话并不轻松，甚至中途一度沉默。但你们终于把委屈说开，关系慢慢回到可修复的轨道上。"
-	  },
-	  {
-		"text": "承认走不下去了，提出分手",
-		"effects": {
-		  "mental": -20,
-		  "social": -5
-		},
-		"add_tags": [
-          "broke_up"
-		],
-		"remove_tags": [
-          "in_relationship"
-		],
-		"result": "分手那天正下着雨。你一个人沿操场走了很久，鞋袜全湿，却不知道该往哪儿去。"
-	  },
-	  {
-		"text": "先冷处理，把精力转到别的事上",
-		"effects": {
-		  "mental": -10
-		},
-		"result": "你们表面上不再争吵，但距离感越来越明显。很多话没说出口，却一直卡在心里。"
-	  }
-	]
-  },
-  {
-	"id": "y3_future",
-	"type": "story",
-	"year_min": 3,
-	"year_max": 3,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 10,
-	"text": "大三开学后，寝室群里、课堂上、食堂排队时，大家都在聊同一个词：\"以后\"。\n考研、就业、出国、考公……你知道自己不能再回避了。",
-	"choices": [
-	  {
-		"text": "定下考研目标，先把方向和院校摸清",
-		"effects": {
-		  "gpa": 5,
-		  "mental": -8
-		},
-		"add_tags": [
-          "want_postgrad"
-		],
-		"result": "你开始刷论坛、看经验帖、跑图书馆查资料。路很长，但至少你终于朝一个明确方向迈步了。"
-	  },
-	  {
-		"text": "把重心转向就业，尽快准备简历和实习",
-		"effects": {
-		  "ability": 5,
-		  "mental": -5
-		},
-		"add_tags": [
-          "want_job"
-		],
-		"result": "你开了十几个招聘网站页面，第一次认真思考\"我能给公司什么\"。焦虑还在，但行动感回来了。"
-	  },
-	  {
-		"text": "目标留学，先启动语言和申请准备",
-		"effects": {
-		  "mental": -5,
-		  "living_money": -400
-		},
-		"add_tags": [
-          "want_abroad"
-		],
-		"result": "你把时间拆成考试、文书和学校清单三块。每一步都烧钱烧精力，但你想给自己试一次的机会。"
-	  },
-	  {
-		"text": "走考公路线，追求稳定和确定性",
-		"effects": {
-		  "mental": 5
-		},
-		"add_tags": [
-          "want_stable"
-		],
-		"result": "你买了行测和申论资料，开始按章节刷题。家里人听完很支持，你心里也安稳了些。"
-	  },
-	  {
-		"text": "先不选，走一步看一步",
-		"effects": {
-		  "mental": -15
-		},
-		"result": "你暂时躲开了决定，但看着身边人一个个定方向，焦虑反而在夜里更明显。"
-	  }
-	]
-  },
-  {
-	"id": "y3_internship",
-	"type": "story",
-	"year_min": 3,
-	"year_max": 3,
-	"semester": 1,
-	"once": true,
-	"weight": 8,
-	"requires": [
-      "want_job"
-	],
-	"text": "你连续投了很多简历，终于收到了两个面试通知：\n一个是流程严格的大公司，一个是节奏极快的创业团队。",
-	"choices": [
-	  {
-		"text": "冲大公司，赌一把体系化成长",
-		"effects": {
-		  "ability": 10,
-		  "social": 5
-		},
-		"add_tags": [
-          "big_company_intern"
-		],
-		"result": "三轮面试后，你拿到了 offer。工作节奏很硬，但你第一次见到成熟流程如何运转，眼界被拉开了。"
-	  },
-	  {
-		"text": "去创业公司，直接上手实战",
-		"effects": {
-		  "ability": 12,
-		  "social": 8,
-		  "living_money": 150
-		},
-		"add_tags": [
-          "startup_intern"
-		],
-		"result": "团队只有十来个人，你从需求到上线都得碰。很累，却也成长飞快，每周都在突破舒适区。"
-	  },
-	  {
-		"text": "都不去，继续海投等更理想机会",
-		"effects": {
-		  "mental": -8
-		},
-		"result": "你又投了几十份，邮箱却迟迟没好消息。刷新页面的次数越来越多，心也越来越悬。"
-	  }
-	]
-  },
-  {
-	"id": "y3_postgrad_pressure",
-	"type": "story",
-	"year_min": 3,
-	"year_max": 3,
-	"semester": 2,
-	"phase": 1,
-	"once": true,
-	"weight": 9,
-	"requires": [
-      "want_postgrad"
-	],
-	"text": "考研复习进入白热化。\n你每天六点起床、深夜回宿舍，书页翻得飞快，却总觉得进度永远追不上焦虑。",
-	"choices": [
-	  {
-		"text": "咬牙顶住，把手机收起来全力冲刺",
-		"effects": {
-		  "gpa": 10,
-		  "health": -15,
-		  "mental": -15
-		},
-		"add_tags": [
-          "postgrad_committed"
-		],
-		"result": "你几乎把生活压成了三点一线。图书馆闭馆广播每天都在耳边响起，只有你知道这段路有多难。"
-	  },
-	  {
-		"text": "调整节奏，每周留固定恢复时间",
-		"effects": {
-		  "gpa": 5,
-		  "health": -5,
-		  "mental": -5
-		},
-		"add_tags": [
-          "postgrad_committed"
-		],
-		"result": "你开始把复习拆成可执行的小目标，反而不再天天崩溃。效率稳住了，状态也没彻底垮掉。"
-	  },
-	  {
-		"text": "承认不适合这条路，转向求职",
-		"effects": {
-		  "mental": -10,
-		  "ability": 5
-		},
-		"remove_tags": [
-          "want_postgrad"
-		],
-		"add_tags": [
-          "want_job"
-		],
-		"result": "你做了很难的一次转向。放下那叠资料时有不甘，也有一种终于喘上气的轻松。"
-	  }
-	]
-  },
-  {
-	"id": "y3_startup",
-	"type": "story",
-	"year_min": 3,
-	"year_max": 4,
-	"once": true,
-	"weight": 5,
-	"conditions": {
-	  "ability": {
-		"min": 50
-	  },
-	  "social": {
-		"min": 40
-	  }
+	"club_events": {
+	  "micro": ["club_micro_1", "club_micro_2"],
+	  "standard": ["club_standard_1", "club_standard_2"],
+	  "main": ["club_main_competition"]
 	},
-	"text": "一次深夜聊天里，你和朋友把一个想法越聊越细。\n从吐槽问题到画草图，再到估算成本，那个念头忽然不再只是空想。",
-	"choices": [
-	  {
-		"text": "把想法落地，先做计划书和最小版本",
-		"effects": {
-		  "ability": 10,
-		  "social": 5,
-		  "living_money": -400
-		},
-		"add_tags": [
-          "started_business"
-		],
-		"result": "你们很快拉起三人小队，白天上课晚上开会。进展并不顺，但你第一次有了\"自己在做一件事\"的实感。"
-	  },
-	  {
-		"text": "冷静一下，先记下来以后再说",
-		"effects": {},
-		"result": "你把方案存进备忘录，生活继续向前。偶尔翻到那页时，仍会想起当晚那股热血。"
-	  }
-	]
-  },
-  {
-	"id": "y4_postgrad_result",
-	"type": "story",
-	"year_min": 4,
-	"year_max": 4,
-	"semester": 1,
-	"phase": 0,
-	"once": true,
-	"weight": 10,
-	"requires": [
-      "postgrad_committed"
-	],
-	"text": "成绩公布这天，你盯着查询页面很久，手心全是汗。\n确认键就在眼前，你却迟迟不敢按下去。",
-	"choices": [
-	  {
-		"text": "深呼吸，查看成绩",
-		"effects": {},
-		"_dynamic": true,
-		"result": ""
-	  }
-	]
-  },
-  {
-	"id": "y4_autumn",
-	"type": "story",
-	"year_min": 4,
-	"year_max": 4,
-	"semester": 1,
-	"once": true,
-	"weight": 9,
-	"requires": [
-      "want_job"
-	],
-	"excludes": [
-      "postgrad_committed"
-	],
-	"text": "秋招季一开，校园里到处是西装和简历。\n宣讲会一场接一场，投递系统里\"已投\"后面的数字不断上涨。",
-	"choices": [
-	  {
-		"text": "海投五十家，先把机会面铺开",
-		"effects": {
-		  "ability": 5,
-		  "mental": -10
-		},
-		"add_tags": [
-          "mass_apply"
-		],
-		"result": "你每天都在改关键词、刷邮箱、等回音。大多数石沉大海，但也终于等来了几次面试通知。"
-	  },
-	  {
-		"text": "只投目标公司，每一份都精修到极致",
-		"effects": {
-		  "ability": 8,
-		  "mental": -5
-		},
-		"result": "你把公司研究、岗位匹配和项目表达都打磨了一遍。投得少，但每次面试都更有把握。"
-	  }
-	]
-  },
-  {
-	"id": "y4_thesis",
-	"type": "story",
-	"year_min": 4,
-	"year_max": 4,
-	"semester": 2,
-	"phase": 1,
-	"once": true,
-	"weight": 10,
-	"text": "毕业论文截止日越逼越近。\n你打开文档，进度条还停在开题报告，光标在空白页上闪个不停。",
-	"choices": [
-	  {
-		"text": "闭关冲刺，一个月把全文肝出来",
-		"effects": {
-		  "gpa": 8,
-		  "health": -10,
-		  "mental": -10
-		},
-		"result": "你几乎把所有社交都暂停了，白天写、夜里改。答辩那天导师说\"整体不错\"，你这才长长松了口气。"
-	  },
-	  {
-		"text": "每天稳定推进，按章节慢慢磨",
-		"effects": {
-		  "gpa": 5,
-		  "mental": -3
-		},
-		"result": "你给自己设了可执行的小目标，虽然来回改了很多版，但最终按时提交，节奏也没彻底崩。"
-	  }
-	]
-  },
-  {
-	"id": "y4_last_night",
-	"type": "story",
-	"year_min": 4,
-	"year_max": 4,
-	"semester": 2,
-	"phase": 2,
-	"once": true,
-	"weight": 10,
-	"text": "毕业前最后一晚，宿舍阳台上摆着啤酒和花生。\n你们四个挤在一起，从军训聊到挂科，从暗恋聊到实习，笑着笑着就有人红了眼眶。",
-	"choices": [
-	  {
-		"text": "举起杯子：\"谢谢你们，这四年真好。\"",
-		"effects": {
-		  "mental": 15,
-		  "social": 10
-		},
-		"result": "话音刚落，空气突然安静了一秒。然后有人笑骂你煽情，有人低头抹眼睛。你知道，这样的夜晚以后很难再有。"
-	  },
-	  {
-		"text": "安静地陪着大家，把情绪都留在心里",
-		"effects": {
-		  "mental": 10
-		},
-		"result": "你没说太多，只是一口口把酒喝完。很多情绪不需要翻译，坐在这里的人都懂。"
-	  }
-	]
-  },
-  {
-	"id": "daily_rain",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "is_weekend": false
+	"social_eat_events": {
+	  "micro": ["eat_micro_1", "eat_micro_2", "eat_micro_3"],
+	  "standard": ["eat_standard_1"],
+	  "main": []
 	},
-	"once": false,
-	"cooldown_days": 40,
-	"weight": 3,
-	"text": "出门才发现下雨了，你没带伞。",
-	"choices": [
-	  {
-		"text": "冒雨跑过去",
-		"effects": {
-		  "health": -2
-		},
-		"result": "到教室时浑身湿透，同学看你像落汤鸡。"
-	  },
-	  {
-		"text": "在楼下等雨停",
-		"effects": {
-		  "gpa": -1
-		},
-		"result": "等了二十分钟，迟到了。"
-	  },
-	  {
-		"text": "找旁边的人借伞",
-		"effects": {
-		  "social": 2
-		},
-		"result": "一个同学二话没说把伞递给了你。"
-	  }
-	]
-  },
-  {
-	"id": "daily_canteen_new",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "weekday": [
-		0,
-		1,
-		2,
-		3,
-		4
-	  ]
+	"social_game_events": {
+	  "micro": ["game_micro_1", "game_micro_2"],
+	  "standard": ["game_standard_1"],
+	  "main": []
 	},
-	"once": false,
-	"cooldown_days": 90,
-	"weight": 2,
-	"text": "食堂新开了一个窗口，排了好长的队。",
-	"choices": [
-	  {
-		"text": "排队尝鲜",
-		"effects": {
-		  "mental": 3,
-		  "living_money": -25
-		},
-		"result": "味道确实不错，发了个朋友圈。"
-	  },
-	  {
-		"text": "算了吃老地方",
-		"effects": {},
-		"result": "还是熟悉的味道靠谱。"
-	  }
-	]
+	"study_events": {
+	  "micro": ["study_micro_1", "study_micro_2", "study_micro_3"],
+	  "standard": ["study_standard_1", "study_standard_2"],
+	  "main": ["study_main_breakthrough"]
+	}
   },
-  {
-	"id": "daily_sick",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"conditions": {
-	  "health": {
-		"max": 35
-	  }
+
+  "events": {
+	"class_micro_1": {
+	  "id": "class_micro_1",
+	  "type": "micro",
+	  "title": "走神",
+	  "text": "这节课有点无聊，你走神了十分钟。",
+	  "effects": {"study_points": -1},
+	  "probability": 0.15
 	},
-	"day_conditions": {
-	  "is_holiday": false
+	"class_micro_2": {
+	  "id": "class_micro_2",
+	  "type": "micro",
+	  "title": "精彩一课",
+	  "text": "老师讲了一个特别生动的例子，你印象深刻。",
+	  "effects": {"study_points": 1, "mental": 1},
+	  "probability": 0.1
 	},
-	"once": false,
-	"cooldown_days": 45,
-	"weight": 8,
-	"text": "你早上醒来感觉头昏沉沉的，嗓子也疼。好像感冒了。",
-	"choices": [
-	  {
-		"text": "请假休息一天",
-		"effects": {
-		  "health": 5,
-		  "gpa": -2
-		},
-		"result": "睡了一整天，好多了。"
-	  },
-	  {
-		"text": "硬撑着去上课",
-		"effects": {
-		  "health": -3,
-		  "gpa": 1,
-		  "mental": -2
-		},
-		"result": "在教室昏昏沉沉，也没听进去什么。"
-	  },
-	  {
-		"text": "去校医院看看",
-		"effects": {
-		  "health": 8,
-		  "living_money": -80
-		},
-		"result": "医生开了点药，嘱咐多喝水多休息。"
-	  }
-	]
-  },
-  {
-	"id": "daily_late_night_talk",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 3,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "is_exam": false,
-	  "weekday": [
-		3,
-		4,
-		5
-	  ]
+	"class_micro_3": {
+	  "id": "class_micro_3",
+	  "type": "micro",
+	  "title": "点名",
+	  "text": "老师突然点名，幸好你来了。",
+	  "effects": {"mental": -1},
+	  "probability": 0.08
 	},
-	"once": false,
-	"cooldown_days": 25,
-	"weight": 3,
-	"text": "夜深了，不知谁先开的头，宿舍卧谈会又开始了。",
-	"choices": [
-	  {
-		"text": "加入聊天",
-		"effects": {
-		  "social": 3,
-		  "mental": 3,
-		  "health": -1
-		},
-		"result": "聊到凌晨两点，从人生理想聊到八卦。"
-	  },
-	  {
-		"text": "戴上耳机不参与",
-		"effects": {
-		  "health": 1
-		},
-		"result": "你听着音乐慢慢睡着了。"
-	  }
-	]
-  },
-  {
-	"id": "daily_package",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false
+	"class_micro_4": {
+	  "id": "class_micro_4",
+	  "type": "micro",
+	  "title": "邻座笔记",
+	  "text": "邻座同学的笔记记得很工整，你借鉴了一下。",
+	  "effects": {"study_points": 1},
+	  "probability": 0.12
 	},
-	"once": false,
-	"cooldown_days": 20,
-	"weight": 2,
-	"text": "快递到了三个包裹！",
-	"choices": [
-	  {
-		"text": "马上去取",
-		"effects": {
-		  "mental": 3,
-		  "living_money": -50
-		},
-		"result": "拆快递的快乐就是这么简单。"
-	  },
-	  {
-		"text": "明天再说",
-		"effects": {},
-		"result": "快递站的短信又催了一次。"
-	  }
-	]
-  },
-  {
-	"id": "daily_exercise",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "is_exam": false
+	"class_micro_5": {
+	  "id": "class_micro_5",
+	  "type": "micro",
+	  "title": "课间闲聊",
+	  "text": "课间和同学聊了几句，心情不错。",
+	  "effects": {"social": 1, "mental": 1},
+	  "probability": 0.1
 	},
-	"once": false,
-	"cooldown_days": 15,
-	"weight": 3,
-	"text": "今天天气不错，你想去运动一下。",
-	"choices": [
-	  {
-		"text": "去操场跑步",
-		"effects": {
-		  "health": 4,
-		  "mental": 3
+
+	"class_standard_1": {
+	  "id": "class_standard_1",
+	  "type": "standard",
+	  "title": "课堂展示",
+	  "text": "老师随机抽人做课堂展示，抽到了你。",
+	  "choices": [
+		{
+		  "text": "硬着头皮上",
+		  "effects": {"ability": 2, "mental": -2, "social": 1}
 		},
-		"result": "跑了三公里，出了一身汗，感觉神清气爽。"
-	  },
-	  {
-		"text": "去打球",
-		"effects": {
-		  "health": 3,
-		  "social": 3
-		},
-		"result": "在球场碰到几个人，一起打了一个小时。"
-	  },
-	  {
-		"text": "算了还是躺着吧",
-		"effects": {
-		  "health": -1
-		},
-		"result": "你又瘫回了床上。"
-	  }
-	]
-  },
-  {
-	"id": "daily_movie",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_weekend": true,
-	  "is_exam": false
+		{
+		  "text": "说自己没准备好",
+		  "effects": {"mental": -1}
+		}
+	  ],
+	  "probability": 0.05
 	},
-	"once": false,
-	"cooldown_days": 30,
-	"weight": 3,
-	"text": "周末，有部新电影上映了，室友问你去不去。",
-	"choices": [
-	  {
-		"text": "一起去看",
-		"effects": {
-		  "social": 3,
-		  "mental": 5,
-		  "living_money": -120
+	"class_standard_2": {
+	  "id": "class_standard_2",
+	  "type": "standard",
+	  "title": "小组作业分组",
+	  "text": "这节课要分小组做期末项目，你还没找到队友。",
+	  "choices": [
+		{
+		  "text": "主动找人组队",
+		  "effects": {"social": 3, "ability": 1}
 		},
-		"result": "电影还不错，出来后你们讨论了一路。"
-	  },
-	  {
-		"text": "不去了，省点钱",
-		"effects": {
-		  "living_money": 25
-		},
-		"result": "你在宿舍刷了一下午手机。"
-	  }
-	]
-  },
-  {
-	"id": "daily_phone_break",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"once": false,
-	"cooldown_days": 100,
-	"weight": 3,
-	"text": "手机啪地一声掉在地上，屏幕裂了。",
-	"choices": [
-	  {
-		"text": "去修",
-		"effects": {
-		  "living_money": -250
-		},
-		"result": "花了两百块换了个屏，心疼。"
-	  },
-	  {
-		"text": "凑合用",
-		"effects": {
-		  "mental": -3
-		},
-		"result": "每次划屏幕都怕割到手。"
-	  },
-	  {
-		"text": "直接换新手机",
-		"effects": {
-		  "mental": 5,
-		  "living_money": -1500
-		},
-		"result": "新手机真香，但钱包真空。"
-	  }
-	]
-  },
-  {
-	"id": "daily_volunteer",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 3,
-	"day_conditions": {
-	  "is_weekend": true,
-	  "is_holiday": false,
-	  "is_exam": false
+		{
+		  "text": "等别人来找你",
+		  "effects": {"mental": -1}
+		}
+	  ],
+	  "probability": 0.03
 	},
-	"once": false,
-	"cooldown_days": 60,
-	"weight": 2,
-	"text": "学校在招志愿者，去社区做公益活动。",
-	"choices": [
-	  {
-		"text": "报名参加",
-		"effects": {
-		  "social": 5,
-		  "ability": 3,
-		  "mental": 3
-		},
-		"result": "帮老人们修手机、陪小朋友画画，感觉很充实。"
-	  },
-	  {
-		"text": "这周没空",
-		"effects": {},
-		"result": "你错过了这次机会。"
-	  }
-	]
-  },
-  {
-	"id": "daily_game_night",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_exam": false
+
+	"class_main_exam": {
+	  "id": "class_main_exam",
+	  "type": "main",
+	  "title": "期末考试",
+	  "text": "期末考试周到了，这是你大学生涯的第一次大考。",
+	  "phases": ["上学期考试周", "下学期考试周"],
+	  "once_per_phase": true,
+	  "effects": {},
+	  "probability": 1.0
 	},
-	"requires": [
-      "gamer_friend"
-	],
-	"once": false,
-	"cooldown_days": 18,
-	"weight": 3,
-	"text": "小张喊你一起打游戏，说今晚必须上分。",
-	"choices": [
-	  {
-		"text": "打到凌晨",
-		"effects": {
-		  "social": 3,
-		  "mental": 5,
-		  "health": -3,
-		  "gpa": -1
-		},
-		"result": "赢了好几把，但第二天上课直接睡过去了。"
-	  },
-	  {
-		"text": "打两把就睡",
-		"effects": {
-		  "social": 2,
-		  "mental": 2
-		},
-		"result": "适度游戏，身心健康。"
-	  },
-	  {
-		"text": "今天不了",
-		"effects": {},
-		"result": "小张表示遗憾，说你变了。"
-	  }
-	]
-  },
-  {
-	"id": "daily_study_buddy",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "is_exam": false,
-	  "is_weekend": false
+
+	"lib_micro_1": {
+	  "id": "lib_micro_1",
+	  "type": "micro",
+	  "title": "安静的氛围",
+	  "text": "图书馆里安静得只能听见翻书声，你很快进入了状态。",
+	  "effects": {"study_points": 1, "mental": 1},
+	  "probability": 0.15
 	},
-	"requires": [
-      "studious_friend"
-	],
-	"once": false,
-	"cooldown_days": 20,
-	"weight": 3,
-	"text": "小李约你一起去图书馆自习。",
-	"choices": [
-	  {
-		"text": "去",
-		"effects": {
-		  "gpa": 3,
-		  "social": 2,
-		  "mental": -1
-		},
-		"result": "在他旁边坐着，效率竟然提高了不少。"
-	  },
-	  {
-		"text": "不去了",
-		"effects": {},
-		"result": "你选择了待在宿舍。"
-	  }
-	]
-  },
-  {
-	"id": "daily_family_call",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"once": false,
-	"cooldown_days": 25,
-	"weight": 3,
-	"text": "妈妈打来了视频电话。",
-	"choices": [
-	  {
-		"text": "接了，聊了半小时",
-		"effects": {
-		  "mental": 5
-		},
-		"result": "妈妈说你瘦了，让你好好吃饭。挂了电话有点想家。"
-	  },
-	  {
-		"text": "说在忙，回头再打",
-		"effects": {
-		  "mental": -2
-		},
-		"result": "挂掉之后有一点点愧疚。"
-	  }
-	]
-  },
-  {
-	"id": "daily_wallet_lost",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false
+	"lib_micro_2": {
+	  "id": "lib_micro_2",
+	  "type": "micro",
+	  "title": "找到好书",
+	  "text": "在书架上偶然发现了一本感兴趣的书。",
+	  "effects": {"ability": 1, "mental": 1},
+	  "probability": 0.1
 	},
-	"once": false,
-	"cooldown_days": 120,
-	"weight": 2,
-	"text": "你发现钱包不见了！翻遍了书包和宿舍都没找到。",
-	"choices": [
-	  {
-		"text": "回去找找",
-		"effects": {
-		  "mental": -5,
-		  "living_money": -150
-		},
-		"result": "最后在教室的角落找到了，但里面少了点现金。"
-	  },
-	  {
-		"text": "直接挂失补办",
-		"effects": {
-		  "mental": -3,
-		  "living_money": -250
-		},
-		"result": "跑了一下午银行和学校，身心俱疲。"
-	  }
-	]
-  },
-  {
-	"id": "daily_date",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"requires": [
-      "in_relationship"
-	],
-	"day_conditions": {
-	  "is_weekend": true,
-	  "is_exam": false
+	"lib_micro_3": {
+	  "id": "lib_micro_3",
+	  "type": "micro",
+	  "title": "座位被占",
+	  "text": "你常坐的位置被人占了，只好另找座位。",
+	  "effects": {"mental": -1},
+	  "probability": 0.08
 	},
-	"once": false,
-	"cooldown_days": 15,
-	"weight": 4,
-	"text": "周末，和TA出去约会。",
-	"choices": [
-	  {
-		"text": "去吃好吃的",
-		"effects": {
-		  "mental": 5,
-		  "social": 3,
-		  "living_money": -150
-		},
-		"result": "一起吃了火锅，聊了很多，感觉感情又近了一步。"
-	  },
-	  {
-		"text": "校园散步",
-		"effects": {
-		  "mental": 4,
-		  "social": 2,
-		  "health": 1
-		},
-		"result": "牵着手在校园走了一圈，夕阳很美。"
-	  },
-	  {
-		"text": "各自待着",
-		"effects": {
-		  "mental": -2
-		},
-		"result": "TA好像有点不开心。"
-	  }
-	]
-  },
-  {
-	"id": "daily_online_shopping",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"once": false,
-	"cooldown_days": 30,
-	"weight": 2,
-	"text": "深夜，你又打开了购物App...",
-	"choices": [
-	  {
-		"text": "买买买",
-		"effects": {
-		  "mental": 5,
-		  "living_money": -250
-		},
-		"result": "下了三单。明天的你会后悔的。"
-	  },
-	  {
-		"text": "放下手机",
-		"effects": {
-		  "mental": 1
-		},
-		"result": "你成功战胜了消费欲。"
-	  }
-	]
-  },
-  {
-	"id": "daily_exam_week_panic",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_exam": true
+	"lib_micro_4": {
+	  "id": "lib_micro_4",
+	  "type": "micro",
+	  "title": "闭馆音乐",
+	  "text": "闭馆音乐响起，你收拾东西离开。今天收获满满。",
+	  "effects": {"study_points": 1, "mental": 2},
+	  "probability": 0.1
 	},
-	"once": false,
-	"cooldown_days": 30,
-	"weight": 5,
-	"text": "明天就考试了，你觉得自己什么都没记住。",
-	"choices": [
-	  {
-		"text": "通宵复习",
-		"effects": {
-		  "gpa": 5,
-		  "health": -5,
-		  "mental": -3
+
+	"lib_standard_1": {
+	  "id": "lib_standard_1",
+	  "type": "standard",
+	  "title": "图书馆占位",
+	  "text": "有人用书本占了你想坐的位子，但人一直没来。",
+	  "choices": [
+		{
+		  "text": "把书挪开坐下",
+		  "effects": {"mental": 1}
 		},
-		"result": "凌晨四点终于合上书。头昏脑胀但至少过了一遍。"
-	  },
-	  {
-		"text": "先睡觉，明天早起",
-		"effects": {
-		  "health": 2,
-		  "gpa": 2
-		},
-		"result": "你设了五点的闹钟。至少上考场时精神还行。"
-	  },
-	  {
-		"text": "随缘吧",
-		"effects": {
-		  "gpa": -3,
-		  "mental": 2
-		},
-		"result": "你选择躺平。生死有命，挂科在天。"
-	  }
-	]
-  },
-  {
-	"id": "daily_money_low",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"conditions": {
-	  "living_money": {
-		"max": 450
-	  }
+		{
+		  "text": "另找座位",
+		  "effects": {"mental": -1}
+		}
+	  ],
+	  "probability": 0.08
 	},
-	"once": false,
-	"cooldown_days": 35,
-	"weight": 6,
-	"text": "生活费快花完了，距离下次打钱还有一周。",
-	"choices": [
-	  {
-		"text": "跟爸妈要",
-		"effects": {
-		  "mental": -3,
-		  "living_money": 800
+	"lib_standard_2": {
+	  "id": "lib_standard_2",
+	  "type": "standard",
+	  "title": "求助",
+	  "text": "旁边的人问你一道题，你刚好会。",
+	  "choices": [
+		{
+		  "text": "耐心讲解",
+		  "effects": {"social": 2, "study_points": 1}
 		},
-		"result": "妈妈没说什么就转了钱，但你有点不好意思。"
-	  },
-	  {
-		"text": "找同学借",
-		"effects": {
-		  "social": -2,
-		  "living_money": 250
-		},
-		"result": "同学爽快借了，但你心里总惦记着还。"
-	  },
-	  {
-		"text": "省着花撑过去",
-		"effects": {
-		  "health": -3,
-		  "mental": -3
-		},
-		"result": "连续吃了一周最便宜的套餐。"
-	  }
-	]
-  },
-  {
-	"id": "daily_mental_low",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"conditions": {
-	  "mental": {
-		"max": 30
-	  }
+		{
+		  "text": "说自己也不会",
+		  "effects": {}
+		}
+	  ],
+	  "probability": 0.05
 	},
-	"once": false,
-	"cooldown_days": 30,
-	"weight": 7,
-	"text": "最近总觉得做什么都提不起劲，连起床都很难。",
-	"choices": [
-	  {
-		"text": "去学校心理咨询中心",
-		"effects": {
-		  "mental": 10
-		},
-		"result": "咨询师很温柔，聊了一个小时，心里好像轻了一些。"
-	  },
-	  {
-		"text": "跟好朋友倾诉",
-		"effects": {
-		  "mental": 5,
-		  "social": 3
-		},
-		"result": "说出来之后好受多了。朋友说会一直在的。"
-	  },
-	  {
-		"text": "自己扛着",
-		"effects": {
-		  "mental": -5,
-		  "health": -2
-		},
-		"result": "又是一个很难熬的夜晚。"
-	  }
-	]
-  },
-  {
-	"id": "daily_library_seat",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "is_weekend": false,
-	  "is_exam": false
+
+	"exercise_micro_1": {
+	  "id": "exercise_micro_1",
+	  "type": "micro",
+	  "title": "突破极限",
+	  "text": "今天比平时多跑了一圈，感觉不错。",
+	  "effects": {"health": 2, "mental": 1},
+	  "probability": 0.15
 	},
-	"once": false,
-	"cooldown_days": 35,
-	"weight": 2,
-	"text": "图书馆门口排了长队，你好不容易进去了。",
-	"choices": [
-	  {
-		"text": "找个角落坐下学习",
-		"effects": {
-		  "gpa": 2,
-		  "mental": -1
-		},
-		"result": "虽然位子不好，但学了一下午。"
-	  },
-	  {
-		"text": "算了去自习室",
-		"effects": {
-		  "gpa": 1
-		},
-		"result": "自习室人少，倒也清净。"
-	  },
-	  {
-		"text": "回宿舍算了",
-		"effects": {
-		  "mental": 1
-		},
-		"result": "回去之后打了一下午游戏。"
-	  }
-	]
-  },
-  {
-	"id": "daily_birthday",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"once": false,
-	"cooldown_days": 365,
-	"weight": 5,
-	"text": "今天是你的生日！室友们买了个蛋糕给你。",
-	"choices": [
-	  {
-		"text": "一起庆祝",
-		"effects": {
-		  "mental": 10,
-		  "social": 5,
-		  "living_money": -80
-		},
-		"result": "大家唱了生日歌，你许了个愿。这一刻觉得大学生活真好。"
-	  },
-	  {
-		"text": "低调过",
-		"effects": {
-		  "mental": 5
-		},
-		"result": "你没声张，自己买了杯奶茶。又长大一岁了。"
-	  }
-	]
-  },
-  {
-	"id": "daily_roommate_conflict",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false
+	"exercise_micro_2": {
+	  "id": "exercise_micro_2",
+	  "type": "micro",
+	  "title": "运动后的畅快",
+	  "text": "运动完冲了个澡，浑身舒畅。",
+	  "effects": {"health": 1, "mental": 2},
+	  "probability": 0.12
 	},
-	"once": false,
-	"cooldown_days": 50,
-	"weight": 3,
-	"text": "室友没经过你同意用了你的东西，你有点不爽。",
-	"choices": [
-	  {
-		"text": "直说",
-		"effects": {
-		  "social": -2,
-		  "mental": 3
-		},
-		"result": "他道了歉，虽然有点尴尬但说开了。"
-	  },
-	  {
-		"text": "算了不计较",
-		"effects": {
-		  "mental": -3
-		},
-		"result": "你压下了不满，但心里还是有点堵。"
-	  }
-	]
-  },
-  {
-	"id": "daily_campus_cat",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"once": false,
-	"cooldown_days": 20,
-	"weight": 2,
-	"text": "校园里那只橘猫又来了，蹲在你面前喵喵叫。",
-	"choices": [
-	  {
-		"text": "喂它一点吃的",
-		"effects": {
-		  "mental": 3,
-		  "living_money": -25
-		},
-		"result": "它吃完蹭了蹭你的腿。今天心情好了。"
-	  },
-	  {
-		"text": "摸摸就走",
-		"effects": {
-		  "mental": 2
-		},
-		"result": "毛茸茸的手感真好。"
-	  }
-	]
-  },
-  {
-	"id": "daily_scholarship_news",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"conditions": {
-	  "gpa": {
-		"min": 80
-	  }
+	"exercise_micro_3": {
+	  "id": "exercise_micro_3",
+	  "type": "micro",
+	  "title": "小伤",
+	  "text": "运动时轻微扭了一下，没什么大碍。",
+	  "effects": {"health": -1},
+	  "probability": 0.08
 	},
-	"day_conditions": {
-	  "is_holiday": false
+
+	"exercise_standard_1": {
+	  "id": "exercise_standard_1",
+	  "type": "standard",
+	  "title": "运动搭子",
+	  "text": "有人邀请你一起打篮球/跑步。",
+	  "choices": [
+		{
+		  "text": "一起运动",
+		  "effects": {"health": 2, "social": 2, "mental": 1}
+		},
+		{
+		  "text": "婉拒",
+		  "effects": {"health": 1}
+		}
+	  ],
+	  "probability": 0.1
 	},
-	"once": false,
-	"cooldown_days": 180,
-	"weight": 5,
-	"text": "辅导员通知你，你的成绩够申请奖学金了。",
-	"choices": [
-	  {
-		"text": "准备材料申请",
-		"effects": {
-		  "mental": 8,
-		  "ability": 3,
-		  "living_money": 800
-		},
-		"result": "一等奖学金到手！三千块钱进了卡里。"
-	  },
-	  {
-		"text": "嫌麻烦算了",
-		"effects": {},
-		"result": "白花花的银子就这么飘走了。"
-	  }
-	]
-  },
-  {
-	"id": "daily_group_project",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "is_exam": false,
-	  "is_weekend": false
+
+	"rest_micro_1": {
+	  "id": "rest_micro_1",
+	  "type": "micro",
+	  "title": "午睡",
+	  "text": "在宿舍睡了个舒服的午觉。",
+	  "effects": {"mental": 2, "health": 1},
+	  "probability": 0.15
 	},
-	"once": false,
-	"cooldown_days": 40,
-	"weight": 3,
-	"text": "小组作业来了。你们四个人得一起做一个报告。",
-	"choices": [
-	  {
-		"text": "主动承担大部分",
-		"effects": {
-		  "ability": 4,
-		  "gpa": 3,
-		  "mental": -3
-		},
-		"result": "你做了70%的内容，累但质量有保证。"
-	  },
-	  {
-		"text": "平均分工",
-		"effects": {
-		  "social": 3,
-		  "gpa": 2
-		},
-		"result": "大家各做一部分，最后拼在一起还行。"
-	  },
-	  {
-		"text": "摸鱼",
-		"effects": {
-		  "social": -3,
-		  "mental": 2
-		},
-		"result": "组员有点怨言，但没当面说。"
-	  }
-	]
-  },
-  {
-	"id": "daily_holiday_travel",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": true
+	"rest_micro_2": {
+	  "id": "rest_micro_2",
+	  "type": "micro",
+	  "title": "刷剧",
+	  "text": "看了一集喜欢的剧，放松一下。",
+	  "effects": {"mental": 2},
+	  "probability": 0.12
 	},
-	"once": false,
-	"cooldown_days": 60,
-	"weight": 3,
-	"text": "朋友约你假期出去玩两天。",
-	"choices": [
-	  {
-		"text": "走！说走就走",
-		"effects": {
-		  "social": 5,
-		  "mental": 8,
-		  "health": -2,
-		  "living_money": -400
-		},
-		"result": "拍了很多照片，虽然累但很开心。"
-	  },
-	  {
-		"text": "不去了，省钱",
-		"effects": {
-		  "living_money": 50
-		},
-		"result": "看着朋友圈的照片，有一丢丢后悔。"
-	  }
-	]
-  },
-  {
-	"id": "daily_oversleep",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "is_weekend": false
+	"rest_micro_3": {
+	  "id": "rest_micro_3",
+	  "type": "micro",
+	  "title": "发呆",
+	  "text": "什么都不做，只是发呆。",
+	  "effects": {"mental": 1},
+	  "probability": 0.1
 	},
-	"once": false,
-	"cooldown_days": 25,
-	"weight": 3,
-	"text": "闹钟响了三遍你都没听到，醒来发现已经迟到了。",
-	"choices": [
-	  {
-		"text": "赶紧冲过去",
-		"effects": {
-		  "gpa": -1,
-		  "health": -1
-		},
-		"result": "踩着拖鞋冲进教室，全班都看着你。"
-	  },
-	  {
-		"text": "干脆翘了",
-		"effects": {
-		  "gpa": -2,
-		  "mental": 2
-		},
-		"result": "又睡了两个小时。舒服是舒服，但有点心虚。"
-	  }
-	]
-  },
-  {
-	"id": "daily_part_time",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 3,
-	"day_conditions": {
-	  "is_weekend": true,
-	  "is_exam": false
+	"rest_micro_4": {
+	  "id": "rest_micro_4",
+	  "type": "micro",
+	  "title": "零食时间",
+	  "text": "吃了点囤的零食，满足。",
+	  "effects": {"mental": 2, "living_money": -5},
+	  "probability": 0.1
 	},
-	"conditions": {
-	  "living_money": {
-		"max": 750
-	  }
+	"rest_micro_5": {
+	  "id": "rest_micro_5",
+	  "type": "micro",
+	  "title": "罪恶感",
+	  "text": "休息了一会儿，开始有点罪恶感。",
+	  "effects": {"mental": -1},
+	  "probability": 0.08
 	},
-	"once": false,
-	"cooldown_days": 40,
-	"weight": 3,
-	"text": "你在校园公告栏看到招兼职的信息。",
-	"choices": [
-	  {
-		"text": "去试试",
-		"effects": {
-		  "ability": 3,
-		  "health": -2,
-		  "living_money": 250
+
+	"rest_standard_1": {
+	  "id": "rest_standard_1",
+	  "type": "standard",
+	  "title": "室友邀请",
+	  "text": "室友邀请你一起打游戏/看电影。",
+	  "choices": [
+		{
+		  "text": "一起玩",
+		  "effects": {"mental": 4, "social": 2, "study_points": -1}
 		},
-		"add_tags": [
-          "part_time_exp"
-		],
-		"result": "在奶茶店站了一天，脚酸但赚了一百多。"
-	  },
-	  {
-		"text": "不去了",
-		"effects": {},
-		"result": "还是把时间留给自己吧。"
-	  }
-	]
-  },
-  {
-	"id": "daily_lecture",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": false,
-	  "is_exam": false,
-	  "weekday": [
-		2,
-		3,
-		4
-	  ]
+		{
+		  "text": "想一个人待着",
+		  "effects": {"mental": 1}
+		}
+	  ],
+	  "probability": 0.12
 	},
-	"once": false,
-	"cooldown_days": 35,
-	"weight": 2,
-	"text": "学校有个大咖讲座，听说是业界很厉害的人。",
-	"choices": [
-	  {
-		"text": "去听",
-		"effects": {
-		  "ability": 4,
-		  "mental": 3
-		},
-		"result": "虽然有些听不懂，但确实开了眼界。"
-	  },
-	  {
-		"text": "不感兴趣",
-		"effects": {},
-		"result": "你选择了做自己的事。"
-	  }
-	]
-  },
-  {
-	"id": "daily_night_run",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_exam": false
+
+	"job_micro_1": {
+	  "id": "job_micro_1",
+	  "type": "micro",
+	  "title": "小费",
+	  "text": "客人给了小费，虽然不多但很开心。",
+	  "effects": {"living_money": 10, "mental": 1},
+	  "probability": 0.1
 	},
-	"once": false,
-	"cooldown_days": 20,
-	"weight": 2,
-	"text": "晚上有点睡不着，你想去操场走走。",
-	"choices": [
-	  {
-		"text": "去跑几圈",
-		"effects": {
-		  "health": 3,
-		  "mental": 4
-		},
-		"result": "夜风很舒服，跑完之后心情好了很多。"
-	  },
-	  {
-		"text": "在操场坐一会儿",
-		"effects": {
-		  "mental": 3
-		},
-		"result": "看着星空发了一会儿呆。"
-	  },
-	  {
-		"text": "还是算了",
-		"effects": {},
-		"result": "你翻了个身继续刷手机。"
-	  }
-	]
-  },
-  {
-	"id": "daily_cooking",
-	"type": "daily",
-	"year_min": 1,
-	"year_max": 4,
-	"day_conditions": {
-	  "is_holiday": true
+	"job_micro_2": {
+	  "id": "job_micro_2",
+	  "type": "micro",
+	  "title": "累但充实",
+	  "text": "工作很累，但拿到工资的那一刻很满足。",
+	  "effects": {"living_money": 5, "mental": 1},
+	  "probability": 0.12
 	},
-	"once": false,
-	"cooldown_days": 30,
-	"weight": 2,
-	"text": "今天想自己做顿饭。",
-	"choices": [
-	  {
-		"text": "大展身手",
-		"effects": {
-		  "ability": 2,
-		  "mental": 5,
-		  "living_money": -80
+	"job_micro_3": {
+	  "id": "job_micro_3",
+	  "type": "micro",
+	  "title": "小失误",
+	  "text": "工作中出了点小差错，被说了几句。",
+	  "effects": {"mental": -2},
+	  "probability": 0.08
+	},
+
+	"job_standard_1": {
+	  "id": "job_standard_1",
+	  "type": "standard",
+	  "title": "加班",
+	  "text": "老板问你能不能加个班，有加班费。",
+	  "choices": [
+		{
+		  "text": "加班",
+		  "effects": {"living_money": 30, "health": -2, "mental": -1}
 		},
-		"result": "虽然卖相一般，但味道还行！发了个朋友圈。"
-	  },
-	  {
-		"text": "还是叫外卖吧",
-		"effects": {
-		  "living_money": -50
+		{
+		  "text": "拒绝",
+		  "effects": {"mental": 1}
+		}
+	  ],
+	  "probability": 0.1
+	},
+	"job_standard_2": {
+	  "id": "job_standard_2",
+	  "type": "standard",
+	  "title": "同事求助",
+	  "text": "同事请你帮忙顶班/代班。",
+	  "choices": [
+		{
+		  "text": "帮忙",
+		  "effects": {"living_money": 15, "social": 2, "health": -1}
 		},
-		"result": "外卖到了，打开一看有点失望。"
-	  }
-	]
+		{
+		  "text": "婉拒",
+		  "effects": {}
+		}
+	  ],
+	  "probability": 0.08
+	},
+
+	"job_main_promotion": {
+	  "id": "job_main_promotion",
+	  "type": "main",
+	  "title": "升职机会",
+	  "text": "老板觉得你做得不错，想提拔你做小组长。",
+	  "conditions": {"min_ability": 35, "work_days": 20},
+	  "choices": [
+		{
+		  "text": "接受",
+		  "effects": {"ability": 5, "living_money": 50, "mental": -2},
+		  "unlocks_flag": "job_leader"
+		},
+		{
+		  "text": "婉拒",
+		  "effects": {"mental": 1}
+		}
+	  ],
+	  "probability": 0.05
+	},
+
+	"dorm_micro_1": {
+	  "id": "dorm_micro_1",
+	  "type": "micro",
+	  "title": "深夜话题",
+	  "text": "和室友聊到了深夜，话题从游戏聊到人生。",
+	  "effects": {"social": 2, "mental": 2},
+	  "probability": 0.15
+	},
+	"dorm_micro_2": {
+	  "id": "dorm_micro_2",
+	  "type": "micro",
+	  "title": "零食分享",
+	  "text": "室友分享了家乡带来的零食。",
+	  "effects": {"social": 1, "mental": 1},
+	  "probability": 0.12
+	},
+	"dorm_micro_3": {
+	  "id": "dorm_micro_3",
+	  "type": "micro",
+	  "title": "吐槽大会",
+	  "text": "大家一起吐槽今天的课程/老师。",
+	  "effects": {"mental": 2, "social": 1},
+	  "probability": 0.1
+	},
+	"dorm_micro_4": {
+	  "id": "dorm_micro_4",
+	  "type": "micro",
+	  "title": "安静的一晚",
+	  "text": "室友们各做各的事，气氛和谐。",
+	  "effects": {"mental": 1},
+	  "probability": 0.1
+	},
+
+	"dorm_standard_1": {
+	  "id": "dorm_standard_1",
+	  "type": "standard",
+	  "title": "借东西",
+	  "text": "室友问你借东西（洗发水/笔记/充电器）。",
+	  "choices": [
+		{
+		  "text": "借给他",
+		  "effects": {"social": 2}
+		},
+		{
+		  "text": "说自己也需要",
+		  "effects": {"social": -1}
+		}
+	  ],
+	  "probability": 0.1
+	},
+	"dorm_standard_2": {
+	  "id": "dorm_standard_2",
+	  "type": "standard",
+	  "title": "宿舍聚餐",
+	  "text": "室友提议一起点外卖/出去吃。",
+	  "choices": [
+		{
+		  "text": "一起去",
+		  "effects": {"social": 3, "mental": 2, "living_money": -25}
+		},
+		{
+		  "text": "不去了",
+		  "effects": {"social": -1}
+		}
+	  ],
+	  "probability": 0.08
+	},
+	"dorm_standard_3": {
+	  "id": "dorm_standard_3",
+	  "type": "standard",
+	  "title": "宿舍矛盾",
+	  "text": "室友之间因为某件小事有了摩擦。",
+	  "choices": [
+		{
+		  "text": "调解",
+		  "effects": {"social": 3, "mental": -1}
+		},
+		{
+		  "text": "不掺和",
+		  "effects": {}
+		}
+	  ],
+	  "probability": 0.05
+	},
+
+	"dorm_main_conflict": {
+	  "id": "dorm_main_conflict",
+	  "type": "main",
+	  "title": "宿舍危机",
+	  "text": "宿舍里积累已久的矛盾爆发了，大家吵了一架。",
+	  "once": true,
+	  "choices": [
+		{
+		  "text": "主动沟通化解",
+		  "effects": {"social": 5, "ability": 3, "mental": -2}
+		},
+		{
+		  "text": "冷处理",
+		  "effects": {"mental": -3, "social": -2}
+		}
+	  ],
+	  "probability": 0.02
+	},
+
+	"club_micro_1": {
+	  "id": "club_micro_1",
+	  "type": "micro",
+	  "title": "社团氛围",
+	  "text": "社团活动很轻松，认识了不少新朋友。",
+	  "effects": {"social": 2, "mental": 1},
+	  "probability": 0.15
+	},
+	"club_micro_2": {
+	  "id": "club_micro_2",
+	  "type": "micro",
+	  "title": "技能提升",
+	  "text": "在社团学到了一些实用技能。",
+	  "effects": {"ability": 1, "social": 1},
+	  "probability": 0.12
+	},
+
+	"club_standard_1": {
+	  "id": "club_standard_1",
+	  "type": "standard",
+	  "title": "社团任务",
+	  "text": "部长分配给你一个任务。",
+	  "choices": [
+		{
+		  "text": "认真完成",
+		  "effects": {"ability": 2, "social": 2}
+		},
+		{
+		  "text": "敷衍了事",
+		  "effects": {"social": -1}
+		}
+	  ],
+	  "probability": 0.1
+	},
+	"club_standard_2": {
+	  "id": "club_standard_2",
+	  "type": "standard",
+	  "title": "社团聚餐",
+	  "text": "社团组织聚餐，去不去？",
+	  "choices": [
+		{
+		  "text": "参加",
+		  "effects": {"social": 4, "mental": 2, "living_money": -30}
+		},
+		{
+		  "text": "不去",
+		  "effects": {"social": -1}
+		}
+	  ],
+	  "probability": 0.08
+	},
+
+	"club_main_competition": {
+	  "id": "club_main_competition",
+	  "type": "main",
+	  "title": "社团比赛",
+	  "text": "社团要参加校级比赛，你被选中代表社团出战。",
+	  "conditions": {"min_ability": 25},
+	  "choices": [
+		{
+		  "text": "全力准备",
+		  "effects": {"ability": 5, "social": 3, "mental": -2, "study_points": -2}
+		},
+		{
+		  "text": "正常参与",
+		  "effects": {"ability": 2, "social": 1}
+		}
+	  ],
+	  "probability": 0.05
+	},
+
+	"eat_micro_1": {
+	  "id": "eat_micro_1",
+	  "type": "micro",
+	  "title": "美食分享",
+	  "text": "朋友推荐了一家好吃的店。",
+	  "effects": {"mental": 2, "social": 1},
+	  "probability": 0.15
+	},
+	"eat_micro_2": {
+	  "id": "eat_micro_2",
+	  "type": "micro",
+	  "title": "聊得来",
+	  "text": "吃饭时聊得很开心。",
+	  "effects": {"social": 2, "mental": 2},
+	  "probability": 0.12
+	},
+	"eat_micro_3": {
+	  "id": "eat_micro_3",
+	  "type": "micro",
+	  "title": "AA制",
+	  "text": "大家AA，花费比预期少一点。",
+	  "effects": {"living_money": 5, "social": 1},
+	  "probability": 0.1
+	},
+
+	"eat_standard_1": {
+	  "id": "eat_standard_1",
+	  "type": "standard",
+	  "title": "请客",
+	  "text": "朋友提议这顿他请，下次你请。",
+	  "choices": [
+		{
+		  "text": "接受",
+		  "effects": {"social": 2, "mental": 1}
+		},
+		{
+		  "text": "坚持AA",
+		  "effects": {"social": 1}
+		}
+	  ],
+	  "probability": 0.1
+	},
+
+	"game_micro_1": {
+	  "id": "game_micro_1",
+	  "type": "micro",
+	  "title": "连胜",
+	  "text": "今天手感不错，赢了好几把。",
+	  "effects": {"mental": 3},
+	  "probability": 0.15
+	},
+	"game_micro_2": {
+	  "id": "game_micro_2",
+	  "type": "micro",
+	  "title": "配合默契",
+	  "text": "和朋友配合得很好。",
+	  "effects": {"social": 2, "mental": 2},
+	  "probability": 0.12
+	},
+
+	"game_standard_1": {
+	  "id": "game_standard_1",
+	  "type": "standard",
+	  "title": "再玩一把？",
+	  "text": "本来打算玩一小时，但朋友说再玩一把。",
+	  "choices": [
+		{
+		  "text": "再玩一把",
+		  "effects": {"mental": 3, "study_points": -2, "health": -1}
+		},
+		{
+		  "text": "不玩了",
+		  "effects": {"mental": 1}
+		}
+	  ],
+	  "probability": 0.15
+	},
+
+	"study_micro_1": {
+	  "id": "study_micro_1",
+	  "type": "micro",
+	  "title": "顿悟",
+	  "text": "突然想通了一个困扰很久的问题。",
+	  "effects": {"study_points": 2, "mental": 2},
+	  "probability": 0.1
+	},
+	"study_micro_2": {
+	  "id": "study_micro_2",
+	  "type": "micro",
+	  "title": "专注",
+	  "text": "今天状态很好，学习效率很高。",
+	  "effects": {"study_points": 1},
+	  "probability": 0.15
+	},
+	"study_micro_3": {
+	  "id": "study_micro_3",
+	  "type": "micro",
+	  "title": "疲惫",
+	  "text": "学久了有点累，但坚持下来了。",
+	  "effects": {"study_points": 1, "mental": -1},
+	  "probability": 0.1
+	},
+
+	"study_standard_1": {
+	  "id": "study_standard_1",
+	  "type": "standard",
+	  "title": "学习瓶颈",
+	  "text": "感觉遇到了瓶颈，怎么也学不进去。",
+	  "choices": [
+		{
+		  "text": "休息一下",
+		  "effects": {"mental": 2}
+		},
+		{
+		  "text": "硬撑",
+		  "effects": {"study_points": 1, "mental": -2}
+		}
+	  ],
+	  "probability": 0.08
+	},
+	"study_standard_2": {
+	  "id": "study_standard_2",
+	  "type": "standard",
+	  "title": "同学请教",
+	  "text": "同学来问你问题，你刚好会。",
+	  "choices": [
+		{
+		  "text": "讲解",
+		  "effects": {"study_points": 1, "social": 2}
+		},
+		{
+		  "text": "推荐别人",
+		  "effects": {"social": -1}
+		}
+	  ],
+	  "probability": 0.06
+	},
+
+	"study_main_breakthrough": {
+	  "id": "study_main_breakthrough",
+	  "type": "main",
+	  "title": "学习突破",
+	  "text": "经过这段时间的努力，你感觉自己的学习能力有了质的飞跃。",
+	  "conditions": {"min_study_points": 60},
+	  "effects": {"study_points": 5, "ability": 3, "mental": 5},
+	  "once": true,
+	  "probability": 0.03
+	}
   }
-]
+}

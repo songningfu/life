@@ -213,3 +213,17 @@ func serialize() -> Dictionary:
 
 func deserialize(data: Dictionary):
 	npc_data = data.duplicate(true)
+
+# ========== 兼容方法（供 PhoneSystem / WechatSystem 调用） ==========
+
+## PhoneSystem.get_sendable_messages 中调用
+func get_relationship(role_id: String) -> Dictionary:
+	return get_npc_display(role_id)
+
+## PhoneSystem._show_contacts_app 中调用
+func get_all_relationships() -> Array:
+	return get_all_npcs()
+
+## WechatSystem._apply_message_effects 中调用
+func modify_affinity(role_id: String, amount: int, day_index: int = -1) -> Dictionary:
+	return change_affinity(role_id, amount, day_index)

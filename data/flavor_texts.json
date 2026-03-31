@@ -1,322 +1,204 @@
 {
-  "flavor_texts": [
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "text": "教学楼走廊的风有点凉，你抱着书加快了脚步。"
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "text": "午后的阳光斜斜照进教室，你差点在最后一排睡着。"
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "text": "今天的作业不算难，但就是特别耗时间。"
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "text": "下课铃一响，大家像潮水一样涌向食堂。"
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "text": "晚自习结束时，校园广播正放着一首老歌。"
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "text": "你在便利店门口犹豫了半天，最后还是买了那杯咖啡。"
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "text": "图书馆靠窗的位置又被抢了，你只好坐在角落。"
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "text": "今天路过操场，看见好几支社团队伍在排练。"
-	},
-	{
-	  "phases": [
-        "weekend"
-	  ],
-	  "text": "周末的宿舍楼安静了不少，连脚步声都变得稀疏。"
-	},
-	{
-	  "phases": [
-        "weekend"
-	  ],
-	  "text": "你睡到自然醒，窗外的天已经亮得刺眼。"
-	},
-	{
-	  "phases": [
-        "weekend"
-	  ],
-	  "text": "和室友去校外吃了顿好的，心情跟着亮起来。"
-	},
-	{
-	  "phases": [
-        "weekend"
-	  ],
-	  "text": "你把堆了几天的衣服洗完，阳台一下子满了。"
-	},
-	{
-	  "phases": [
-        "weekend"
-	  ],
-	  "text": "傍晚绕着校园慢慢走了一圈，风很舒服。"
-	},
-	{
-	  "phases": [
-        "review"
-	  ],
-	  "text": "复习资料铺满了桌面，你一时间不知道该从哪页开始。"
-	},
-	{
-	  "phases": [
-        "review"
-	  ],
-	  "text": "自习室的空调有点冷，但没人愿意离开座位。"
-	},
-	{
-	  "phases": [
-        "review"
-	  ],
-	  "text": "你把一门课从头过了一遍，终于不再那么慌。"
-	},
-	{
-	  "phases": [
-        "review"
-	  ],
-	  "text": "打印店门口排着长队，大家都抱着一叠讲义。"
-	},
-	{
-	  "phases": [
-        "review"
-	  ],
-	  "text": "夜里回宿舍时，楼道里还有人小声背书。"
-	},
-	{
-	  "phases": [
-        "exam"
-	  ],
-	  "text": "考场外的走廊安静得反常，只剩翻书声。"
-	},
-	{
-	  "phases": [
-        "exam"
-	  ],
-	  "text": "你盯着试卷最后一道题，笔尖悬在半空很久。"
-	},
-	{
-	  "phases": [
-        "exam"
-	  ],
-	  "text": "走出考场后，大家互相看了看，默契地都没对答案。"
-	},
-	{
-	  "phases": [
-        "exam"
-	  ],
-	  "text": "今天又是一门，书包里的笔记越翻越皱。"
-	},
-	{
-	  "phases": [
-        "exam"
-	  ],
-	  "text": "你喝了第三杯咖啡，眼睛却还是发酸。"
-	},
-	{
-	  "phases": [
-        "military"
-	  ],
-	  "text": "口令声在操场上回荡，大家的动作逐渐整齐起来。"
-	},
-	{
-	  "phases": [
-        "military"
-	  ],
-	  "text": "太阳很毒，鞋底都像在发烫。"
-	},
-	{
-	  "phases": [
-        "military"
-	  ],
-	  "text": "晚点名结束后，整层宿舍都在抱怨腿酸。"
-	},
-	{
-	  "phases": [
-        "military"
-	  ],
-	  "text": "教官难得让你们提前休息，队伍里一阵欢呼。"
-	},
-	{
-	  "phases": [
-        "holiday_winter"
-	  ],
-	  "text": "家里的饭桌总是比学校热闹，也更让人放松。"
-	},
-	{
-	  "phases": [
-        "holiday_winter"
-	  ],
-	  "text": "你裹着毯子刷手机，不知不觉就到了深夜。"
-	},
-	{
-	  "phases": [
-        "holiday_winter"
-	  ],
-	  "text": "亲戚问起成绩时，你笑着把话题带了过去。"
-	},
-	{
-	  "phases": [
-        "holiday_winter"
-	  ],
-	  "text": "和老同学见了一面，大家都比从前成熟了些。"
-	},
-	{
-	  "phases": [
-        "holiday_summer"
-	  ],
-	  "text": "蝉鸣从早响到晚，空气里都是盛夏的味道。"
-	},
-	{
-	  "phases": [
-        "holiday_summer"
-	  ],
-	  "text": "你在空调房里待了一整天，直到傍晚才出门。"
-	},
-	{
-	  "phases": [
-        "holiday_summer"
-	  ],
-	  "text": "夜里和朋友吃了路边摊，聊到很晚才散。"
-	},
-	{
-	  "phases": [
-        "holiday_summer"
-	  ],
-	  "text": "你翻看这学期的照片，忽然有点想念校园。"
-	},
-	{
-	  "phases": [
-		"daily",
-        "weekend"
-	  ],
-	  "requires": [
-        "gamer_friend"
-	  ],
-	  "text": "{roommate_gamer}在群里发来一句：\"今晚开黑，速来。\""
-	},
-	{
-	  "phases": [
-		"daily",
-        "review"
-	  ],
-	  "requires": [
-        "studious_friend"
-	  ],
-	  "text": "{roommate_studious}又比你先到图书馆，桌上已经摊开了三本书。"
-	},
-	{
-	  "phases": [
-		"daily",
-        "weekend"
-	  ],
-	  "requires": [
-        "in_relationship"
-	  ],
-	  "text": "TA发来一张今天的天空照片：\"这云很好看，想到你了。\""
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "requires": [
-        "student_union"
-	  ],
-	  "text": "学生会群消息不断，你刚放下手机又弹出新通知。"
-	},
-	{
-	  "phases": [
-        "daily"
-	  ],
-	  "requires": [
-        "tech_club"
-	  ],
-	  "text": "技术社群里又有人在讨论新项目，你默默记下了几个关键词。"
-	},
-	{
-	  "phases": [
-		"daily",
-        "weekend"
-	  ],
-	  "conditions": {
-		"mental": {
-		  "max": 30
-		}
-	  },
-	  "text": "今天做什么都提不起劲，连说话都觉得费力。"
-	},
-	{
-	  "phases": [
-		"daily",
-        "weekend"
-	  ],
-	  "conditions": {
-		"health": {
-		  "max": 25
-		}
-	  },
-	  "text": "你一整天都有些疲惫，走几步路就想停下来。"
-	},
-	{
-	  "phases": [
-		"daily",
-        "weekend"
-	  ],
-	  "conditions": {
-		"living_money": {
-		  "max": 450
-		}
-	  },
-	  "text": "打开付款码前，你下意识先算了算余额。"
-	},
-	{
-	  "phases": [
-		"daily",
-        "review"
-	  ],
-	  "conditions": {
-		"gpa": {
-		  "min": 80
-		}
-	  },
-	  "text": "课代表来问你借笔记，你忽然意识到自己真的进步了。"
-	},
-	{
-	  "phases": [
-		"daily",
-        "weekend"
-	  ],
-	  "conditions": {
-		"social": {
-		  "min": 75
-		}
-	  },
-	  "text": "消息提醒几乎没停过，你今天回消息回到手酸。"
-	}
-  ]
+  "version": "2.0",
+  "description": "微事件数据 - 一句话事件，绑定行动和阶段，带微小数值效果",
+  "total_count": 120,
+  "note": "实际游戏中应扩充至300+条",
+  
+  "micro_events": {
+    "class": [
+      {"id": "m_class_001", "text": "这节课的老师讲课很有激情，你听得很投入。", "effects": {"study_points": 1, "mental": 1}, "probability": 0.08},
+      {"id": "m_class_002", "text": "邻座同学小声问你问题，你简单解释了一下。", "effects": {"social": 1, "study_points": 1}, "probability": 0.06},
+      {"id": "m_class_003", "text": "老师点名提问，刚好问到你会的。", "effects": {"study_points": 2, "mental": 1}, "probability": 0.05},
+      {"id": "m_class_004", "text": "这节课内容很难，你有点跟不上。", "effects": {"study_points": -1, "mental": -1}, "probability": 0.07},
+      {"id": "m_class_005", "text": "你在课本上发现上任主人的笔记，很有帮助。", "effects": {"study_points": 1}, "probability": 0.04},
+      {"id": "m_class_006", "text": "课间休息时，你和同学聊了聊周末计划。", "effects": {"social": 1, "mental": 1}, "probability": 0.06},
+      {"id": "m_class_007", "text": "这节课的PPT很精美，你多记了几页笔记。", "effects": {"study_points": 1}, "probability": 0.05},
+      {"id": "m_class_008", "text": "后排有人在打游戏，声音有点大。", "effects": {"mental": -1}, "probability": 0.06},
+      {"id": "m_class_009", "text": "老师分享了一个行业内的趣事，挺有意思的。", "effects": {"ability": 1, "mental": 1}, "probability": 0.05},
+      {"id": "m_class_010", "text": "这节课的内容和上周的作业有关，你突然想通了。", "effects": {"study_points": 2}, "probability": 0.04},
+      {"id": "m_class_011", "text": "你坐在了喜欢的位置，心情不错。", "effects": {"mental": 1}, "probability": 0.05},
+      {"id": "m_class_012", "text": "这节课的老师声音很催眠，你努力保持清醒。", "effects": {"mental": -1}, "probability": 0.06},
+      {"id": "m_class_013", "text": "你发现了一个学习小组的微信群，扫码加入了。", "effects": {"social": 2}, "probability": 0.03},
+      {"id": "m_class_014", "text": "这节课的作业要求很清晰，你记在了笔记本第一页。", "effects": {"ability": 1}, "probability": 0.04},
+      {"id": "m_class_015", "text": "老师提前下课了，你多了十分钟的自由时间。", "effects": {"mental": 2}, "probability": 0.03}
+    ],
+    
+    "library": [
+      {"id": "m_lib_001", "text": "图书馆的空调开得很足，你裹紧了外套。", "effects": {"mental": -1}, "probability": 0.05},
+      {"id": "m_lib_002", "text": "你找到了一本绝版书，如获至宝。", "effects": {"study_points": 2, "mental": 2}, "probability": 0.03},
+      {"id": "m_lib_003", "text": "对面坐了一个很认真的人，你也被感染了。", "effects": {"study_points": 1}, "probability": 0.06},
+      {"id": "m_lib_004", "text": "图书馆的WiFi有点慢，你用手机流量查了资料。", "effects": {"living_money": -2}, "probability": 0.05},
+      {"id": "m_lib_005", "text": "你在书架间穿梭，发现了一个新的阅读区域。", "effects": {"ability": 1}, "probability": 0.04},
+      {"id": "m_lib_006", "text": "今天图书馆人很少，你独占了一整张大桌子。", "effects": {"mental": 2}, "probability": 0.05},
+      {"id": "m_lib_007", "text": "你借的书明天到期，今天必须看完。", "effects": {"study_points": 1, "mental": -1}, "probability": 0.04},
+      {"id": "m_lib_008", "text": "图书馆的咖啡机坏了，你只好去外面买。", "effects": {"living_money": -8, "mental": 1}, "probability": 0.04},
+      {"id": "m_lib_009", "text": "你在期刊区发现了一篇对你很有启发的论文。", "effects": {"study_points": 2, "ability": 1}, "probability": 0.03},
+      {"id": "m_lib_010", "text": "闭馆前的半小时，效率出奇地高。", "effects": {"study_points": 2}, "probability": 0.05},
+      {"id": "m_lib_011", "text": "图书馆的打印机没纸了，你只能手写笔记。", "effects": {"study_points": 1, "mental": -1}, "probability": 0.04},
+      {"id": "m_lib_012", "text": "你帮管理员整理了归还的书籍。", "effects": {"social": 1, "mental": 1}, "probability": 0.03},
+      {"id": "m_lib_013", "text": "在电子阅览室发现了一个超好用的数据库。", "effects": {"ability": 2}, "probability": 0.03},
+      {"id": "m_lib_014", "text": "图书馆的窗外下起了雨，氛围很好。", "effects": {"mental": 2}, "probability": 0.05},
+      {"id": "m_lib_015", "text": "你预约的书到了，正好是你需要的参考资料。", "effects": {"study_points": 1}, "probability": 0.04}
+    ],
+    
+    "exercise": [
+      {"id": "m_ex_001", "text": "今天天气很好，户外运动特别舒服。", "effects": {"health": 2, "mental": 2}, "probability": 0.06},
+      {"id": "m_ex_002", "text": "你打破了自己的跑步记录，很有成就感。", "effects": {"health": 2, "mental": 3}, "probability": 0.04},
+      {"id": "m_ex_003", "text": "运动场上认识了一个志同道合的朋友。", "effects": {"social": 2, "health": 1}, "probability": 0.05},
+      {"id": "m_ex_004", "text": "今天的训练强度有点大，你有点吃不消。", "effects": {"health": 1, "mental": -1}, "probability": 0.05},
+      {"id": "m_ex_005", "text": "你在健身房尝试了一个新的器械，效果不错。", "effects": {"health": 2, "ability": 1}, "probability": 0.04},
+      {"id": "m_ex_006", "text": "运动完喝了一杯蛋白粉，补充能量。", "effects": {"health": 1, "living_money": -5}, "probability": 0.05},
+      {"id": "m_ex_007", "text": "篮球场上有高手，你观摩学习了一下。", "effects": {"ability": 1}, "probability": 0.04},
+      {"id": "m_ex_008", "text": "游泳时遇到了一个热心的教练，指点了几句。", "effects": {"health": 2, "ability": 1}, "probability": 0.03},
+      {"id": "m_ex_009", "text": "晨跑时看到了日出，心情特别好。", "effects": {"mental": 3}, "probability": 0.04},
+      {"id": "m_ex_010", "text": "今天运动的人很少，你独占了一条跑道。", "effects": {"mental": 1}, "probability": 0.05},
+      {"id": "m_ex_011", "text": "运动时不小心扭了一下，幸好不严重。", "effects": {"health": -1}, "probability": 0.04},
+      {"id": "m_ex_012", "text": "你和陌生人组队打了场球，配合默契。", "effects": {"social": 2, "health": 1}, "probability": 0.04},
+      {"id": "m_ex_013", "text": "运动后冲了个热水澡，浑身舒畅。", "effects": {"mental": 2}, "probability": 0.06},
+      {"id": "m_ex_014", "text": "你坚持运动一个月了，体能明显提升。", "effects": {"health": 3, "mental": 2}, "probability": 0.02},
+      {"id": "m_ex_015", "text": "今天运动完特别饿，多吃了一碗饭。", "effects": {"health": 1, "living_money": -3}, "probability": 0.05}
+    ],
+    
+    "rest": [
+      {"id": "m_rest_001", "text": "你睡了一个长长的午觉，醒来神清气爽。", "effects": {"health": 2, "mental": 3}, "probability": 0.07},
+      {"id": "m_rest_002", "text": "刷了一下午的短视频，有点罪恶感。", "effects": {"mental": 2, "study_points": -1}, "probability": 0.06},
+      {"id": "m_rest_003", "text": "看了一部好电影，感动得差点哭了。", "effects": {"mental": 3}, "probability": 0.05},
+      {"id": "m_rest_004", "text": "你在床上躺了一天，腰酸背痛。", "effects": {"health": -1, "mental": 1}, "probability": 0.05},
+      {"id": "m_rest_005", "text": "整理了一下宿舍，心情变好了。", "effects": {"mental": 2}, "probability": 0.05},
+      {"id": "m_rest_006", "text": "听了一下午的音乐，很放松。", "effects": {"mental": 2}, "probability": 0.06},
+      {"id": "m_rest_007", "text": "打了一下午游戏，段位提升了。", "effects": {"mental": 3, "study_points": -1}, "probability": 0.05},
+      {"id": "m_rest_008", "text": "你尝试做了一个新菜，味道还不错。", "effects": {"ability": 1, "mental": 2}, "probability": 0.04},
+      {"id": "m_rest_009", "text": "看了一本书，收获很大。", "effects": {"study_points": 2, "mental": 2}, "probability": 0.04},
+      {"id": "m_rest_010", "text": "和室友打牌，输了一下午。", "effects": {"mental": 1, "social": 1}, "probability": 0.05},
+      {"id": "m_rest_011", "text": "你写了一篇日记，梳理了一下最近的心情。", "effects": {"mental": 2}, "probability": 0.04},
+      {"id": "m_rest_012", "text": "网购的东西到了，拆快递很开心。", "effects": {"mental": 2, "living_money": -10}, "probability": 0.05},
+      {"id": "m_rest_013", "text": "你给父母打了个电话，聊了聊近况。", "effects": {"mental": 3}, "probability": 0.04},
+      {"id": "m_rest_014", "text": "下午睡太多，晚上有点失眠。", "effects": {"health": -1, "mental": -1}, "probability": 0.04},
+      {"id": "m_rest_015", "text": "你给自己做了一次面膜，精致了一下。", "effects": {"mental": 2}, "probability": 0.03}
+    ],
+    
+    "part_time_job": [
+      {"id": "m_job_001", "text": "今天客人很少，你偷偷背了几个单词。", "effects": {"study_points": 1, "living_money": 20}, "probability": 0.05},
+      {"id": "m_job_002", "text": "老板夸你做事认真，给了奖金。", "effects": {"living_money": 30, "mental": 2}, "probability": 0.03},
+      {"id": "m_job_003", "text": "遇到一个难缠的客人，心情有点糟。", "effects": {"living_money": 20, "mental": -2}, "probability": 0.06},
+      {"id": "m_job_004", "text": "同事请你喝了一杯奶茶，很暖心。", "effects": {"social": 1, "mental": 1}, "probability": 0.05},
+      {"id": "m_job_005", "text": "今天学到了一些新的工作技能。", "effects": {"ability": 2, "living_money": 25}, "probability": 0.04},
+      {"id": "m_job_006", "text": "下班时下雨了，你没带伞，淋湿了。", "effects": {"health": -1, "living_money": 25}, "probability": 0.04},
+      {"id": "m_job_007", "text": "你帮同事解决了问题，他请你吃饭。", "effects": {"social": 2, "ability": 1}, "probability": 0.03},
+      {"id": "m_job_008", "text": "今天工作特别忙，累得不想动。", "effects": {"living_money": 35, "health": -2, "mental": -1}, "probability": 0.05},
+      {"id": "m_job_009", "text": "你发现了工作流程中的一个改进点，提了出来。", "effects": {"ability": 2, "living_money": 25}, "probability": 0.03},
+      {"id": "m_job_010", "text": "老板让你提前下班，开心。", "effects": {"mental": 2, "living_money": 20}, "probability": 0.04},
+      {"id": "m_job_011", "text": "今天遇到了一个很有趣的客人，聊得很开心。", "effects": {"social": 2, "mental": 2, "living_money": 25}, "probability": 0.04},
+      {"id": "m_job_012", "text": "工作中犯了一个小错误，被批评了。", "effects": {"mental": -2, "living_money": 20}, "probability": 0.05},
+      {"id": "m_job_013", "text": "你和一个常客熟络了起来，他每次都找你。", "effects": {"social": 2, "living_money": 25}, "probability": 0.03},
+      {"id": "m_job_014", "text": "今天的营业额不错，老板心情好。", "effects": {"living_money": 30, "mental": 1}, "probability": 0.04},
+      {"id": "m_job_015", "text": "你学会了和不同类型的人打交道。", "effects": {"social": 2, "ability": 1, "living_money": 25}, "probability": 0.04}
+    ],
+    
+    "dorm": [
+      {"id": "m_dorm_001", "text": "室友分享了他的零食，很好吃。", "effects": {"social": 1, "mental": 1}, "probability": 0.06},
+      {"id": "m_dorm_002", "text": "深夜卧谈会，大家聊到了人生理想。", "effects": {"social": 2, "mental": 2}, "probability": 0.05},
+      {"id": "m_dorm_003", "text": "室友打游戏声音太大，你有点烦躁。", "effects": {"mental": -1}, "probability": 0.06},
+      {"id": "m_dorm_004", "text": "你们一起点了外卖，AA制很划算。", "effects": {"social": 1, "living_money": -15}, "probability": 0.05},
+      {"id": "m_dorm_005", "text": "室友帮你带了快递，省了你跑一趟。", "effects": {"social": 2}, "probability": 0.05},
+      {"id": "m_dorm_006", "text": "宿舍卫生检查，你们一起打扫。", "effects": {"social": 1, "mental": -1}, "probability": 0.04},
+      {"id": "m_dorm_007", "text": "室友的闹钟响了半小时，把你吵醒了。", "effects": {"health": -1, "mental": -1}, "probability": 0.05},
+      {"id": "m_dorm_008", "text": "你们一起看了场球赛，很嗨。", "effects": {"social": 2, "mental": 2}, "probability": 0.04},
+      {"id": "m_dorm_009", "text": "室友失恋了，你安慰了他一晚上。", "effects": {"social": 3, "mental": -1}, "probability": 0.03},
+      {"id": "m_dorm_010", "text": "你们一起拼单买了生活用品，省了不少钱。", "effects": {"social": 1, "living_money": 5}, "probability": 0.05},
+      {"id": "m_dorm_011", "text": "室友借了你的洗发水，忘了还。", "effects": {"social": 1}, "probability": 0.05},
+      {"id": "m_dorm_012", "text": "深夜有人敲门，原来是隔壁宿舍借东西。", "effects": {"mental": -1}, "probability": 0.04},
+      {"id": "m_dorm_013", "text": "你们一起庆祝了室友的生日，很开心。", "effects": {"social": 3, "mental": 2, "living_money": -20}, "probability": 0.03},
+      {"id": "m_dorm_014", "text": "宿舍的WiFi突然断了，大家面面相觑。", "effects": {"mental": -1}, "probability": 0.04},
+      {"id": "m_dorm_015", "text": "室友教你玩了一个新游戏，你入坑了。", "effects": {"social": 2, "mental": 1}, "probability": 0.04}
+    ],
+    
+    "club": [
+      {"id": "m_club_001", "text": "社团活动认识了一个志同道合的朋友。", "effects": {"social": 2, "ability": 1}, "probability": 0.06},
+      {"id": "m_club_002", "text": "今天的社团训练很累，但收获很大。", "effects": {"ability": 2, "health": -1}, "probability": 0.05},
+      {"id": "m_club_003", "text": "社团学长分享了他的经验，你很受启发。", "effects": {"ability": 2, "social": 1}, "probability": 0.05},
+      {"id": "m_club_004", "text": "社团组织的活动很成功，大家很有成就感。", "effects": {"social": 2, "ability": 2, "mental": 2}, "probability": 0.04},
+      {"id": "m_club_005", "text": "你在社团里承担了一个小任务，完成得不错。", "effects": {"ability": 2}, "probability": 0.05},
+      {"id": "m_club_006", "text": "社团聚餐，你认识了其他部门的人。", "effects": {"social": 3, "living_money": -25}, "probability": 0.05},
+      {"id": "m_club_007", "text": "今天的社团活动因为下雨取消了，有点失望。", "effects": {"mental": -1}, "probability": 0.04},
+      {"id": "m_club_008", "text": "你在社团里展示了自己的特长，获得了认可。", "effects": {"ability": 2, "social": 2, "mental": 2}, "probability": 0.04},
+      {"id": "m_club_009", "text": "社团里有人退出了，氛围有点低落。", "effects": {"mental": -1}, "probability": 0.04},
+      {"id": "m_club_010", "text": "你主动申请了一个新项目，很有挑战性。", "effects": {"ability": 3, "mental": 1}, "probability": 0.03},
+      {"id": "m_club_011", "text": "社团的指导老师给了你们很多建议。", "effects": {"ability": 2}, "probability": 0.04},
+      {"id": "m_club_012", "text": "社团里的前辈毕业了，大家很舍不得。", "effects": {"social": 1, "mental": -1}, "probability": 0.03},
+      {"id": "m_club_013", "text": "你在社团里学会了团队协作的重要性。", "effects": {"social": 2, "ability": 1}, "probability": 0.04},
+      {"id": "m_club_014", "text": "社团招新，你作为老成员去面试新人。", "effects": {"social": 2, "ability": 1}, "probability": 0.04},
+      {"id": "m_club_015", "text": "社团获得了学校的表彰，大家很骄傲。", "effects": {"social": 2, "mental": 3}, "probability": 0.03}
+    ],
+    
+    "social": [
+      {"id": "m_soc_001", "text": "和朋友吃饭，聊了很多有趣的话题。", "effects": {"social": 2, "mental": 2, "living_money": -20}, "probability": 0.06},
+      {"id": "m_soc_002", "text": "你主动请客，朋友很感动。", "effects": {"social": 3, "living_money": -30}, "probability": 0.04},
+      {"id": "m_soc_003", "text": "朋友向你倾诉烦恼，你给了建议。", "effects": {"social": 2, "mental": -1}, "probability": 0.05},
+      {"id": "m_soc_004", "text": "你们一起打游戏，配合默契。", "effects": {"social": 2, "mental": 2}, "probability": 0.05},
+      {"id": "m_soc_005", "text": "朋友介绍了新朋友给你认识。", "effects": {"social": 3}, "probability": 0.04},
+      {"id": "m_soc_006", "text": "你们一起看电影，吐槽了一路。", "effects": {"social": 2, "mental": 2, "living_money": -25}, "probability": 0.04},
+      {"id": "m_soc_007", "text": "朋友临时放了你鸽子，有点不爽。", "effects": {"mental": -2}, "probability": 0.04},
+      {"id": "m_soc_008", "text": "你们一起逛街，买到了喜欢的东西。", "effects": {"social": 2, "mental": 2, "living_money": -40}, "probability": 0.04},
+      {"id": "m_soc_009", "text": "朋友请你吃饭，欠了人情。", "effects": {"social": 2}, "probability": 0.05},
+      {"id": "m_soc_010", "text": "你们一起复习，互相提问。", "effects": {"social": 2, "study_points": 2}, "probability": 0.04},
+      {"id": "m_soc_011", "text": "朋友分享了一个实习信息给你。", "effects": {"social": 2, "ability": 1}, "probability": 0.04},
+      {"id": "m_soc_012", "text": "你们一起参加了讲座，收获很大。", "effects": {"social": 2, "study_points": 1}, "probability": 0.04},
+      {"id": "m_soc_013", "text": "朋友生日，你送了礼物。", "effects": {"social": 3, "living_money": -30}, "probability": 0.03},
+      {"id": "m_soc_014", "text": "你们因为小事起了争执，不欢而散。", "effects": {"social": -1, "mental": -2}, "probability": 0.03},
+      {"id": "m_soc_015", "text": "朋友鼓励你追求喜欢的人，给了你信心。", "effects": {"social": 2, "mental": 2}, "probability": 0.04}
+    ],
+    
+    "general": [
+      {"id": "m_gen_001", "text": "今天天气很好，心情也跟着好了。", "effects": {"mental": 2}, "probability": 0.05},
+      {"id": "m_gen_002", "text": "下雨了，没带伞，有点狼狈。", "effects": {"health": -1, "mental": -1}, "probability": 0.05},
+      {"id": "m_gen_003", "text": "食堂阿姨多打了一勺肉，开心。", "effects": {"mental": 1}, "probability": 0.06},
+      {"id": "m_gen_004", "text": "快递到了，是你等了很久的东西。", "effects": {"mental": 2}, "probability": 0.04},
+      {"id": "m_gen_005", "text": "手机没电了，错过了重要消息。", "effects": {"mental": -1}, "probability": 0.04},
+      {"id": "m_gen_006", "text": "今天遇到了一个很久没见的同学。", "effects": {"social": 1}, "probability": 0.05},
+      {"id": "m_gen_007", "text": "你发现自己瘦了/胖了，心情复杂。", "effects": {"mental": 1}, "probability": 0.04},
+      {"id": "m_gen_008", "text": "收到了父母的转账，生活费到账。", "effects": {"living_money": 100, "mental": 2}, "probability": 0.03},
+      {"id": "m_gen_009", "text": "今天是个特别的日子，你给自己买了个小礼物。", "effects": {"mental": 2, "living_money": -15}, "probability": 0.04},
+      {"id": "m_gen_010", "text": "你在校园里发现了一家新开的店，尝试了一下。", "effects": {"mental": 1, "living_money": -10}, "probability": 0.05},
+      {"id": "m_gen_011", "text": "今天的晚霞特别美，你拍了几张照片。", "effects": {"mental": 2}, "probability": 0.04},
+      {"id": "m_gen_012", "text": "你帮陌生人指了路，对方很感激。", "effects": {"mental": 1}, "probability": 0.04},
+      {"id": "m_gen_013", "text": "今天的课表排得很满，有点累。", "effects": {"mental": -1}, "probability": 0.05},
+      {"id": "m_gen_014", "text": "你在校园里迷路了，转了好几圈。", "effects": {"mental": -1}, "probability": 0.04},
+      {"id": "m_gen_015", "text": "今天的月亮很圆，你想家了。", "effects": {"mental": -1}, "probability": 0.04}
+    ]
+  },
+  
+  "phase_specific": {
+    "军训": [
+      {"id": "m_mil_001", "text": "今天的训练强度很大，你咬牙坚持下来了。", "effects": {"health": 2, "mental": 1}, "probability": 0.08},
+      {"id": "m_mil_002", "text": "教官今天心情不错，训练提前结束了。", "effects": {"mental": 2}, "probability": 0.05},
+      {"id": "m_mil_003", "text": "你和隔壁排的同学混熟了。", "effects": {"social": 2}, "probability": 0.06},
+      {"id": "m_mil_004", "text": "站军姿时你想了很多人生问题。", "effects": {"mental": 1}, "probability": 0.05},
+      {"id": "m_mil_005", "text": "今天的伙食比昨天好，你多吃了半碗。", "effects": {"health": 1, "mental": 1}, "probability": 0.06}
+    ],
+    
+    "考试周": [
+      {"id": "m_exam_001", "text": "昨晚复习到很晚，今天有点困。", "effects": {"study_points": 1, "health": -1}, "probability": 0.08},
+      {"id": "m_exam_002", "text": "考到了昨天复习的原题，幸运！", "effects": {"study_points": 2, "mental": 3}, "probability": 0.05},
+      {"id": "m_exam_003", "text": "有一道题完全不会，只能蒙了。", "effects": {"mental": -2}, "probability": 0.06},
+      {"id": "m_exam_004", "text": "考完后和同学对答案，发现错了一道。", "effects": {"mental": -1}, "probability": 0.05},
+      {"id": "m_exam_005", "text": "终于考完了，如释重负。", "effects": {"mental": 5}, "probability": 0.07}
+    ],
+    
+    "寒假": [
+      {"id": "m_winter_001", "text": "回家的高铁上，你睡了一路。", "effects": {"health": 1, "mental": 2}, "probability": 0.06},
+      {"id": "m_winter_002", "text": "和家人一起吃饭，很温馨。", "effects": {"mental": 3}, "probability": 0.07},
+      {"id": "m_winter_003", "text": "高中同学聚会，大家变化都很大。", "effects": {"social": 2, "mental": 1}, "probability": 0.05},
+      {"id": "m_winter_004", "text": "被亲戚问成绩/对象，有点尴尬。", "effects": {"mental": -1}, "probability": 0.05},
+      {"id": "m_winter_005", "text": "在家待久了，开始想念学校的生活。", "effects": {"mental": 1}, "probability": 0.04}
+    ],
+    
+    "暑假": [
+      {"id": "m_summer_001", "text": "暑假实习第一天，有点紧张。", "effects": {"ability": 1, "mental": -1}, "probability": 0.06},
+      {"id": "m_summer_002", "text": "在家躺了一天，空调真舒服。", "effects": {"mental": 2, "health": -1}, "probability": 0.06},
+      {"id": "m_summer_003", "text": "和朋友去旅行，拍了很多照片。", "effects": {"social": 2, "mental": 3, "living_money": -50}, "probability": 0.04},
+      {"id": "m_m_summer_004", "text": "学了一个新技能，很有成就感。", "effects": {"ability": 3, "mental": 2}, "probability": 0.04},
+      {"id": "m_summer_005", "text": "暑假工很累，但赚到了钱。", "effects": {"living_money": 80, "health": -1}, "probability": 0.05}
+    ]
+  }
 }
