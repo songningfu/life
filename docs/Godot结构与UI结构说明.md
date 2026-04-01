@@ -260,3 +260,145 @@ UI 不是硬编码内容，而是读取数据层与模块层结果：
 - 游戏中核心交互路径明确（行动选择 → 事件反馈 → 状态变化）
 - 复杂信息通过档案与手机系统分层承载
 - 结构上适合继续扩展新模块、新事件池与新面板
+
+---
+
+## 8. 关键场景节点树（ASCII）
+
+以下是便于排查和定位的结构图（精简版，保留关键节点）。
+
+### 8.1 `Game.tscn`
+
+```text
+GameRoot (VBoxContainer)
+├─ BackgroundWindow
+│  ├─ SceneBackground
+│  └─ SceneBackgroundShade
+├─ StatusBar
+│  └─ StatusMargin/StatusVBox
+│     ├─ StatusHint
+│     └─ DayProgress
+├─ TimeControlBar
+│  ├─ PauseBtn
+│  ├─ Speed1xBtn / Speed2xBtn / Speed4xBtn
+│  ├─ PhoneBtn
+│  ├─ ProfileBtn
+│  ├─ TopStatusInfo
+│  │  ├─ MoneyInfo
+│  │  ├─ GpaInfo
+│  │  ├─ StudyInfo
+│  │  └─ CreditsInfo
+│  └─ DateLabel
+└─ MainHBox
+   ├─ LeftPanel
+   │  ├─ CurrentCard
+   │  │  └─ CurrentMargin/CurrentVBox
+   │  │     ├─ CurrentHint
+   │  │     └─ CurrentText
+   │  ├─ ChoicesContainer
+   │  ├─ LogHeader
+   │  ├─ EventText
+   │  └─ NextButton
+   └─ RightPanel
+      └─ RightScroll/RightContent
+         ├─ CampusMapPanel/CampusMap
+         ├─ GpaRow
+         ├─ SocialRow
+         ├─ AbilityRow
+         ├─ MoneyRow
+         ├─ MentalRow
+         ├─ HealthRow
+         └─ Tag/Info Rows ...
+```
+
+### 8.2 `PlayerInfoPanel.tscn`
+
+```text
+PlayerInfoPanel (CanvasLayer)
+├─ Overlay
+└─ MarginContainer
+   └─ Shell
+      └─ MainVBox
+         ├─ HeaderPanel
+         │  └─ HeaderMargin/HeaderRow
+         │     ├─ IdentityBlock
+         │     │  ├─ HeaderEyebrow
+         │     │  ├─ HeaderTitle
+         │     │  └─ HeaderSub
+         │     └─ Actions
+         │        ├─ HintLabel
+         │        └─ CloseBtn
+         ├─ Divider
+         └─ ScrollContainer
+            └─ ContentMargin/ContentVBox
+               ├─ QuickStatsPanel
+               │  └─ QuickStatsGrid
+               └─ BodyColumns
+                  ├─ LeftColumn
+                  │  ├─ BasicInfoPanel/InfoGrid
+                  │  ├─ ProgressPanel/ProgressContent
+                  │  ├─ TalentsPanel/TalentsFlow
+                  │  └─ TagsPanel/TagsFlow
+                  └─ RightColumn
+                     ├─ StoryPanel/StoryContent
+                     ├─ AcademicPanel/AcademicContent
+                     ├─ DormPanel/RoommatesContent
+                     ├─ RelationshipsPanel/RelationshipsContent
+                     └─ DataPanel/RawDataContent
+```
+
+### 8.3 `main_menu.tscn`
+
+```text
+MainMenu (Control)
+├─ Background
+├─ Center/MainVBox
+│  ├─ Title
+│  ├─ Subtitle
+│  └─ BtnVBox
+│     ├─ NewBtn
+│     ├─ ContinueBtn
+│     └─ QuitBtn
+├─ Overlay
+├─ SavePanel (存档弹层)
+├─ CharPanel (快速建角弹层)
+└─ LoadPage
+   ├─ CardList
+   └─ LoadCardTemplate
+```
+
+### 8.4 `CharacterCreation.tscn`
+
+```text
+CharacterCreation (Control)
+├─ Background
+├─ PageContainer
+│  ├─ Page1_Name
+│  ├─ Page2_Gender
+│  ├─ Page3_Background
+│  ├─ Page4_University
+│  ├─ Page5_Major
+│  │  ├─ MajorList (Grid)
+│  │  └─ MajorPager (Prev/Next)
+│  └─ Page6_Talent
+│     ├─ TalentList
+│     ├─ RollBtn
+│     └─ StartBtn
+└─ ProgressIndicator
+   ├─ Dot1
+   ├─ Dot2
+   ├─ Dot3
+   ├─ Dot4
+   ├─ Dot5
+   └─ Dot6
+```
+
+---
+
+## 9. 快速定位建议（开发时）
+
+- 查“行动按钮为什么没出现”：先看 `Game.tscn/ChoicesContainer`，再看 `Game.gd` 的可用行动收集。
+- 查“档案数据没刷新”：看 `PlayerInfoPanel.gd` 的 `_refresh_data()` 调用链。
+- 查“手机点不开/关不掉”：看 `PhoneSystem.gd` 中 `PhoneOverlay` 与 `open_phone/close_phone`。
+- 查“某页显示错乱”：优先检查对应 `*.tscn` 的容器层级和 `size_flags`。
+
