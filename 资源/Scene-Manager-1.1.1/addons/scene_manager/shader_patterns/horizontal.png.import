@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgmfhc32g6va6"
-path.s3tc="res://.godot/imported/diagonal.png-b8cba5f1e205557f719545aaed0a4683.s3tc.ctex"
+uid="uid://7ypismovx1sv"
+path.s3tc="res://.godot/imported/horizontal.png-484b506c97540f545bc4d361f61f94bd.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://新建文件夹/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/diagonal.png"
-dest_files=["res://.godot/imported/diagonal.png-b8cba5f1e205557f719545aaed0a4683.s3tc.ctex"]
+source_file="res://资源/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/horizontal.png"
+dest_files=["res://.godot/imported/horizontal.png-484b506c97540f545bc4d361f61f94bd.s3tc.ctex"]
 
 [params]
 

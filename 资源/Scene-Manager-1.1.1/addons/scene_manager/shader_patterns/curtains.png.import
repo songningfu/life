@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7ypismovx1sv"
-path.s3tc="res://.godot/imported/horizontal.png-5eb5e57b3c07ffacec87043e873627d7.s3tc.ctex"
+uid="uid://nglientb4rxo"
+path.s3tc="res://.godot/imported/curtains.png-395419e10962630e6ec6049025253922.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://新建文件夹/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/horizontal.png"
-dest_files=["res://.godot/imported/horizontal.png-5eb5e57b3c07ffacec87043e873627d7.s3tc.ctex"]
+source_file="res://资源/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/curtains.png"
+dest_files=["res://.godot/imported/curtains.png-395419e10962630e6ec6049025253922.s3tc.ctex"]
 
 [params]
 

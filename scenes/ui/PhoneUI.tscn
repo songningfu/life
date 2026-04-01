@@ -1,0 +1,133 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/PhoneUI.gd" id="1_phone_ui"]
+[ext_resource type="Script" path="res://scripts/ui/ChatWindow.gd" id="2_chat_window"]
+
+[node name="PhoneUI" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_phone_ui")
+
+[node name="PhoneBG" type="ColorRect" parent="." unique_name_in_owner=true]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.5)
+
+[node name="PhonePanel" type="PanelContainer" parent="." unique_name_in_owner=true]
+visible = false
+custom_minimum_size = Vector2(360, 640)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -320.0
+offset_right = 180.0
+offset_bottom = 320.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AnimPlayer" type="AnimationPlayer" parent="PhonePanel" unique_name_in_owner=true]
+
+[node name="VBox" type="VBoxContainer" parent="PhonePanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TopBar" type="HBoxContainer" parent="PhonePanel/VBox"]
+layout_mode = 2
+
+[node name="PhoneTitle" type="Label" parent="PhonePanel/VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "消息"
+
+[node name="CloseBtn" type="Button" parent="PhonePanel/VBox/TopBar" unique_name_in_owner=true]
+layout_mode = 2
+text = "✕"
+
+[node name="ContactScroll" type="ScrollContainer" parent="PhonePanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContactList" type="VBoxContainer" parent="PhonePanel/VBox/ContactScroll" unique_name_in_owner=true]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ChatWindow" type="PanelContainer" parent="PhonePanel/VBox" unique_name_in_owner=true]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_chat_window")
+
+[node name="VBox2" type="VBoxContainer" parent="PhonePanel/VBox/ChatWindow"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ChatTopBar" type="HBoxContainer" parent="PhonePanel/VBox/ChatWindow/VBox2"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="PhonePanel/VBox/ChatWindow/VBox2/ChatTopBar" unique_name_in_owner=true]
+layout_mode = 2
+text = "←"
+
+[node name="ChatTitle" type="Label" parent="PhonePanel/VBox/ChatWindow/VBox2/ChatTopBar" unique_name_in_owner=true]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "聊天"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PhonePanel/VBox/ChatWindow/VBox2" unique_name_in_owner=true]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MessageList" type="VBoxContainer" parent="PhonePanel/VBox/ChatWindow/VBox2/ScrollContainer" unique_name_in_owner=true]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ReplyOptions" type="VBoxContainer" parent="PhonePanel/VBox/ChatWindow/VBox2" unique_name_in_owner=true]
+layout_mode = 2
+
+[node name="InputBar" type="HBoxContainer" parent="PhonePanel/VBox/ChatWindow/VBox2" unique_name_in_owner=true]
+layout_mode = 2
+
+[node name="InputField" type="LineEdit" parent="PhonePanel/VBox/ChatWindow/VBox2/InputBar" unique_name_in_owner=true]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "输入消息"
+
+[node name="SendButton" type="Button" parent="PhonePanel/VBox/ChatWindow/VBox2/InputBar" unique_name_in_owner=true]
+layout_mode = 2
+text = "发送"
+
+[node name="PhoneToggleBtn" type="Button" parent="." unique_name_in_owner=true]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -96.0
+offset_top = -96.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "📱"
+
+[node name="NotificationBadge" type="Label" parent="PhoneToggleBtn" unique_name_in_owner=true]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -20.0
+offset_right = 6.0
+offset_bottom = 22.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "0"

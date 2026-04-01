@@ -1,0 +1,74 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/RoommateDrawUI.gd" id="1_roommate_ui"]
+
+[node name="RoommateDrawUI" type="CanvasLayer"]
+layer = 30
+script = ExtResource("1_roommate_ui")
+
+[node name="Mask" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.65)
+
+[node name="RootPanel" type="PanelContainer" parent="." unique_name_in_owner=true]
+custom_minimum_size = Vector2(980, 720)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -490.0
+offset_top = -360.0
+offset_right = 490.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AnimPlayer" type="AnimationPlayer" parent="RootPanel" unique_name_in_owner=true]
+
+[node name="VBox" type="VBoxContainer" parent="RootPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="RootPanel/VBox" unique_name_in_owner=true]
+layout_mode = 2
+text = "抽取舍友"
+horizontal_alignment = 1
+
+[node name="RedrawInfo" type="Label" parent="RootPanel/VBox" unique_name_in_owner=true]
+layout_mode = 2
+text = "剩余重抽次数：0 / 0"
+horizontal_alignment = 1
+
+[node name="CardScroll" type="ScrollContainer" parent="RootPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CardList" type="HBoxContainer" parent="RootPanel/VBox/CardScroll" unique_name_in_owner=true]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BottomBar" type="HBoxContainer" parent="RootPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="CancelBtn" type="Button" parent="RootPanel/VBox/BottomBar" unique_name_in_owner=true]
+layout_mode = 2
+text = "取消"
+
+[node name="RedrawBtn" type="Button" parent="RootPanel/VBox/BottomBar" unique_name_in_owner=true]
+layout_mode = 2
+text = "重抽"
+
+[node name="ConfirmBtn" type="Button" parent="RootPanel/VBox/BottomBar" unique_name_in_owner=true]
+layout_mode = 2
+text = "确认舍友"

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b45fitoojqhxe"
-path.s3tc="res://.godot/imported/squares.png-13e93f18c291e050d7240f7e700a93c4.s3tc.ctex"
+uid="uid://bgcid7fyjtd30"
+path.s3tc="res://.godot/imported/scribbles.png-7158ece3b47fa873ae5152e6a993fb69.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://新建文件夹/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/squares.png"
-dest_files=["res://.godot/imported/squares.png-13e93f18c291e050d7240f7e700a93c4.s3tc.ctex"]
+source_file="res://资源/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/scribbles.png"
+dest_files=["res://.godot/imported/scribbles.png-7158ece3b47fa873ae5152e6a993fb69.s3tc.ctex"]
 
 [params]
 

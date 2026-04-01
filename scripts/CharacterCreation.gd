@@ -14,6 +14,9 @@ var selected_major_id: String = "computer_science"
 var selected_major_profile: Dictionary = {}
 var current_talents: Array = []
 var save_slot: int = -1
+const ROOMMATE_DRAW_UI_SCENE: PackedScene = preload("res://scenes/ui/RoommateDrawUI.tscn")
+var _roommate_draw_ui: CanvasLayer = null
+var _pending_init_data: Dictionary = {}
 
 # 页面节点
 var pages: Array = []
@@ -643,8 +646,7 @@ func _start_game():
 		$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.text = "请先抽取天赋！"
 		$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.add_theme_color_override("font_color", colors.accent_bright)
 		return
-	
-	# ★ 修复：同步天赋到TalentModule
+
 	var talent_module: TalentModule = null
 	if ModuleManager:
 		talent_module = ModuleManager.get_module("talent") as TalentModule
@@ -652,10 +654,10 @@ func _start_game():
 		talent_module.set_talents(current_talents)
 	else:
 		print("[CharacterCreation] 警告：TalentModule未找到，天赋将通过init_data传递")
-	
+
 	NamePool.init_new_game()
-	
-	SaveManager.store_temp("pending_game_init", {
+
+	_pending_init_data = {
 		"player_name": player_name,
 		"player_gender": selected_gender,
 		"save_slot": save_slot,
@@ -666,6 +668,33 @@ func _start_game():
 		"major_id": selected_major_id,
 		"major_profile": selected_major_profile.duplicate(true),
 		"talents": current_talents.duplicate(true),
-	})
-	
+	}
+
+	_start_roommate_draw()
+
+func _start_roommate_draw() -> void:
+	if _roommate_draw_ui != null:
+		_roommate_draw_ui.queue_free()
+	_roommate_draw_ui = ROOMMATE_DRAW_UI_SCENE.instantiate() as CanvasLayer
+	add_child(_roommate_draw_ui)
+
+	if not _roommate_draw_ui.draw_completed.is_connected(_on_roommates_drawn):
+		_roommate_draw_ui.draw_completed.connect(_on_roommates_drawn)
+
+	if not _roommate_draw_ui.draw_cancelled.is_connected(_on_roommate_draw_cancelled):
+		_roommate_draw_ui.draw_cancelled.connect(_on_roommate_draw_cancelled)
+
+	_roommate_draw_ui.start_draw()
+
+func _on_roommates_drawn(roommates: Array) -> void:
+	SaveManager.set_roommates(roommates)
+
+	var final_init_data: Dictionary = _pending_init_data.duplicate(true)
+	final_init_data["roommates"] = roommates.duplicate(true)
+
+	SaveManager.store_temp("pending_game_init", final_init_data)
 	SceneTransitions.creation_to_game()
+
+func _on_roommate_draw_cancelled() -> void:
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.text = "已取消抽舍友，可重新开始抽取"
+	$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.add_theme_color_override("font_color", colors.accent_bright)

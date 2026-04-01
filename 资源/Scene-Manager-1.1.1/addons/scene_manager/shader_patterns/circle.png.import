@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwci7g18k0mgh"
-path.s3tc="res://.godot/imported/vertical.png-3a03b88b3a8aef2299e16706f1acf013.s3tc.ctex"
+uid="uid://bpskbib6w4gdp"
+path.s3tc="res://.godot/imported/circle.png-06c0bf1ee569cebc02420b5a7bf5af95.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://新建文件夹/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/vertical.png"
-dest_files=["res://.godot/imported/vertical.png-3a03b88b3a8aef2299e16706f1acf013.s3tc.ctex"]
+source_file="res://资源/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/circle.png"
+dest_files=["res://.godot/imported/circle.png-06c0bf1ee569cebc02420b5a7bf5af95.s3tc.ctex"]
 
 [params]
 

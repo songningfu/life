@@ -1,0 +1,117 @@
+{
+  "roommate_pool": [
+    {
+      "id": "rm_scholar_01",
+      "name": "陆闻书",
+      "personality": "学霸",
+      "hobby": "刷题、看论文、做知识图谱",
+      "sleep_habit": "早睡早起",
+      "cleanliness": 9,
+      "noise_level": 2,
+      "portrait": "res://images/portraits/roommates/rm_scholar_01.png",
+      "traits": ["自律", "计划控", "笔记狂魔"],
+      "description": "作息像闹钟一样精确，书桌永远整洁，考试周能带飞全寝。",
+      "flavor_texts": {
+        "morning": "他六点半就开台灯背单词了。",
+        "night": "十点半准时收书，提醒你别熬夜。",
+        "study": "他把重点整理成了三色便签递给你。",
+        "weekend": "周末也在图书馆预约了固定座位。"
+      }
+    },
+    {
+      "id": "rm_social_01",
+      "name": "姜浩然",
+      "personality": "社牛",
+      "hobby": "社团活动、摄影、组织聚会",
+      "sleep_habit": "晚睡晚起",
+      "cleanliness": 6,
+      "noise_level": 8,
+      "portrait": "res://images/portraits/roommates/rm_social_01.png",
+      "traits": ["外向", "人脉广", "情绪感染力强"],
+      "description": "朋友圈比课表还复杂，走在路上三步一个熟人，寝室气氛担当。",
+      "flavor_texts": {
+        "morning": "他一边刷牙一边语音安排晚上聚会。",
+        "night": "熄灯后还在讲今晚活动里的神操作。",
+        "study": "他说先认识人，再认识公式。",
+        "weekend": "他周末几乎不在寝室，活动排满。"
+      }
+    },
+    {
+      "id": "rm_gamer_01",
+      "name": "唐一鸣",
+      "personality": "游戏宅",
+      "hobby": "MOBA、Roguelike、主机游戏",
+      "sleep_habit": "昼夜颠倒",
+      "cleanliness": 5,
+      "noise_level": 7,
+      "portrait": "res://images/portraits/roommates/rm_gamer_01.png",
+      "traits": ["夜猫子", "梗王", "设备党"],
+      "description": "键盘声是寝室夜间背景乐，虽然偶尔摆烂，但关键时刻很讲义气。",
+      "flavor_texts": {
+        "morning": "你起床时他刚关机，嘴里还念着‘差一把上分’。",
+        "night": "耳机里传来‘这波能打’的低吼。",
+        "study": "他把番茄钟当成副本倒计时来用。",
+        "weekend": "周末是他的赛季冲分黄金时间。"
+      }
+    },
+    {
+      "id": "rm_sport_01",
+      "name": "赵劲松",
+      "personality": "运动达人",
+      "hobby": "跑步、健身、羽毛球",
+      "sleep_habit": "规律早睡",
+      "cleanliness": 8,
+      "noise_level": 4,
+      "portrait": "res://images/portraits/roommates/rm_sport_01.png",
+      "traits": ["自律", "执行力强", "正能量"],
+      "description": "冰箱里永远有鸡胸肉，寝室地板都能反光，行动力拉满。",
+      "flavor_texts": {
+        "morning": "他晨跑回来顺手给你带了豆浆。",
+        "night": "他做完拉伸后就安静看训练记录。",
+        "study": "他说先练体能，再练脑力，效率更高。",
+        "weekend": "周末固定去球馆打满两小时。"
+      }
+    },
+    {
+      "id": "rm_art_01",
+      "name": "顾清川",
+      "personality": "文艺青年",
+      "hobby": "吉他、写诗、看展",
+      "sleep_habit": "不固定",
+      "cleanliness": 7,
+      "noise_level": 3,
+      "portrait": "res://images/portraits/roommates/rm_art_01.png",
+      "traits": ["细腻", "感性", "审美在线"],
+      "description": "说话像写句子，常在窗边发呆，偶尔一句话能让你沉默很久。",
+      "flavor_texts": {
+        "morning": "他在阳台拍晨光落在书页上的影子。",
+        "night": "他轻轻拨吉他，旋律像在讲故事。",
+        "study": "他把课堂笔记写成了短诗结构。",
+        "weekend": "周末他常去看独立电影或小展览。"
+      }
+    },
+    {
+      "id": "rm_slack_01",
+      "name": "王摆摆",
+      "personality": "摆烂哥",
+      "hobby": "短视频、躺平、囤零食",
+      "sleep_habit": "随机",
+      "cleanliness": 3,
+      "noise_level": 5,
+      "portrait": "res://images/portraits/roommates/rm_slack_01.png",
+      "traits": ["随缘", "乐天", "抗压奇高"],
+      "description": "他的口头禅是‘明天再说’，但总能在最后时刻奇迹补救。",
+      "flavor_texts": {
+        "morning": "他把闹钟关了三次后说‘再睡五分钟’。",
+        "night": "他躺着刷视频，突然感慨人生。",
+        "study": "他说复习计划已经在脑子里完成了。",
+        "weekend": "周末他和被子完成了深度绑定。"
+      }
+    }
+  ],
+  "draw_config": {
+    "roommate_count": 3,
+    "allow_redraw": true,
+    "max_redraw": 2
+  }
+}

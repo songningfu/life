@@ -3,6 +3,15 @@
 
 extends Node
 
+const UI_COLORS = preload("res://scripts/ui/UIColors.gd")
+const GAME_FLOW_SCRIPT = preload("res://scripts/core/GameFlow.gd")
+const ACTION_EXECUTOR_SCRIPT = preload("res://scripts/core/ActionExecutor.gd")
+const EVENT_RUNTIME_SCRIPT = preload("res://scripts/core/EventRuntime.gd")
+const PHONE_UI_SCENE: PackedScene = preload("res://scenes/ui/PhoneUI.tscn")
+
+@onready var _notify: Node = get_node_or_null("/root/Notify")
+@onready var _scene_transitions: Node = get_node_or_null("/root/SceneTransitions")
+
 # ==================== 信号 ====================
 
 signal day_advanced(day_index: int)
@@ -145,32 +154,31 @@ var _flavor_texts_cache: Dictionary = {}
 @onready var _right_content: VBoxContainer = $MainHBox/RightPanel/RightScroll/RightContent
 
 @onready var _campus_map: Control = $MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap
-@onready var _gpa_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow/GpaValue
-@onready var _gpa_sub_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaSubValue
-@onready var _social_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow/SocialValue
-@onready var _social_bar: ProgressBar = $MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialBar
-@onready var _ability_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow/AbilityValue
-@onready var _ability_bar: ProgressBar = $MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityBar
-@onready var _money_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow/MoneyValue
-@onready var _mental_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow/MentalValue
-@onready var _mental_bar: ProgressBar = $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalBar
-@onready var _health_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow/HealthValue
-@onready var _health_bar: ProgressBar = $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthBar
-@onready var _tags_label: Label = $MainHBox/RightPanel/RightScroll/RightContent/TagsLabel
 
 # 运行态UI
 var _time_speed: float = 1.0
 var _phone_ui: CanvasLayer
+var _phone_ui_v2: CanvasLayer
 var _profile_ui: CanvasLayer
 var _pause_menu_ui: CanvasLayer
 var _selected_actions: Dictionary = {"morning": "", "afternoon": "", "evening": ""}
 var _stat_rows: Dictionary = {}
 var _relation_rows_box: VBoxContainer
 
+var _phase_advancing: bool = false
+var _game_flow: RefCounted
+var _action_executor: RefCounted
+var _event_runtime: RefCounted
+
 # ==================== 生命周期 ====================
 
 func _ready() -> void:
 	_log("Game.gd 初始化")
+
+	# 先初始化委托器，避免初始化流程中调用时为空
+	_game_flow = GAME_FLOW_SCRIPT.new()
+	_action_executor = ACTION_EXECUTOR_SCRIPT.new()
+	_event_runtime = EVENT_RUNTIME_SCRIPT.new()
 	
 	var init_data: Variant = SaveManager.get_temp("pending_game_init")
 	if init_data != null and init_data is Dictionary:
@@ -180,21 +188,22 @@ func _ready() -> void:
 		else:
 			_load_existing_game(init_data)
 	
-	# ★ 改这里：用 ensure_modules_loaded 替换原来的 ModLoader.load_all_modules()
 	ModuleManager.ensure_modules_loaded()
 	
 	_load_actions_data()
 	_connect_module_signals()
 	_bind_ui()
-	_rebuild_right_panel_ui()
 	_attach_overlay_scenes()
 	_refresh_ui()
-	Notify.info("游戏加载完成")
+	if _campus_map and _campus_map.has_method("setup"):
+		_campus_map.setup(self)
+	if _notify and _notify.has_method("info"):
+		_notify.info("游戏加载完成")
 
 func _process(delta: float) -> void:
 	if not time_running:
 		return
-	if waiting_for_choice or is_game_over:
+	if waiting_for_choice or is_game_over or _phase_advancing:
 		return
 	day_timer += delta * _time_speed
 	if day_timer >= day_interval:
@@ -244,6 +253,9 @@ func _attach_overlay_scenes() -> void:
 		_phone_ui.layer = 100
 		_phone_ui.set_script(load("res://scripts/PhoneSystem.gd"))
 		add_child(_phone_ui)
+
+	_attach_phone_ui_v2()
+	
 	if not _profile_ui:
 		var profile_scene: PackedScene = load("res://scenes/PlayerInfoPanel.tscn")
 		if profile_scene:
@@ -280,8 +292,30 @@ func _on_speed_4x_pressed() -> void:
 	_set_speed(4.0)
 
 func _on_phone_pressed() -> void:
+	if _phone_ui_v2 and _phone_ui_v2.has_method("toggle_phone"):
+		_phone_ui_v2.toggle_phone()
+		return
 	if _phone_ui and _phone_ui.has_method("toggle_phone"):
 		_phone_ui.toggle_phone()
+
+func _attach_phone_ui_v2() -> void:
+	if _phone_ui_v2 != null:
+		return
+	if PHONE_UI_SCENE == null:
+		return
+	_phone_ui_v2 = PHONE_UI_SCENE.instantiate() as CanvasLayer
+	add_child(_phone_ui_v2)
+	if _phone_ui_v2.has_signal("phone_opened") and not _phone_ui_v2.phone_opened.is_connected(_on_phone_ui_opened):
+		_phone_ui_v2.phone_opened.connect(_on_phone_ui_opened)
+	if _phone_ui_v2.has_signal("phone_closed") and not _phone_ui_v2.phone_closed.is_connected(_on_phone_ui_closed):
+		_phone_ui_v2.phone_closed.connect(_on_phone_ui_closed)
+
+func _on_phone_ui_opened() -> void:
+	time_running = false
+
+func _on_phone_ui_closed() -> void:
+	if not waiting_for_choice and not is_game_over:
+		time_running = true
 
 func _on_profile_pressed() -> void:
 	if _profile_ui and _profile_ui.has_method("toggle"):
@@ -299,6 +333,9 @@ func _on_next_button_pressed() -> void:
 	if waiting_for_choice:
 		_append_log("请先在行动列表中选择一个行动")
 		return
+	if _phase_advancing:
+		return
+	day_timer = 0.0
 	_advance_phase()
 
 func _refresh_ui() -> void:
@@ -348,7 +385,7 @@ func _rebuild_right_panel_ui() -> void:
 	var gpa_label := Label.new()
 	gpa_label.name = "GpaHeadline"
 	gpa_label.text = "绩点 -- / 4.00"
-	gpa_label.add_theme_color_override("font_color", UIColors.STAT_STUDY)
+	gpa_label.add_theme_color_override("font_color", UI_COLORS.STAT_STUDY)
 	gpa_label.add_theme_font_size_override("font_size", 16)
 	_right_content.add_child(gpa_label)
 
@@ -370,7 +407,7 @@ func _rebuild_right_panel_ui() -> void:
 	money_val.name = "MoneyValue"
 	money_val.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	money_val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	money_val.add_theme_color_override("font_color", UIColors.STAT_ABILITY)
+	money_val.add_theme_color_override("font_color", UI_COLORS.STAT_ABILITY)
 	money_row.add_child(money_name)
 	money_row.add_child(money_val)
 	_right_content.add_child(money_row)
@@ -388,7 +425,7 @@ func _rebuild_right_panel_ui() -> void:
 
 	var tags := Label.new()
 	tags.name = "TagsLabel"
-	tags.add_theme_color_override("font_color", UIColors.TEXT_SECONDARY)
+	tags.add_theme_color_override("font_color", UI_COLORS.TEXT_SECONDARY)
 	_right_content.add_child(tags)
 
 func _add_stat_row(parent: VBoxContainer, key: String, display_name: String) -> void:
@@ -465,6 +502,7 @@ func _init_new_game_from_creation(init_data: Dictionary) -> void:
 	major_profile = init_data.get("major_profile", {})
 	major_name = major_profile.get("name", "未选专业")
 	major_required_credits = major_profile.get("required_credits", 165)
+	roommate_roster = init_data.get("roommates", [])
 	
 	# 应用家庭背景效果
 	_apply_background_effects(selected_background)
@@ -589,119 +627,19 @@ func _init_schedule_templates() -> void:
 
 ## 推进到下一阶段
 func _advance_phase() -> void:
-	if waiting_for_choice:
-		_append_log("请先完成当前行动选择")
-		return
-	
-	match current_phase_enum:
-		DayPhase.MORNING_INFO:
-			_process_morning_info()
-			_refresh_ui()  # ← 新增这一行
-			_advance_to_phase(DayPhase.SLOT_MORNING)
-		
-		DayPhase.SLOT_MORNING:
-			_process_time_slot("morning")
-			_advance_to_phase(DayPhase.SLOT_AFTERNOON)
-		
-		DayPhase.SLOT_AFTERNOON:
-			_process_time_slot("afternoon")
-			_advance_to_phase(DayPhase.SLOT_EVENING)
-		
-		DayPhase.SLOT_EVENING:
-			_process_time_slot("evening")
-			_advance_to_phase(DayPhase.NIGHT_SUMMARY)
-		
-		DayPhase.NIGHT_SUMMARY:
-			_process_night_summary()
-			# 进入下一天
-			_advance_to_next_day()
-			_advance_to_phase(DayPhase.MORNING_INFO)
+	_game_flow.advance_phase(self)
 
 ## 处理晨间信息
 func _process_morning_info() -> void:
-	_log("处理晨间信息 - 第%d天" % current_day)
-	
-	# 更新模块管理器中的玩家状态
-	if ModuleManager:
-		ModuleManager.set_player_state(_get_player_state())
-		ModuleManager.broadcast_day_start(current_day, current_phase_name)
-	
-	# 收集晨间信息
-	var morning_infos: Array[Dictionary] = []
-	if ModuleManager:
-		morning_infos = ModuleManager.collect_morning_info(current_day)
-	
-	# 基础晨间信息
-	var base_info: Array[Dictionary] = _get_base_morning_info()
-	morning_infos.append_array(base_info)
-	
-	# 按优先级排序
-	morning_infos.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		return a.get("priority", 0) > b.get("priority", 0)
-	)
-	
-	if _current_text:
-		_current_text.clear()
-		_current_text.append_text("[b]晨间信息[/b]\n")
-		for info: Dictionary in morning_infos:
-			_current_text.append_text("%s %s\n" % [info.get("icon", "•"), info.get("text", "")])
-	
-	_append_log("晨间信息已更新（%d条）" % morning_infos.size())
+	_game_flow.process_morning_info(self)
 
 ## 获取基础晨间信息
 func _get_base_morning_info() -> Array[Dictionary]:
-	var infos: Array[Dictionary] = []
-	
-	# 日期信息
-	infos.append({
-		"icon": "📅",
-		"text": "第%d天 · %s · 大%d" % [current_day + 1, current_phase_name, current_year],
-		"priority": 10
-	})
-	
-	# 生活费提醒（月初）
-	if current_day % 30 == 0:
-		infos.append({
-			"icon": "💰",
-			"text": "生活费到账 +¥1500",
-			"priority": 9
-		})
-		attributes["living_money"] += 1500
-		Notify.money_change(1500)
-	
-	# 健康提醒
-	if attributes["health"] < 30:
-		infos.append({
-			"icon": "🏥",
-			"text": "你的健康状况不佳，注意休息",
-			"priority": 8
-		})
-	
-	# 心理提醒
-	if attributes["mental"] < 30:
-		infos.append({
-			"icon": "💭",
-			"text": "你感觉压力很大，找人聊聊吧",
-			"priority": 8
-		})
-	
-	return infos
+	return _game_flow.get_base_morning_info(self)
 
 ## 处理时段行动
 func _process_time_slot(time_slot: String) -> void:
-	_log("处理%s时段" % time_slot)
-	
-	# 检查是否为重要日
-	var is_important: bool = _is_important_day()
-	waiting_for_choice = false
-	
-	if is_important:
-		# 重要日：显示行动菜单让玩家选择
-		waiting_for_choice = true
-		_show_action_menu(time_slot)
-	else:
-		# 普通日：使用日程模板自动执行
-		_auto_execute_action(time_slot)
+	_game_flow.process_time_slot(self, time_slot)
 
 ## 显示行动菜单
 func _show_action_menu(time_slot: String) -> void:
@@ -779,69 +717,11 @@ func _select_action(action_id: String, time_slot: String) -> void:
 
 ## 执行行动
 func _execute_action(action_id: String, time_slot: String) -> void:
-	_log("执行行动: %s (%s)" % [action_id, time_slot])
-	waiting_for_choice = false
-	
-	# 记录行动
-	daily_actions[time_slot] = action_id
-	
-	# 获取行动数据
-	var action_data: Dictionary = _get_action_data(action_id)
-
-	# 先处理行动花费
-	var action_cost: int = int(action_data.get("cost", 0))
-	if action_cost > 0:
-		attributes["living_money"] -= action_cost
-		Notify.money_change(-action_cost)
-	
-	# 计算基础效果
-	var base_effects: Dictionary = _calculate_action_effects(action_data)
-	
-	# 应用模块修正
-	var final_effects: Dictionary = _apply_modifiers(base_effects)
-	
-	# 应用效果
-	_apply_effects(final_effects)
-	
-	# 广播行动执行
-	var context: Dictionary = {
-		"action_id": action_id,
-		"time_slot": time_slot,
-		"effects": final_effects,
-		"action_data": action_data
-	}
-	
-	if ModuleManager:
-		ModuleManager.broadcast_action_performed(action_id, time_slot, context)
-	
-	# 检查事件触发
-	_check_event_trigger(action_id, time_slot)
-	
-	# 记录历史
-	action_history.append({
-		"day": current_day,
-		"time_slot": time_slot,
-		"action": action_id,
-		"effects": final_effects
-	})
-	
-	var action_name: String = action_data.get("name", action_id)
-	_append_log("[%s] 执行：%s" % [time_slot, action_name])
-	_refresh_ui()
-	action_selected.emit(action_id, time_slot)
+	_action_executor.execute_action(self, action_id, time_slot)
 
 ## 计算行动效果
 func _calculate_action_effects(action_data: Dictionary) -> Dictionary:
-	var effects: Dictionary = {}
-	
-	var action_effects: Dictionary = action_data.get("effects", {})
-	for attr: String in action_effects.keys():
-		var effect_data: Dictionary = action_effects[attr]
-		var min_val: int = effect_data.get("min", 0)
-		var max_val: int = effect_data.get("max", 0)
-		effects[attr] = randi() % (max_val - min_val + 1) + min_val
-	
-	return effects
+	return _action_executor.calculate_action_effects(self, action_data)
 
 ## 应用修正
 func _apply_modifiers(effects: Dictionary) -> Dictionary:
@@ -872,196 +752,27 @@ func _apply_modifiers(effects: Dictionary) -> Dictionary:
 
 ## 应用效果到属性
 func _apply_effects(effects: Dictionary) -> void:
-	var attr_names: Dictionary = {
-		"study_points": "学习",
-		"social": "社交",
-		"ability": "能力",
-		"mental": "心理",
-		"health": "健康",
-		"living_money": "生活费",
-		"gpa": "绩点"
-	}
-	for attr: String in effects.keys():
-		if not attributes.has(attr):
-			continue
-		var old_value: float = float(attributes[attr])
-		attributes[attr] += effects[attr]
-		# 限制范围
-		attributes[attr] = clamp(attributes[attr], 0, 100) if attr != "living_money" and attr != "gpa" else attributes[attr]
-		var new_value: float = float(attributes[attr])
-		var delta: float = new_value - old_value
-		if is_zero_approx(delta):
-			continue
-		if attr == "living_money":
-			Notify.money_change(int(round(delta)))
-		else:
-			Notify.stat_change(attr_names.get(attr, attr), delta)
+	_action_executor.apply_effects(self, effects)
 
 ## 检查事件触发
 func _check_event_trigger(action_id: String, time_slot: String) -> void:
-	# 1. 收集模块注入事件
-	var module_events: Array[Dictionary] = []
-	if ModuleManager:
-		module_events = ModuleManager.collect_event_injections(current_day, current_phase_name, action_id)
-	for event: Dictionary in module_events:
-		_display_event(event)
-
-	# 2. 从 events.json 检查对应行动池的事件
-	var action_data: Dictionary = _get_action_data(action_id)
-	var event_pool_id: String = action_data.get("event_pool", "")
-	if not event_pool_id.is_empty():
-		_try_trigger_pool_event(event_pool_id)
-
-	# 3. 触发微事件（flavor_texts.json）
-	_try_trigger_flavor_text(action_id)
+	_event_runtime.check_event_trigger(self, action_id, time_slot)
 
 ## 从事件池中尝试触发事件
 func _try_trigger_pool_event(pool_id: String) -> void:
-	var pools: Dictionary = _events_data_cache.get("event_pools", {})
-	if not pools.has(pool_id):
-		return
-	var pool: Dictionary = pools[pool_id]
-	var events_dict: Dictionary = _events_data_cache.get("events", {})
-
-	# 先尝试微型事件，再尝试标准事件
-	for tier: String in ["micro", "standard"]:
-		var event_ids: Array = pool.get(tier, [])
-		for event_id in event_ids:
-			if not events_dict.has(event_id):
-				continue
-			if event_id in used_event_ids:
-				var used_event_data: Dictionary = events_dict[event_id]
-				if used_event_data.get("once", false) or used_event_data.get("once_per_phase", false):
-					continue
-			var event_data: Dictionary = events_dict[event_id]
-			var probability: float = event_data.get("probability", 0.0)
-			if randf() <= probability:
-				_display_event(event_data)
-				if event_id not in used_event_ids:
-					used_event_ids.append(event_id)
-				return  # 每次行动最多触发一个事件
+	_event_runtime.try_trigger_pool_event(self, pool_id)
 
 ## 尝试触发微事件（flavor_texts.json）
 func _try_trigger_flavor_text(action_id: String) -> void:
-	# 根据行动ID映射到微事件分类
-	var category_map: Dictionary = {
-		"attend_class": "class", "self_study": "library", "library": "library",
-		"exercise": "exercise", "rest": "rest", "part_time_job": "part_time_job",
-		"dorm_chat": "dorm", "club_activity": "club",
-		"hangout_eat": "social", "hangout_game": "social", "hangout_study": "social",
-	}
-	var category: String = category_map.get(action_id, "general")
-	var micro_events: Dictionary = _flavor_texts_cache.get("micro_events", {})
-	var event_list: Array = micro_events.get(category, []).duplicate()
-	if event_list.is_empty():
-		event_list = micro_events.get("general", []).duplicate()
-	if event_list.is_empty():
-		return
-
-	# 也检查阶段特定微事件
-	var phase_events: Dictionary = _flavor_texts_cache.get("phase_specific", {})
-	for phase_key: String in phase_events.keys():
-		if phase_key in current_phase_name:
-			event_list.append_array(phase_events[phase_key])
-
-	# 按概率触发
-	for event: Dictionary in event_list:
-		var prob: float = event.get("probability", 0.0)
-		if randf() <= prob:
-			var text: String = event.get("text", "")
-			var effects: Dictionary = event.get("effects", {})
-			if not text.is_empty():
-				_append_log("💭 " + text)
-				_apply_effects(effects)
-				_refresh_ui()
-			return
+	_event_runtime.try_trigger_flavor_text(self, action_id)
 
 ## 显示事件（带选项的标准事件或纯文本微型事件）
 func _display_event(event_data: Dictionary) -> void:
-	var title: String = event_data.get("title", "")
-	var text: String = event_data.get("text", "")
-	var event_type: String = event_data.get("type", "micro")
-
-	if event_type == "micro":
-		# 微型事件：直接显示文本和应用效果
-		if not text.is_empty():
-			_append_log("📌 %s：%s" % [title, text])
-		var effects: Dictionary = event_data.get("effects", {})
-		_apply_effects(effects)
-		_refresh_ui()
-	else:
-		# 标准/主线事件：显示文本和选项
-		var choices: Array = event_data.get("choices", [])
-		if choices.is_empty():
-			_append_log("📌 %s：%s" % [title, text])
-			var effects: Dictionary = event_data.get("effects", {})
-			_apply_effects(effects)
-			_refresh_ui()
-			return
-
-		# 显示事件文本
-		if _current_text:
-			_current_text.clear()
-			_current_text.append_text("[b]%s[/b]\n%s" % [title, text])
-
-		# 显示选项按钮
-		_clear_choices()
-		waiting_for_choice = true
-		if _next_button:
-			_next_button.disabled = true
-
-		for i: int in range(choices.size()):
-			var choice: Dictionary = choices[i]
-			var choice_text: String = choice.get("text", "选项%d" % (i + 1))
-			var btn := Button.new()
-			btn.custom_minimum_size = Vector2(0, 44)
-			btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-			btn.text = "  ▸ " + choice_text
-
-			var normal_style := StyleBoxFlat.new()
-			normal_style.bg_color = Color(0.10, 0.13, 0.18, 0.92)
-			normal_style.set_corner_radius_all(8)
-			normal_style.content_margin_left = 10
-			normal_style.content_margin_right = 10
-			btn.add_theme_stylebox_override("normal", normal_style)
-			var hover_style: StyleBoxFlat = normal_style.duplicate()
-			hover_style.bg_color = Color(0.16, 0.22, 0.30, 1.0)
-			btn.add_theme_stylebox_override("hover", hover_style)
-			btn.add_theme_color_override("font_color", Color(0.92, 0.95, 0.99))
-
-			btn.pressed.connect(_on_event_choice_selected.bind(choice))
-			_choices_container.add_child(btn)
-
-		event_triggered.emit(event_data.get("id", ""))
+	_event_runtime.display_event(self, event_data)
 
 ## 处理事件选项选择
 func _on_event_choice_selected(choice: Dictionary) -> void:
-	var choice_text: String = choice.get("text", "")
-	_append_log("→ 你选择了：%s" % choice_text)
-
-	var effects: Dictionary = choice.get("effects", {})
-	_apply_effects(effects)
-
-	# 处理标签
-	if choice.has("unlocks_flag"):
-		flags[choice["unlocks_flag"]] = true
-	if choice.has("add_tags"):
-		for tag in choice["add_tags"]:
-			if tag not in tags:
-				tags.append(tag)
-	if choice.has("remove_tags"):
-		for tag in choice["remove_tags"]:
-			tags.erase(tag)
-
-	var followup: String = choice.get("followup", "")
-	if not followup.is_empty():
-		_append_log(followup)
-
-	_clear_choices()
-	waiting_for_choice = false
-	if _next_button:
-		_next_button.disabled = false
-	_refresh_ui()
+	_event_runtime.on_event_choice_selected(self, choice)
 
 ## 处理夜间结算
 func _process_night_summary() -> void:
@@ -1078,7 +789,8 @@ func _process_night_summary() -> void:
 	
 	# 每日消耗
 	attributes["living_money"] -= 20  # 每日基础消费
-	Notify.money_change(-20)
+	if _notify and _notify.has_method("money_change"):
+		_notify.money_change(-20)
 	attributes["health"] = clamp(attributes["health"], 0, 100)
 	attributes["mental"] = clamp(attributes["mental"], 0, 100)
 	
@@ -1156,31 +868,7 @@ func _calculate_gpa() -> void:
 
 ## 进入下一天
 func _advance_to_next_day() -> void:
-	SceneTransitions.day_transition()
-	current_day += 1
-
-	current_year = (current_day / 365) + 1
-	var day_in_year: int = current_day % 365
-	if day_in_year < 177:
-		current_semester = 1
-	else:
-		current_semester = 2
-	
-	# 更新阶段名称
-	_update_phase_name()
-	
-	# 重置每日行动记录
-	daily_actions = {"morning": "", "afternoon": "", "evening": ""}
-	_selected_actions = {"morning": "", "afternoon": "", "evening": ""}
-	
-	# 检查游戏结束
-	if current_day >= TOTAL_DAYS:
-		_trigger_game_end()
-		return
-	
-	_auto_save_if_needed()
-	_refresh_ui()
-	day_advanced.emit(current_day)
+	_game_flow.advance_to_next_day(self)
 
 ## 更新阶段名称
 func _update_phase_name() -> void:
@@ -1193,10 +881,7 @@ func _update_phase_name() -> void:
 
 ## 推进到指定阶段
 func _advance_to_phase(phase: DayPhase) -> void:
-	current_phase_enum = phase
-	phase_changed.emit(phase)
-	_log("进入阶段: %s" % _get_phase_name(phase))
-	_refresh_ui()
+	_game_flow.advance_to_phase(self, phase)
 
 ## 获取阶段名称
 func _get_phase_name(phase: DayPhase) -> String:
@@ -1394,7 +1079,7 @@ func _get_action_disable_reason(action: Dictionary) -> String:
 ## 获取存档数据
 func get_save_data() -> Dictionary:
 	var data: Dictionary = {
-		"version": "2.0",
+		"version": SaveManager.SAVE_VERSION,
 		"player_name": player_name,
 		"player_gender": player_gender,
 		"save_slot": save_slot,
@@ -1410,6 +1095,7 @@ func get_save_data() -> Dictionary:
 		"semester_records": semester_records.duplicate(true),
 		"academic_warning_count": academic_warning_count,
 		"tags": tags.duplicate(),
+		"roommate_roster": roommate_roster.duplicate(true),
 		"day_index": current_day,
 		"day": current_day,
 		"phase_enum": current_phase_enum,
@@ -1459,6 +1145,7 @@ func load_save_data(data: Dictionary) -> void:
 	tags.clear()
 	for tag in loaded_tags:
 		tags.append(str(tag))
+	roommate_roster = data.get("roommate_roster", roommate_roster)
 	
 	current_day = data.get("day", data.get("day_index", 0))
 	current_phase_enum = data.get("phase_enum", DayPhase.MORNING_INFO)
@@ -1620,7 +1307,10 @@ func _show_game_over_panel(end_type: String) -> void:
 	var restart_btn := Button.new()
 	restart_btn.custom_minimum_size = Vector2(0, 48)
 	restart_btn.text = "返回主菜单"
-	restart_btn.pressed.connect(func(): SceneTransitions.back_to_menu())
+	restart_btn.pressed.connect(func():
+		if _scene_transitions and _scene_transitions.has_method("back_to_menu"):
+			_scene_transitions.back_to_menu()
+	)
 	_choices_container.add_child(restart_btn)
 
 func _translate_time_slot(slot: String) -> String:

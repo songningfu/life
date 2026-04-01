@@ -67,44 +67,48 @@ func get_module_count() -> int:
 # ==================== 确保模块已加载 ====================
 ## 确保内置模块已加载（CharacterCreation等场景可调用）
 func ensure_modules_loaded() -> void:
-	if _modules.is_empty():
-		_log("模块为空，触发加载...")
-		if ModLoader:
-			ModLoader.load_all_modules()
+	if not _modules.is_empty():
+		return
+	_log("模块为空，触发加载...")
+	var loader: Node = get_node_or_null("/root/ModLoader")
+	if loader and loader.has_method("load_all_modules"):
+		loader.load_all_modules()
+	else:
+		push_error("ModuleManager: ModLoader 不可用，无法加载模块")
 
 # ==================== 广播方法 ====================
 func broadcast_new_game(init_data: Dictionary) -> void:
 	_log("广播: 新游戏初始化")
 	for module_id: String in _module_ids:
 		var module: GameModule = _modules[module_id]
-		module.on_new_game(init_data)
+		_safe_module_call(module_id, func(): module.on_new_game(init_data))
 
 func broadcast_day_start(day_index: int, phase: String) -> void:
 	for module_id: String in _module_ids:
 		var module: GameModule = _modules[module_id]
-		module.on_day_start(day_index, phase)
+		_safe_module_call(module_id, func(): module.on_day_start(day_index, phase))
 
 func broadcast_action_performed(action_id: String, time_slot: String, context: Dictionary) -> void:
 	for module_id: String in _module_ids:
 		var module: GameModule = _modules[module_id]
-		module.on_action_performed(action_id, time_slot, context)
+		_safe_module_call(module_id, func(): module.on_action_performed(action_id, time_slot, context))
 
 func broadcast_day_end(day_index: int, phase: String) -> void:
 	for module_id: String in _module_ids:
 		var module: GameModule = _modules[module_id]
-		module.on_day_end(day_index, phase)
+		_safe_module_call(module_id, func(): module.on_day_end(day_index, phase))
 
 func broadcast_week_end(week_index: int) -> void:
 	_log("广播: 第%d周结束" % week_index)
 	for module_id: String in _module_ids:
 		var module: GameModule = _modules[module_id]
-		module.on_week_end(week_index)
+		_safe_module_call(module_id, func(): module.on_week_end(week_index))
 
 func broadcast_semester_end(year: int, semester: int) -> void:
 	_log("广播: 第%d学年第%d学期结束" % [year, semester])
 	for module_id: String in _module_ids:
 		var module: GameModule = _modules[module_id]
-		module.on_semester_end(year, semester)
+		_safe_module_call(module_id, func(): module.on_semester_end(year, semester))
 
 # ==================== 聚合方法 ====================
 func collect_available_actions(day_index: int, phase: String, time_slot: String, player_state: Dictionary) -> Array[Dictionary]:
@@ -265,5 +269,10 @@ func request_receive_message(role_id: String, message: String) -> void:
 	receive_message_requested.emit(role_id, message)
 
 # ==================== 工具方法 ====================
+func _safe_module_call(module_id: String, callable_ref: Callable) -> void:
+	var call_result: Variant = callable_ref.call()
+	if call_result != null:
+		push_error("ModuleManager: 模块调用失败 %s" % module_id)
+
 func _log(message: String) -> void:
 	print("[ModuleManager] %s" % message)

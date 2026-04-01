@@ -2,21 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpipc6av3p107"
-path.s3tc="res://.godot/imported/radial.png-340e40333624dc947571c11835a3f47d.s3tc.ctex"
+uid="uid://dsmbvyxnh0j5a"
+path="res://.godot/imported/截屏2026-04-01 22.27.54.png-abf0137a7ca83d96cb243f4d5c4bf88d.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
-source_file="res://新建文件夹/Scene-Manager-1.1.1/addons/scene_manager/shader_patterns/radial.png"
-dest_files=["res://.godot/imported/radial.png-340e40333624dc947571c11835a3f47d.s3tc.ctex"]
+source_file="res://scripts/core/截屏2026-04-01 22.27.54.png"
+dest_files=["res://.godot/imported/截屏2026-04-01 22.27.54.png-abf0137a7ca83d96cb243f4d5c4bf88d.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -24,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -38,4 +37,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

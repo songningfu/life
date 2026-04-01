@@ -5,6 +5,7 @@ extends Node
 
 const SAVE_DIR = "user://saves/"
 const MAX_SLOTS = 3
+const SAVE_VERSION = "5.2"
 
 func _ready():
 	if not DirAccess.dir_exists_absolute(SAVE_DIR):
@@ -18,10 +19,12 @@ func _get_meta_path(slot: int) -> String:
 
 func save_game(slot: int, game_data: Dictionary) -> bool:
 	var save_data = {
-		"version": "5.1",
+		"version": SAVE_VERSION,
 		"timestamp": Time.get_datetime_string_from_system(),
 		"game_data": game_data,
 	}
+	var payload_text: String = JSON.stringify(game_data)
+	save_data["checksum"] = payload_text.sha256_text()
 	var json_str = JSON.stringify(save_data, "  ")
 	var file = FileAccess.open(_get_save_path(slot), FileAccess.WRITE)
 	if file == null:
@@ -61,23 +64,29 @@ func load_game(slot: int) -> Dictionary:
 	file.close()
 	var json = JSON.new()
 	if json.parse(json_str) != OK:
+		push_error("存档解析失败: slot %d" % slot)
 		return {}
-	var data = json.data
-	if data is Dictionary and data.has("game_data"):
-		var game_data = data["game_data"]
-		if game_data is Dictionary:
-			if game_data.has("money") and not game_data.has("living_money"):
-				game_data["living_money"] = int(float(game_data.get("money", 0.0)) * 30.0 + 500.0)
-				game_data["study_points"] = float(game_data.get("study_points", game_data.get("gpa", 65.0)))
-				game_data["gpa"] = 0.0
-				game_data["semester_records"] = []
-				game_data["academic_warning_count"] = 0
-			if game_data.has("semester_credits") and not game_data.has("semester_records"):
-				game_data["semester_records"] = game_data["semester_credits"]
-			if game_data.has("consecutive_low_gpa_semesters") and not game_data.has("academic_warning_count"):
-				game_data["academic_warning_count"] = game_data["consecutive_low_gpa_semesters"]
-			return game_data
-	return {}
+	var data: Variant = json.data
+	if not (data is Dictionary) or not data.has("game_data"):
+		push_error("存档结构无效: slot %d" % slot)
+		return {}
+
+	var wrapped: Dictionary = data
+	var game_data_variant: Variant = wrapped.get("game_data", {})
+	if not (game_data_variant is Dictionary):
+		push_error("存档game_data无效: slot %d" % slot)
+		return {}
+
+	var game_data: Dictionary = game_data_variant.duplicate(true)
+	var stored_checksum: String = str(wrapped.get("checksum", ""))
+	if not stored_checksum.is_empty():
+		var current_checksum: String = JSON.stringify(game_data).sha256_text()
+		if current_checksum != stored_checksum:
+			push_error("存档校验失败(可能损坏): slot %d" % slot)
+			return {}
+
+	var version: String = str(wrapped.get("version", "0"))
+	return _migrate_game_data(game_data, version)
 
 func delete_save(slot: int) -> bool:
 	var path = _get_save_path(slot)
@@ -117,6 +126,27 @@ func get_all_slots_info() -> Array:
 		})
 	return result
 
+func _migrate_game_data(game_data: Dictionary, version: String) -> Dictionary:
+	# 旧版 money 字段迁移
+	if game_data.has("money") and not game_data.has("living_money"):
+		game_data["living_money"] = int(float(game_data.get("money", 0.0)) * 30.0 + 500.0)
+		game_data["study_points"] = float(game_data.get("study_points", game_data.get("gpa", 65.0)))
+		game_data["gpa"] = 0.0
+		game_data["semester_records"] = []
+		game_data["academic_warning_count"] = 0
+
+	# 学期字段迁移
+	if game_data.has("semester_credits") and not game_data.has("semester_records"):
+		game_data["semester_records"] = game_data["semester_credits"]
+	if game_data.has("consecutive_low_gpa_semesters") and not game_data.has("academic_warning_count"):
+		game_data["academic_warning_count"] = game_data["consecutive_low_gpa_semesters"]
+
+	# 统一写入当前版本号，便于后续链式迁移
+	game_data["version"] = SAVE_VERSION
+	if version != SAVE_VERSION:
+		push_warning("存档已迁移: %s -> %s" % [version, SAVE_VERSION])
+	return game_data
+
 # 从存档数据中算出年份和阶段（不依赖Game节点）
 func get_date_info_from_data(data: Dictionary) -> Dictionary:
 	var di = int(data.get("day_index", 0))
@@ -154,3 +184,24 @@ func get_temp(key: String, default: Variant = null) -> Variant:
 ## 检查是否有指定临时数据
 func has_temp(key: String) -> bool:
 	return _temp_store.has(key)
+
+# ==================== 舍友数据缓存 ====================
+
+var _roommates_cache: Array = []
+
+## 设置舍友数据
+func set_roommates(roommates: Array) -> void:
+	_roommates_cache = roommates.duplicate(true)
+
+## 获取全部舍友
+func get_roommates() -> Array:
+	return _roommates_cache.duplicate(true)
+
+## 根据ID获取舍友
+func get_roommate(id: String) -> Dictionary:
+	for item: Variant in _roommates_cache:
+		if item is Dictionary:
+			var info: Dictionary = item
+			if str(info.get("id", "")) == id:
+				return info.duplicate(true)
+	return {}
