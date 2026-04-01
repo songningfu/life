@@ -10,6 +10,7 @@ const MODS_DIR: String = "user://mods/"
 var _built_in_modules: Array[String] = [
 	"res://scripts/modules/TalentModule.gd",
 	"res://scripts/modules/LoveModule.gd",
+	"res://scripts/modules/AchievementModule.gd",
 ]
 
 var _loaded_user_mods: Array[Dictionary] = []

@@ -19,11 +19,15 @@ config/icon="res://icon.svg"
 
 SaveManager="*res://scripts/SaveManager.gd"
 AudioManager="*res://scripts/AudioManager.gd"
+Notify="*res://scripts/utils/Notify.gd"
+SceneTransitions="*res://scripts/utils/SceneTransitions.gd"
 NamePool="*res://scripts/NamePool.gd"
 ModuleManager="*res://scripts/core/ModuleManager.gd"
 ModLoader="*res://scripts/core/ModLoader.gd"
 RelationshipManager="*res://scripts/RelationshipManager.gd"
 WechatSystem="*res://scripts/WechatSystem.gd"
+ToastParty="*uid://mta4a5insvve"
+SceneManager="*uid://j20v4cg7v8m1"
 
 [display]
 
@@ -31,6 +35,10 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/toastparty/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/dialogic/plugin.cfg")
 
 [physics]
 

@@ -668,4 +668,4 @@ func _start_game():
 		"talents": current_talents.duplicate(true),
 	})
 	
-	get_tree().change_scene_to_file("res://scenes/Game.tscn")
+	SceneTransitions.creation_to_game()

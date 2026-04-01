@@ -149,6 +149,12 @@ func change_affinity(role_id: String, amount: int, day_index: int = -1) -> Dicti
 		data.met = true
 	data.level = _calc_level(role_id, data.affinity)
 
+	# 好感变更通知
+	if amount != 0 and has_node("/root/Notify") and NamePool and NamePool.has_method("get_full_name"):
+		Notify.affinity_change(NamePool.get_full_name(role_id), amount)
+	elif amount != 0 and has_node("/root/Notify"):
+		Notify.affinity_change(role_id, amount)
+
 	var result = {"old_level": old_level, "new_level": data.level, "affinity": data.affinity}
 	if old_level != data.level:
 		result["level_changed"] = true

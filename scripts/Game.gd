@@ -186,6 +186,7 @@ func _ready() -> void:
 	_refresh_ui()
 	if _campus_map and _campus_map.has_method("setup"):
 		_campus_map.setup(self)
+	Notify.info("游戏加载完成")
 
 func _process(delta: float) -> void:
 	if not time_running:
@@ -579,6 +580,7 @@ func _get_base_morning_info() -> Array[Dictionary]:
 			"priority": 9
 		})
 		attributes["living_money"] += 1500
+		Notify.money_change(1500)
 	
 	# 健康提醒
 	if attributes["health"] < 30:
@@ -717,6 +719,12 @@ func _execute_action(action_id: String, time_slot: String) -> void:
 	
 	# 获取行动数据
 	var action_data: Dictionary = _get_action_data(action_id)
+
+	# 先处理行动花费
+	var action_cost: int = int(action_data.get("cost", 0))
+	if action_cost > 0:
+		attributes["living_money"] -= action_cost
+		Notify.money_change(-action_cost)
 	
 	# 计算基础效果
 	var base_effects: Dictionary = _calculate_action_effects(action_data)
@@ -796,11 +804,30 @@ func _apply_modifiers(effects: Dictionary) -> Dictionary:
 
 ## 应用效果到属性
 func _apply_effects(effects: Dictionary) -> void:
+	var attr_names: Dictionary = {
+		"study_points": "学习",
+		"social": "社交",
+		"ability": "能力",
+		"mental": "心理",
+		"health": "健康",
+		"living_money": "生活费",
+		"gpa": "绩点"
+	}
 	for attr: String in effects.keys():
-		if attributes.has(attr):
-			attributes[attr] += effects[attr]
-			# 限制范围
-			attributes[attr] = clamp(attributes[attr], 0, 100) if attr != "living_money" and attr != "gpa" else attributes[attr]
+		if not attributes.has(attr):
+			continue
+		var old_value: float = float(attributes[attr])
+		attributes[attr] += effects[attr]
+		# 限制范围
+		attributes[attr] = clamp(attributes[attr], 0, 100) if attr != "living_money" and attr != "gpa" else attributes[attr]
+		var new_value: float = float(attributes[attr])
+		var delta: float = new_value - old_value
+		if is_zero_approx(delta):
+			continue
+		if attr == "living_money":
+			Notify.money_change(int(round(delta)))
+		else:
+			Notify.stat_change(attr_names.get(attr, attr), delta)
 
 ## 检查事件触发
 func _check_event_trigger(action_id: String, time_slot: String) -> void:
@@ -983,6 +1010,7 @@ func _process_night_summary() -> void:
 	
 	# 每日消耗
 	attributes["living_money"] -= 20  # 每日基础消费
+	Notify.money_change(-20)
 	attributes["health"] = clamp(attributes["health"], 0, 100)
 	attributes["mental"] = clamp(attributes["mental"], 0, 100)
 	
@@ -1060,6 +1088,7 @@ func _calculate_gpa() -> void:
 
 ## 进入下一天
 func _advance_to_next_day() -> void:
+	SceneTransitions.day_transition()
 	current_day += 1
 
 	current_year = (current_day / 365) + 1
@@ -1515,7 +1544,7 @@ func _show_game_over_panel(end_type: String) -> void:
 	var restart_btn := Button.new()
 	restart_btn.custom_minimum_size = Vector2(0, 48)
 	restart_btn.text = "返回主菜单"
-	restart_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/MainMenu.tscn"))
+	restart_btn.pressed.connect(func(): SceneTransitions.back_to_menu())
 	_choices_container.add_child(restart_btn)
 
 func _translate_time_slot(slot: String) -> String:
@@ -1539,6 +1568,10 @@ func _trigger_game_end() -> void:
 	
 	# 计算结局
 	var end_type: String = _calculate_ending()
+	if ModuleManager and ModuleManager.has_module("achievement"):
+		var achievement_module: GameModule = ModuleManager.get_module("achievement")
+		if achievement_module and achievement_module.has_method("on_game_end"):
+			achievement_module.on_game_end(end_type, _get_player_state())
 	_show_game_over_panel(end_type)
 	game_over.emit(end_type)
 

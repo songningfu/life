@@ -1,0 +1,40 @@
+{
+  "achievements": [
+    {"id": "first_action", "name": "第一步", "desc": "执行 1 次行动", "type": "counter", "counter": "actions_total", "target": 1},
+    {"id": "action_100", "name": "日常达人", "desc": "累计执行 100 次行动", "type": "counter", "counter": "actions_total", "target": 100},
+    {"id": "action_300", "name": "时间管理大师", "desc": "累计执行 300 次行动", "type": "counter", "counter": "actions_total", "target": 300},
+
+    {"id": "self_study_20", "name": "图书馆常客", "desc": "执行 20 次自习", "type": "counter", "counter": "action_self_study", "target": 20},
+    {"id": "attend_class_40", "name": "全勤学生", "desc": "执行 40 次上课", "type": "counter", "counter": "action_attend_class", "target": 40},
+    {"id": "exercise_20", "name": "运动打卡", "desc": "执行 20 次锻炼", "type": "counter", "counter": "action_exercise", "target": 20},
+    {"id": "social_actions_30", "name": "社交达人", "desc": "执行 30 次社交行动", "type": "counter", "counter": "social_actions", "target": 30},
+    {"id": "part_time_20", "name": "勤工俭学", "desc": "执行 20 次兼职", "type": "counter", "counter": "action_part_time_job", "target": 20},
+    {"id": "dorm_chat_30", "name": "宿舍人气王", "desc": "执行 30 次宿舍闲聊", "type": "counter", "counter": "action_dorm_chat", "target": 30},
+    {"id": "club_activity_20", "name": "社团骨干", "desc": "执行 20 次社团活动", "type": "counter", "counter": "action_club_activity", "target": 20},
+
+    {"id": "money_2000", "name": "小有积蓄", "desc": "生活费达到 ¥2000", "type": "attribute", "attribute": "living_money", "target": 2000, "op": ">="},
+    {"id": "money_5000", "name": "理财高手", "desc": "生活费达到 ¥5000", "type": "attribute", "attribute": "living_money", "target": 5000, "op": ">="},
+
+    {"id": "survive_180", "name": "半程选手", "desc": "生存到第 180 天", "type": "counter", "counter": "days_survived", "target": 180},
+    {"id": "survive_365", "name": "年度坚持", "desc": "生存到第 365 天", "type": "counter", "counter": "days_survived", "target": 365},
+
+    {"id": "gpa_30", "name": "成绩合格", "desc": "GPA 达到 3.0", "type": "attribute", "attribute": "gpa", "target": 3.0, "op": ">="},
+    {"id": "gpa_38", "name": "学业之光", "desc": "GPA 达到 3.8", "type": "attribute", "attribute": "gpa", "target": 3.8, "op": ">="},
+
+    {"id": "social_70", "name": "社牛上线", "desc": "社交达到 70", "type": "attribute", "attribute": "social", "target": 70, "op": ">="},
+    {"id": "ability_70", "name": "能力担当", "desc": "能力达到 70", "type": "attribute", "attribute": "ability", "target": 70, "op": ">="},
+    {"id": "health_90", "name": "身体倍棒", "desc": "健康达到 90", "type": "attribute", "attribute": "health", "target": 90, "op": ">="},
+    {"id": "mental_90", "name": "内心稳定", "desc": "心理达到 90", "type": "attribute", "attribute": "mental", "target": 90, "op": ">="},
+
+    {"id": "semester_4", "name": "学业中坚", "desc": "完成 4 次学期结算", "type": "counter", "counter": "semesters_completed", "target": 4},
+    {"id": "met_npcs_5", "name": "人脉初成", "desc": "认识 5 位 NPC", "type": "counter", "counter": "met_npcs", "target": 5},
+
+    {"id": "ending_elite", "name": "学霸精英结局", "desc": "达成结局：学霸精英", "type": "ending", "ending": "学霸精英"},
+    {"id": "ending_social", "name": "社交达人结局", "desc": "达成结局：社交达人", "type": "ending", "ending": "社交达人"},
+    {"id": "ending_business", "name": "创业成功结局", "desc": "达成结局：创业成功", "type": "ending", "ending": "创业成功"},
+    {"id": "ending_good", "name": "顺利毕业结局", "desc": "达成结局：顺利毕业", "type": "ending", "ending": "顺利毕业"},
+    {"id": "ending_plain", "name": "平凡毕业结局", "desc": "达成结局：平凡毕业", "type": "ending", "ending": "平凡毕业"},
+
+    {"id": "collector", "name": "全成就", "desc": "解锁除“全成就”外的所有成就", "type": "meta"}
+  ]
+}

@@ -134,4 +134,4 @@ func _input(event):
 		_do_exit()
 
 func _go_to_menu():
-	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	SceneTransitions.logo_to_menu()

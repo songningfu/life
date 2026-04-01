@@ -1,404 +1,233 @@
 # Godot 结构与 UI 结构说明
 
-> 适用版本：当前仓库（Godot 4.6）
-> 
-> 目标：详细说明项目的场景组织、脚本分层、以及各主界面的 UI 结构（节点层级 + 职责）。
-
-## 1. 项目架构总览
-
-项目采用三层组合：
-
-- **场景层（`scenes/`）**：定义页面与可视结构
-- **逻辑层（`scripts/`）**：驱动状态机、交互、数据刷新
-- **配置层（`data/*.json`）**：行动、事件、恋爱、消息等数据驱动
-
-并通过 **Autoload 单例** 提供全局服务（存档、模块、关系、微信等）。
+> 适用版本：当前仓库（Godot 4.6）  
+> 文档目的：建立“场景结构 + 脚本职责 + 数据驱动 + 模块体系 + 插件接入”的统一认知。  
+> 推荐搭配：先读 `docs/README.md`，再读本文。
 
 ---
 
-## 2. 启动链路与场景职责
+## 1. 项目架构总览
 
-启动顺序：
+项目整体是“**场景层 + 逻辑层 + 数据层 + 插件层**”四层协同：
 
-1. `scenes/studio_logo.tscn`（启动过渡）
-2. `scenes/main_menu.tscn`（主菜单与存档入口）
-3. `scenes/CharacterCreation.tscn`（角色创建 6 步）
+1. 场景层（`scenes/`）
+   - 定义页面结构、节点层级、视觉布局
+2. 逻辑层（`scripts/`）
+   - 负责状态机、交互处理、渲染刷新
+3. 数据层（`data/*.json`）
+   - 配置行动、事件、恋爱、消息、成就定义
+4. 插件层（`addons/`）
+   - 提供通知系统、场景过渡、剧情编辑能力
+
+跨场景共享通过 Autoload 单例实现，Game 主场景只做“调度与显示”，核心状态由系统模块维护。
+
+---
+
+## 2. 启动链路与页面职责
+
+### 2.1 启动顺序
+
+1. `scenes/studio_logo.tscn`（启动页）
+2. `scenes/main_menu.tscn`（主菜单 / 新游戏 / 继续）
+3. `scenes/CharacterCreation.tscn`（角色创建）
 4. `scenes/Game.tscn`（主循环玩法）
 
-功能覆盖层：
+### 2.2 场景切换机制
 
-- `scenes/PlayerInfoPanel.tscn`：游戏内档案面板（覆盖显示）
-- 手机系统由 `scripts/PhoneSystem.gd` 动态构建 UI（非单独 tscn）
+当前统一由：
+
+- `scripts/utils/SceneTransitions.gd`（语义封装）
+- `addons/scene_manager`（实际过渡执行）
+
+即业务脚本不再直接硬切，而是调用：
+
+- `logo_to_menu()`
+- `menu_to_creation()`
+- `creation_to_game()`
+- `back_to_menu()`
+- `day_transition()`（仅过渡不切场景）
 
 ---
 
 ## 3. 全局单例（Autoload）
 
-- `SaveManager`：存档读写、槽位管理
-- `AudioManager`：背景音乐/音效控制
-- `NamePool`：随机名字池
-- `ModuleManager`：模块广播与聚合（行动、事件、消息、面板）
-- `ModLoader`：模块加载
-- `RelationshipManager`：NPC 好感与关系等级
-- `WechatSystem`：聊天记录、会话、消息收发
+当前项目核心 Autoload：
 
-说明：主场景只做“组合与调度”，全局状态与跨页面数据通过单例共享。
+- `SaveManager`：存档管理
+- `AudioManager`：音频管理
+- `Notify`：统一 toast / 警告 / 成就提示
+- `SceneTransitions`：业务层场景过渡封装
+- `NamePool`：名字池
+- `ModuleManager`：模块生命周期广播与聚合
+- `ModLoader`：模块加载器
+- `RelationshipManager`：关系与好感
+- `WechatSystem`：聊天与消息系统
+- `ToastParty`：toast 插件 autoload
+- `SceneManager`：过渡插件 autoload
 
 ---
 
-## 4. 脚本结构（按职责）
+## 4. 脚本分层与职责
 
 ### 4.1 主流程脚本
 
-- `scripts/MainMenu.gd`：菜单跳转、继续游戏、存档页
-- `scripts/CharacterCreation.gd`：分页流程、选项生成、结果汇总
-- `scripts/Game.gd`：日循环状态机、行动执行、事件触发、UI刷新
+- `scripts/MainMenu.gd`
+  - 主菜单 UI 与存档入口
+  - 新游戏/读档跳转链路
+- `scripts/CharacterCreation.gd`
+  - 六步建角流程
+  - 角色初始数据组装并写入临时初始化缓存
+- `scripts/Game.gd`
+  - 日循环状态机
+  - 行动与事件处理
+  - 主界面刷新
+  - 结局计算 + 成就模块结算回调
 
-### 4.2 游戏内系统脚本
+### 4.2 游戏系统脚本
 
-- `scripts/PhoneSystem.gd`：手机 UI、App 切换、遮罩与动画
-- `scripts/WechatSystem.gd`：会话数据、发送/接收逻辑
-- `scripts/PlayerInfoPanel.gd`：档案面板数据渲染
-- `scripts/RelationshipManager.gd`：关系初始化与好感变化
-- `scripts/SaveManager.gd`：存档序列化入口与恢复
+- `scripts/PhoneSystem.gd`：手机面板动态 UI
+- `scripts/PlayerInfoPanel.gd`：档案页渲染与统计
+- `scripts/SaveManager.gd`：存档序列化入口
+- `scripts/RelationshipManager.gd`：关系数据管理
+- `scripts/WechatSystem.gd`：聊天记录与消息机制
 
-### 4.3 模块系统
+### 4.3 模块系统（可扩展）
 
-- `scripts/core/GameModule.gd`：模块接口
-- `scripts/core/ModuleManager.gd`：生命周期广播、数据聚合
-- `scripts/core/ModLoader.gd`：模块注册加载
-- `scripts/modules/TalentModule.gd`：天赋相关逻辑
-- `scripts/modules/LoveModule.gd`：恋爱角色与阶段逻辑
+- `scripts/core/GameModule.gd`：模块接口基类
+- `scripts/core/ModuleManager.gd`：统一广播（day/action/semester 等）
+- `scripts/core/ModLoader.gd`：加载内置模块和外部模组
+
+当前内置模块：
+
+- `TalentModule.gd`
+- `LoveModule.gd`
+- `AchievementModule.gd`
 
 ---
 
-## 5. UI 结构详解
+## 5. 主要 UI 结构（按页面）
 
-## 5.1 主菜单 `scenes/main_menu.tscn`
+## 5.1 主菜单 `main_menu.tscn`
 
-### 结构层级（核心）
+结构核心：
 
 - `MainMenu (Control)`
-  - `Background (ColorRect)`：全屏底色
-  - `Center/MainVBox`：主标题区与主按钮区
-    - `Title` / `Subtitle`
-    - `BtnVBox`
-      - `NewBtn`
-      - `ContinueBtn`
-      - `QuitBtn`
-  - `Overlay`：弹层遮罩
-  - `SavePanel`：存档位弹窗
-  - `CharPanel`：快速建角弹窗（兼容入口）
-  - `LoadPage`：完整读档页
-    - `CardList`：动态注入存档卡
-    - `LoadCardTemplate`：卡片模板
+  - `Background`
+  - `Center/MainVBox`（标题与主按钮）
+  - `Overlay`
+  - `SavePanel`
+  - `CharPanel`
+  - `LoadPage`（卡片化读档区）
 
-### 交互职责
-
-- 主按钮决定流程分支（新建/继续/退出）
-- `Overlay + Panel` 组合实现弹层体验
-- `LoadPage` 提供独立“读档页模式”（非简单弹窗）
+职责：入口页 + 存档流转。
 
 ---
 
-## 5.2 角色创建 `scenes/CharacterCreation.tscn`
+## 5.2 角色创建 `CharacterCreation.tscn`
 
-采用**多页向导式**结构，页面统一放在 `PageContainer` 下：
+结构核心：
 
-- `Page1_Name`：姓名输入
-- `Page2_Gender`：性别选择
-- `Page3_Background`：家庭背景列表
-- `Page4_University`：院校列表
-- `Page5_Major`：专业网格 + 分页器（上一组/下一组）
-- `Page6_Talent`：天赋抽取与确认
-- 底部 `ProgressIndicator (Dot1~Dot6)`：流程进度点
+- `PageContainer`
+  - `Page1_Name`
+  - `Page2_Gender`
+  - `Page3_Background`
+  - `Page4_University`
+  - `Page5_Major`
+  - `Page6_Talent`
+- `ProgressIndicator`
 
-### UI 特征
-
-- 每页都有统一导航：`BackBtn / NextBtn`（最后页是 `StartBtn`）
-- 中间内容区以 `VBoxContainer + 列表容器` 为主
-- 专业页采用 `GridContainer`，支持更高信息密度
-- 天赋页强化 CTA：`🎲 抽取天赋`
+职责：收集初始角色条件，生成开局 init 数据。
 
 ---
 
-## 5.3 主游戏界面 `scenes/Game.tscn`
+## 5.3 主游戏 `Game.tscn`
 
-这是项目最核心的 UI，整体是“**顶部控制 + 左叙事 + 右数据**”布局。
+结构核心：
 
-### 顶层结构
+- 顶栏：状态、时间控制、快捷入口
+- 左栏：当前阶段叙事 + 选择按钮 + 日志
+- 右栏：属性与信息面板
 
-- `GameRoot (VBoxContainer)`
-  - `BackgroundWindow`
-    - `SceneBackground`
-    - `SceneBackgroundShade`
-  - `StatusBar`
-    - `StatusHint`
-    - `DayProgress`
-  - `TimeControlBar`
-    - 时间控制：`PauseBtn`、`Speed1x/2x/4xBtn`
-    - 快捷入口：`PhoneBtn`、`ProfileBtn`
-    - 状态信息：`MoneyInfo`、`GpaInfo`、`StudyInfo`、`CreditsInfo`、`DateLabel`
-  - `MainHBox`
-    - `LeftPanel`
-    - `RightPanel`
-
-### 左侧 `LeftPanel`（叙事驱动）
-
-- `CurrentCard`
-  - `CurrentHint`（阶段播报标题）
-  - `CurrentText`（当前阶段/事件主文本）
-- `ChoicesContainer`（动态行动/选项按钮）
-- `EventText`（日志流）
-- `NextButton`（推进）
-
-职责：把“当下该做什么”清晰呈现给玩家，偏流程导向。
-
-### 右侧 `RightPanel`（数据驱动）
-
-- `RightScroll/RightContent`（滚动区）
-- `CampusMapPanel/CampusMap`（地图区）
-- 属性分组（如 `GpaRow`、`SocialRow` 等）
-
-职责：把“长期状态与成长结果”可视化，偏信息导向。
-
-### 主界面 UI 设计特点
-
-- 大量 `StyleBoxFlat` 子资源统一主题（圆角、描边、半透明）
-- 深色背景 + 高亮强调色（蓝/青）
-- 左右分栏明确区分“操作区”和“状态区”
-- `ScrollContainer` 用于承载扩展数据，避免拥挤
+职责：主玩法承载页（行动 → 反馈 → 状态变化）。
 
 ---
 
-## 5.4 档案面板 `scenes/PlayerInfoPanel.tscn`
+## 5.4 档案页 `PlayerInfoPanel.tscn`
 
-`CanvasLayer` 覆盖层，信息密度最高的 UI。
+作为 `CanvasLayer` 覆盖面板，当前右列已包含：
 
-### 顶层结构
+- `StoryPanel`
+- `AcademicPanel`
+- `AchievementPanel`（新增）
+- `DormPanel`
+- `RelationshipsPanel`
+- `DataPanel`
 
-- `PlayerInfoPanel (CanvasLayer)`
-  - `Overlay`（半透明遮罩）
-  - `MarginContainer`
-    - `Shell`
-      - `MainVBox`
-        - `HeaderPanel`
-        - `Divider`
-        - `ScrollContainer`
+其中成就区显示：
 
-### Header 区
-
-- `HeaderEyebrow` / `HeaderTitle` / `HeaderSub`
-- `CloseBtn`
-
-用于展示角色身份摘要与关闭操作。
-
-### 内容区（重点）
-
-`ContentVBox` 下分两层：
-
-1. `QuickStatsPanel`：核心概览（`QuickStatsGrid`）
-2. `BodyColumns`：左右双列详情
-
-左列（成长与基础）：
-
-- `BasicInfoPanel`（基本信息）
-- `ProgressPanel`（进度状态）
-- `TalentsPanel`（天赋）
-- `TagsPanel`（标签）
-
-右列（世界与关系）：
-
-- `StoryPanel`（剧情进展）
-- `AcademicPanel`（学业情况）
-- `DormPanel`（宿舍成员）
-- `RelationshipsPanel`（人际关系）
-- `DataPanel`（详细原始数据）
-
-### 面板定位
-
-- 主游戏中的“深度信息查看器”
-- 适合在暂停态/规划态阅读
-- 与主界面形成：轻交互（主界面）+ 重信息（档案面板）的互补
+- 完成度（已解锁数 / 总数）
+- 单项成就状态与进度
+- 列表排序：未解锁优先
 
 ---
 
-## 5.5 手机系统 UI（`PhoneSystem.gd` 动态构建）
+## 6. 数据驱动关系
 
-虽然没有独立 tscn，但结构稳定：
+关键数据文件：
 
-- `PhonePanel`：手机壳体容器
-- `PhoneOverlay`：全屏遮罩（点击关闭）
-- `StatusBar`、导航区、App 容器
-- 内置 App：通讯录、微信、朋友圈、日程、备忘录、设置
+- `data/actions.json`：行动定义
+- `data/events.json` / `data/flavor_texts.json`：事件池
+- `data/love_*.json`：恋爱系统配置
+- `data/sendable_messages.json` / `data/npc_behaviors.json`：社交消息
+- `data/achievements.json`：成就定义（28项）
 
-特征：
+运行时模式：
 
-- 动画开合（Tween）
-- 可从模块收集扩展面板（App 注入）
-- 微信聊天页支持联系人列表、消息内容、可发送选项
-
----
-
-## 6. 数据驱动与 UI 的连接关系
-
-UI 不是硬编码内容，而是读取数据层与模块层结果：
-
-- 行动来源：`actions.json` + 模块注入行动
-- 事件来源：`events.json`（标准事件）+ `flavor_texts.json`（微事件）
-- 恋爱与消息：`love_*.json`、`sendable_messages.json`、`npc_behaviors.json`
-- 关系显示：`RelationshipManager`
-- 存档恢复后 UI 由 `Game.gd`、`PlayerInfoPanel.gd` 统一刷新
+- Game + ModuleManager 聚合静态配置与动态模块数据
+- UI 层只读状态并渲染，不直接保存业务状态
 
 ---
 
-## 7. 当前 UI 结构结论
+## 7. 插件接入说明
 
-当前项目 UI 已形成完整的“主流程 + 覆盖面板 + 动态子系统”体系：
+当前已接入插件：
 
-- 主流程页面清晰（菜单/建角/主游戏）
-- 游戏中核心交互路径明确（行动选择 → 事件反馈 → 状态变化）
-- 复杂信息通过档案与手机系统分层承载
-- 结构上适合继续扩展新模块、新事件池与新面板
-
----
-
-## 8. 关键场景节点树（ASCII）
-
-以下是便于排查和定位的结构图（精简版，保留关键节点）。
-
-### 8.1 `Game.tscn`
-
-```text
-GameRoot (VBoxContainer)
-├─ BackgroundWindow
-│  ├─ SceneBackground
-│  └─ SceneBackgroundShade
-├─ StatusBar
-│  └─ StatusMargin/StatusVBox
-│     ├─ StatusHint
-│     └─ DayProgress
-├─ TimeControlBar
-│  ├─ PauseBtn
-│  ├─ Speed1xBtn / Speed2xBtn / Speed4xBtn
-│  ├─ PhoneBtn
-│  ├─ ProfileBtn
-│  ├─ TopStatusInfo
-│  │  ├─ MoneyInfo
-│  │  ├─ GpaInfo
-│  │  ├─ StudyInfo
-│  │  └─ CreditsInfo
-│  └─ DateLabel
-└─ MainHBox
-   ├─ LeftPanel
-   │  ├─ CurrentCard
-   │  │  └─ CurrentMargin/CurrentVBox
-   │  │     ├─ CurrentHint
-   │  │     └─ CurrentText
-   │  ├─ ChoicesContainer
-   │  ├─ LogHeader
-   │  ├─ EventText
-   │  └─ NextButton
-   └─ RightPanel
-      └─ RightScroll/RightContent
-         ├─ CampusMapPanel/CampusMap
-         ├─ GpaRow
-         ├─ SocialRow
-         ├─ AbilityRow
-         ├─ MoneyRow
-         ├─ MentalRow
-         ├─ HealthRow
-         └─ Tag/Info Rows ...
-```
-
-### 8.2 `PlayerInfoPanel.tscn`
-
-```text
-PlayerInfoPanel (CanvasLayer)
-├─ Overlay
-└─ MarginContainer
-   └─ Shell
-      └─ MainVBox
-         ├─ HeaderPanel
-         │  └─ HeaderMargin/HeaderRow
-         │     ├─ IdentityBlock
-         │     │  ├─ HeaderEyebrow
-         │     │  ├─ HeaderTitle
-         │     │  └─ HeaderSub
-         │     └─ Actions
-         │        ├─ HintLabel
-         │        └─ CloseBtn
-         ├─ Divider
-         └─ ScrollContainer
-            └─ ContentMargin/ContentVBox
-               ├─ QuickStatsPanel
-               │  └─ QuickStatsGrid
-               └─ BodyColumns
-                  ├─ LeftColumn
-                  │  ├─ BasicInfoPanel/InfoGrid
-                  │  ├─ ProgressPanel/ProgressContent
-                  │  ├─ TalentsPanel/TalentsFlow
-                  │  └─ TagsPanel/TagsFlow
-                  └─ RightColumn
-                     ├─ StoryPanel/StoryContent
-                     ├─ AcademicPanel/AcademicContent
-                     ├─ DormPanel/RoommatesContent
-                     ├─ RelationshipsPanel/RelationshipsContent
-                     └─ DataPanel/RawDataContent
-```
-
-### 8.3 `main_menu.tscn`
-
-```text
-MainMenu (Control)
-├─ Background
-├─ Center/MainVBox
-│  ├─ Title
-│  ├─ Subtitle
-│  └─ BtnVBox
-│     ├─ NewBtn
-│     ├─ ContinueBtn
-│     └─ QuitBtn
-├─ Overlay
-├─ SavePanel (存档弹层)
-├─ CharPanel (快速建角弹层)
-└─ LoadPage
-   ├─ CardList
-   └─ LoadCardTemplate
-```
-
-### 8.4 `CharacterCreation.tscn`
-
-```text
-CharacterCreation (Control)
-├─ Background
-├─ PageContainer
-│  ├─ Page1_Name
-│  ├─ Page2_Gender
-│  ├─ Page3_Background
-│  ├─ Page4_University
-│  ├─ Page5_Major
-│  │  ├─ MajorList (Grid)
-│  │  └─ MajorPager (Prev/Next)
-│  └─ Page6_Talent
-│     ├─ TalentList
-│     ├─ RollBtn
-│     └─ StartBtn
-└─ ProgressIndicator
-   ├─ Dot1
-   ├─ Dot2
-   ├─ Dot3
-   ├─ Dot4
-   ├─ Dot5
-   └─ Dot6
-```
+1. `toastparty`
+   - 用于通知气泡
+   - 通过 `Notify` 统一调用
+2. `scene_manager`
+   - 提供过渡 shader/pattern
+   - 由 `SceneTransitions` 封装业务入口
+3. `dialogic`
+   - 已规范安装到 `addons/dialogic`
+   - 当前项目可用，但是否深入使用由剧情系统演进决定
 
 ---
 
-## 9. 快速定位建议（开发时）
+## 8. 故障定位建议
 
-- 查“行动按钮为什么没出现”：先看 `Game.tscn/ChoicesContainer`，再看 `Game.gd` 的可用行动收集。
-- 查“档案数据没刷新”：看 `PlayerInfoPanel.gd` 的 `_refresh_data()` 调用链。
-- 查“手机点不开/关不掉”：看 `PhoneSystem.gd` 中 `PhoneOverlay` 与 `open_phone/close_phone`。
-- 查“某页显示错乱”：优先检查对应 `*.tscn` 的容器层级和 `size_flags`。
+1. 场景打不开 / 报切换错：
+   - 先查 `SceneTransitions.gd` 场景映射
+   - 再查 `project.godot` 中 `SceneManager` 是否可用
 
+2. 成就不解锁：
+   - 查 `AchievementModule` 是否已在 `ModLoader` 注册
+   - 查 `data/achievements.json` 定义字段
+   - 查档案页成就区是否读到 overview
+
+3. 档案页显示不完整：
+   - 查 `PlayerInfoPanel.tscn` 节点是否存在
+   - 查 `PlayerInfoPanel.gd` 对应 onready 路径
+
+4. 插件类解析报错（如 Dialogic）：
+   - 优先确认插件路径必须在 `res://addons/<plugin_name>/`
+   - 避免把插件源码包直接放在临时目录下被工程扫描
+
+---
+
+## 9. 后续建议
+
+1. 在文档层建立“版本化架构快照”（每次大改后更新）
+2. 为成就系统补一份独立说明（规则、阈值、调参方法）
+3. 给 `SceneTransitions` 补转场参数约定表（颜色/速度/pattern）
+4. 把 `Dialogic` 使用边界写清楚（是否与现有事件系统并行）

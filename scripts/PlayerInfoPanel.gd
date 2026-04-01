@@ -56,6 +56,7 @@ var was_time_running_before_open := false
 @onready var academic_content: VBoxContainer = $MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/AcademicPanel/SectionMargin/SectionVBox/AcademicContent
 @onready var roommates_content: VBoxContainer = $MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DormPanel/SectionMargin/SectionVBox/RoommatesContent
 @onready var relationships_content: VBoxContainer = $MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/RelationshipsPanel/SectionMargin/SectionVBox/RelationshipsContent
+@onready var achievements_content: VBoxContainer = $MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/AchievementPanel/SectionMargin/SectionVBox/AchievementContent
 @onready var data_content: VBoxContainer = $MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DataPanel/SectionMargin/SectionVBox/RawDataContent
 
 
@@ -179,6 +180,7 @@ func _apply_styles():
 		$MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/LeftColumn/TagsPanel,
 		$MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/StoryPanel,
 		$MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/AcademicPanel,
+		$MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/AchievementPanel,
 		$MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DormPanel,
 		$MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/RelationshipsPanel,
 		$MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DataPanel,
@@ -205,6 +207,7 @@ func _refresh_data():
 	_populate_tags()
 	_populate_story()
 	_populate_academic()
+	_populate_achievements()
 	_populate_roommates()
 	_populate_relationships()
 	_populate_data_details()
@@ -371,6 +374,52 @@ func _populate_academic():
 			"绩点 %.2f | 学分 %d" % [gpa_val, int(record.get("credits_earned", 0))],
 			_gpa_color(gpa_val)
 		)
+
+
+func _populate_achievements():
+	_clear(achievements_content)
+	if not ModuleManager or not ModuleManager.has_module("achievement"):
+		achievements_content.add_child(_make_empty_label("成就模块未加载"))
+		return
+	
+	var achievement_module: GameModule = ModuleManager.get_module("achievement")
+	if not achievement_module or not achievement_module.has_method("get_overview"):
+		achievements_content.add_child(_make_empty_label("成就数据不可用"))
+		return
+	
+	var overview: Dictionary = achievement_module.get_overview()
+	var defs: Array = overview.get("definitions", [])
+	var unlocked_map: Dictionary = overview.get("unlocked", {})
+	var counters: Dictionary = overview.get("counters", {})
+	
+	if defs.is_empty():
+		achievements_content.add_child(_make_empty_label("暂无成就定义"))
+		return
+	
+	var unlocked_count := 0
+	for def in defs:
+		if unlocked_map.get(def.get("id", ""), false):
+			unlocked_count += 1
+	_add_kv_row(achievements_content, "完成度", "%d / %d" % [unlocked_count, defs.size()], Color(1.0, 0.86, 0.34))
+	
+	var sorted_defs: Array = defs.duplicate()
+	sorted_defs.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var a_unlocked: bool = bool(unlocked_map.get(a.get("id", ""), false))
+		var b_unlocked: bool = bool(unlocked_map.get(b.get("id", ""), false))
+		if a_unlocked == b_unlocked:
+			return str(a.get("name", "")) < str(b.get("name", ""))
+		return (not a_unlocked) and b_unlocked
+	)
+	
+	for def in sorted_defs:
+		var aid: String = str(def.get("id", ""))
+		if aid.is_empty():
+			continue
+		var is_unlocked: bool = bool(unlocked_map.get(aid, false))
+		var title := "%s %s" % ["🏆" if is_unlocked else "🔒", str(def.get("name", aid))]
+		var progress := _achievement_progress_text(def, counters, is_unlocked)
+		var accent := Color(1.0, 0.82, 0.24) if is_unlocked else Color(0.56, 0.62, 0.72)
+		achievements_content.add_child(_make_simple_card(title, "%s\n%s" % [str(def.get("desc", "")), progress], accent))
 
 
 func _populate_roommates():
@@ -833,5 +882,27 @@ func _relationship_color(affinity: int) -> Color:
 	if affinity < 20:
 		return Color(0.96, 0.40, 0.44)
 	return Color(0.72, 0.78, 0.86)
+
+func _achievement_progress_text(def: Dictionary, counters: Dictionary, is_unlocked: bool) -> String:
+	if is_unlocked:
+		return "状态：已解锁"
+	var t: String = str(def.get("type", ""))
+	match t:
+		"counter":
+			var key: String = str(def.get("counter", ""))
+			var cur: int = int(counters.get(key, 0))
+			var target: int = int(def.get("target", 0))
+			return "进度：%d / %d" % [cur, target]
+		"attribute":
+			var attr: String = str(def.get("attribute", ""))
+			var value: float = float(game_node.attributes.get(attr, 0.0)) if game_node and game_node.attributes is Dictionary else 0.0
+			var target_attr: float = float(def.get("target", 0.0))
+			return "当前：%.2f / %.2f" % [value, target_attr]
+		"ending":
+			return "需达成结局：%s" % str(def.get("ending", ""))
+		"meta":
+			return "需解锁其余全部成就"
+		_:
+			return "状态：未解锁"
 
 # ✅ 阶段1完成

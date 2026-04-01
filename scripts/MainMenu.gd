@@ -325,7 +325,7 @@ func _show_load_page():
 				SaveManager.store_temp("pending_game_init", {
 					"save_slot": slot, "is_new_game": false, "save_data": data,
 				})
-				get_tree().change_scene_to_file("res://scenes/Game.tscn")
+				SceneTransitions.fade_to("game")
 		)
 
 		var del_btn = card.get_node("CardHBox/DeleteBtn") as Button
@@ -368,7 +368,7 @@ func _on_slot_picked(slot: int, _exists: bool):
 	selected_slot = slot
 	_close_panels()
 	SaveManager.store_temp("pending_char_creation_slot", slot)
-	get_tree().change_scene_to_file("res://scenes/CharacterCreation.tscn")
+	SceneTransitions.menu_to_creation()
 
 func _on_delete_slot(slot: int):
 	SaveManager.delete_save(slot)
