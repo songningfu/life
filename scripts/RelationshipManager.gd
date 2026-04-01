@@ -74,6 +74,31 @@ const NPC_TEMPLATES = {
 		"personality": "年轻的辅导员，亲和力强，偶尔严厉",
 		"icon": "👩‍🏫", "color": "#c0a0ff",
 	},
+	"lin_zhiyi": {
+		"role": "同学", "gender": "female",
+		"personality": "安静而优秀，喜欢阅读和写作",
+		"icon": "📖", "color": "#4db8e6",
+	},
+	"su_xiaowan": {
+		"role": "同学", "gender": "female",
+		"personality": "辩论社活跃分子，表面强势内心脆弱",
+		"icon": "🎤", "color": "#ff9933",
+	},
+	"chen_yutong": {
+		"role": "同学", "gender": "female",
+		"personality": "温柔大方，对所有人都很热情",
+		"icon": "🌸", "color": "#ff85a2",
+	},
+	"zhou_yiran": {
+		"role": "同学", "gender": "female",
+		"personality": "独立坚强，同时打两份工",
+		"icon": "💪", "color": "#a0522d",
+	},
+	"shen_yingshuang": {
+		"role": "同学", "gender": "female",
+		"personality": "考研战友，专注而内敛",
+		"icon": "📝", "color": "#6c5ce7",
+	},
 }
 
 # ========== 运行时数据 ==========
@@ -105,6 +130,8 @@ func _get_initial_affinity(role_id: String) -> int:
 			return 15  # 室友开局就认识
 		"counselor":
 			return 10  # 辅导员开局认识
+		"chen_yutong":
+			return 10  # 开局自动认识
 		_:
 			return 0
 
@@ -227,3 +254,5 @@ func get_all_relationships() -> Array:
 ## WechatSystem._apply_message_effects 中调用
 func modify_affinity(role_id: String, amount: int, day_index: int = -1) -> Dictionary:
 	return change_affinity(role_id, amount, day_index)
+
+# ✅ 阶段3完成

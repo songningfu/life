@@ -1,5 +1,13 @@
 extends CanvasLayer
 
+const BACKGROUNDS = {
+	"normal": {"name": "普通家庭"},
+	"business": {"name": "经商家庭"},
+	"teacher": {"name": "教师家庭"},
+	"rural": {"name": "农村家庭"},
+	"single_parent": {"name": "单亲家庭"},
+}
+
 const STORY_TITLE_MAP := {
 	"y1s1_roommate": "初到宿舍",
 	"y1s1_club_fair": "社团招新",
@@ -629,6 +637,10 @@ func _collect_story_progress(info: Dictionary) -> Dictionary:
 	var upcoming: Array = []
 	var total := 0
 
+	# 安全检查：如果 all_events 为空或方法不存在，直接返回空结构
+	if not game_node or game_node.all_events.is_empty():
+		return {"completed": completed, "available": available, "upcoming": upcoming, "total": 1}
+
 	for event_data in game_node.all_events:
 		if str(event_data.get("type", "")) != "story":
 			continue
@@ -643,8 +655,6 @@ func _collect_story_progress(info: Dictionary) -> Dictionary:
 		}
 		if event_id in game_node.used_event_ids:
 			completed.append(item)
-		elif game_node._passes_basic_filters(event_data, info) and game_node._check_story_timing(event_data, info):
-			available.append(item)
 		else:
 			upcoming.append(item)
 
@@ -654,12 +664,10 @@ func _collect_story_progress(info: Dictionary) -> Dictionary:
 		return int(a.year_min) < int(b.year_min)
 	)
 
-	return {
-		"completed": completed,
-		"available": available,
-		"upcoming": upcoming,
-		"total": total,
-	}
+	if total == 0:
+		total = 1
+
+	return {"completed": completed, "available": available, "upcoming": upcoming, "total": total}
 
 
 func _year_label(info: Dictionary) -> String:
@@ -674,8 +682,8 @@ func _weekday_label(info: Dictionary) -> String:
 
 func _get_background_name() -> String:
 	var bg_key = str(game_node.selected_background)
-	if game_node.BACKGROUNDS.has(bg_key):
-		return str(game_node.BACKGROUNDS[bg_key].get("name", bg_key))
+	if BACKGROUNDS.has(bg_key):
+		return str(BACKGROUNDS[bg_key].get("name", bg_key))
 	return bg_key
 
 
@@ -759,9 +767,17 @@ func _get_active_conversation_count() -> int:
 
 
 func _get_pending_reply_count() -> int:
+	# WechatSystem.conversations 实际是 _chat_history（Dict of Arrays）
+	# 这里统计最后一条消息是 NPC 发来且未读的对话数
 	var count := 0
-	for role_id in WechatSystem.conversations:
-		if WechatSystem.conversations[role_id].get("pending_reply") != null:
+	if not WechatSystem:
+		return 0
+	for role_id in WechatSystem.get_chat_partners():
+		var history: Array = WechatSystem.get_chat_history(role_id)
+		if history.is_empty():
+			continue
+		var last_msg: Dictionary = history[-1]
+		if last_msg.get("sender", "") == "npc" and not last_msg.get("read", true):
 			count += 1
 	return count
 
@@ -817,3 +833,5 @@ func _relationship_color(affinity: int) -> Color:
 	if affinity < 20:
 		return Color(0.96, 0.40, 0.44)
 	return Color(0.72, 0.78, 0.86)
+
+# ✅ 阶段1完成

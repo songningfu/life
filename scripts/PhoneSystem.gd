@@ -38,6 +38,7 @@ var _title_label: Label
 
 # 动画
 var _anim_tween: Tween
+var _overlay: ColorRect
 
 # ==================== 颜色主题 ====================
 
@@ -202,6 +203,20 @@ func _setup_ui() -> void:
 	panel_style.shadow_color = Color(0, 0, 0, 0.4)
 	panel_style.shadow_size = 20
 	phone_panel.add_theme_stylebox_override("panel", panel_style)
+
+	# 创建遮罩
+	var overlay: ColorRect = ColorRect.new()
+	overlay.name = "PhoneOverlay"
+	overlay.color = Color(0, 0, 0, 0.5)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.visible = false
+	overlay.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed:
+			close_phone()
+	)
+	add_child(overlay)
+	_overlay = overlay
 	
 	add_child(phone_panel)
 	
@@ -714,6 +729,8 @@ func open_phone() -> void:
 	
 	is_open = true
 	show()
+	if _overlay:
+		_overlay.visible = true
 	
 	# 动画
 	if _anim_tween:
@@ -742,6 +759,8 @@ func _close_phone() -> void:
 	_anim_tween.set_ease(Tween.EASE_IN)
 	_anim_tween.set_trans(Tween.TRANS_QUART)
 	_anim_tween.tween_property(phone_panel, "position:y", 1080.0, ANIM_DURATION)
+	if _overlay:
+		_overlay.visible = false
 	_anim_tween.tween_callback(func(): hide())
 	
 	phone_closed.emit()
@@ -791,3 +810,5 @@ func refresh() -> void:
 	_refresh_apps()
 	if current_app == "":
 		_show_home_screen()
+
+# ✅ 阶段5完成

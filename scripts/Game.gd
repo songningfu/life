@@ -117,6 +117,10 @@ var daily_actions: Dictionary = {
 # 行动数据缓存
 var _actions_data: Dictionary = {}
 
+## 事件数据缓存
+var _events_data_cache: Dictionary = {}
+var _flavor_texts_cache: Dictionary = {}
+
 # UI 节点（主界面绑定）
 @onready var _status_hint: Label = $StatusBar/StatusMargin/StatusVBox/StatusHint
 @onready var _day_progress: ProgressBar = $StatusBar/StatusMargin/StatusVBox/DayProgress
@@ -504,6 +508,7 @@ func _advance_phase() -> void:
 	match current_phase_enum:
 		DayPhase.MORNING_INFO:
 			_process_morning_info()
+			_refresh_ui()  # ← 新增这一行
 			_advance_to_phase(DayPhase.SLOT_MORNING)
 		
 		DayPhase.SLOT_MORNING:
@@ -628,11 +633,15 @@ func _show_action_menu(time_slot: String) -> void:
 		var action_id: String = action.get("id", "")
 		var action_name: String = action.get("name", action_id)
 		var action_desc: String = action.get("description", "")
+		var action_data: Dictionary = action
 		
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(0, 50)
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		btn.text = "  %s  ·  %s" % [action_name, action_desc]
+		var effects_preview: String = _format_effects_preview(action_data.get("effects", {}))
+		var cost: int = action_data.get("cost", 0)
+		var cost_text: String = "  |  费用 ¥%d" % cost if cost > 0 else ""
+		btn.text = "  %s  ·  %s\n  %s%s" % [action_name, action_desc, effects_preview, cost_text]
 		
 		var normal_style := StyleBoxFlat.new()
 		normal_style.bg_color = Color(0.10, 0.13, 0.18, 0.92)
@@ -656,6 +665,29 @@ func _show_action_menu(time_slot: String) -> void:
 	
 	_next_button.disabled = true
 	_append_log("[%s] 请选择行动" % _translate_time_slot(time_slot))
+
+## 格式化行动效果预览
+func _format_effects_preview(effects: Dictionary) -> String:
+	var parts: Array[String] = []
+	var attr_names: Dictionary = {
+		"study_points": "学习", "social": "社交", "ability": "能力",
+		"living_money": "金钱", "mental": "心理", "health": "健康"
+	}
+	for attr: String in effects.keys():
+		var effect_data = effects[attr]
+		var display_name: String = attr_names.get(attr, attr)
+		if effect_data is Dictionary:
+			var min_val: int = effect_data.get("min", 0)
+			var max_val: int = effect_data.get("max", 0)
+			if min_val == max_val:
+				parts.append("%s%+d" % [display_name, min_val])
+			else:
+				parts.append("%s %+d~%+d" % [display_name, min_val, max_val])
+		elif effect_data is int or effect_data is float:
+			parts.append("%s%+d" % [display_name, int(effect_data)])
+	if parts.is_empty():
+		return ""
+	return "[" + " | ".join(parts) + "]"
 
 func _on_action_choice_pressed(action_id: String, time_slot: String) -> void:
 	_select_action(action_id, time_slot)
@@ -772,20 +804,169 @@ func _apply_effects(effects: Dictionary) -> void:
 
 ## 检查事件触发
 func _check_event_trigger(action_id: String, time_slot: String) -> void:
-	# 收集模块注入事件
+	# 1. 收集模块注入事件
 	var module_events: Array[Dictionary] = []
 	if ModuleManager:
 		module_events = ModuleManager.collect_event_injections(current_day, current_phase_name, action_id)
-	
-	# TODO: 从events.json加载基础事件
-	# 简化版：随机决定是否触发微事件
-	if randf() < 0.3:  # 30%概率
-		_trigger_micro_event(action_id)
+	for event: Dictionary in module_events:
+		_display_event(event)
 
-## 触发微事件
-func _trigger_micro_event(action_id: String) -> void:
-	# TODO: 从flavor_texts.json加载微事件
-	_log("触发微事件")
+	# 2. 从 events.json 检查对应行动池的事件
+	var action_data: Dictionary = _get_action_data(action_id)
+	var event_pool_id: String = action_data.get("event_pool", "")
+	if not event_pool_id.is_empty():
+		_try_trigger_pool_event(event_pool_id)
+
+	# 3. 触发微事件（flavor_texts.json）
+	_try_trigger_flavor_text(action_id)
+
+## 从事件池中尝试触发事件
+func _try_trigger_pool_event(pool_id: String) -> void:
+	var pools: Dictionary = _events_data_cache.get("event_pools", {})
+	if not pools.has(pool_id):
+		return
+	var pool: Dictionary = pools[pool_id]
+	var events_dict: Dictionary = _events_data_cache.get("events", {})
+
+	# 先尝试微型事件，再尝试标准事件
+	for tier: String in ["micro", "standard"]:
+		var event_ids: Array = pool.get(tier, [])
+		for event_id in event_ids:
+			if not events_dict.has(event_id):
+				continue
+			if event_id in used_event_ids:
+				var used_event_data: Dictionary = events_dict[event_id]
+				if used_event_data.get("once", false) or used_event_data.get("once_per_phase", false):
+					continue
+			var event_data: Dictionary = events_dict[event_id]
+			var probability: float = event_data.get("probability", 0.0)
+			if randf() <= probability:
+				_display_event(event_data)
+				if event_id not in used_event_ids:
+					used_event_ids.append(event_id)
+				return  # 每次行动最多触发一个事件
+
+## 尝试触发微事件（flavor_texts.json）
+func _try_trigger_flavor_text(action_id: String) -> void:
+	# 根据行动ID映射到微事件分类
+	var category_map: Dictionary = {
+		"attend_class": "class", "self_study": "library", "library": "library",
+		"exercise": "exercise", "rest": "rest", "part_time_job": "part_time_job",
+		"dorm_chat": "dorm", "club_activity": "club",
+		"hangout_eat": "social", "hangout_game": "social", "hangout_study": "social",
+	}
+	var category: String = category_map.get(action_id, "general")
+	var micro_events: Dictionary = _flavor_texts_cache.get("micro_events", {})
+	var event_list: Array = micro_events.get(category, []).duplicate()
+	if event_list.is_empty():
+		event_list = micro_events.get("general", []).duplicate()
+	if event_list.is_empty():
+		return
+
+	# 也检查阶段特定微事件
+	var phase_events: Dictionary = _flavor_texts_cache.get("phase_specific", {})
+	for phase_key: String in phase_events.keys():
+		if phase_key in current_phase_name:
+			event_list.append_array(phase_events[phase_key])
+
+	# 按概率触发
+	for event: Dictionary in event_list:
+		var prob: float = event.get("probability", 0.0)
+		if randf() <= prob:
+			var text: String = event.get("text", "")
+			var effects: Dictionary = event.get("effects", {})
+			if not text.is_empty():
+				_append_log("💭 " + text)
+				_apply_effects(effects)
+				_refresh_ui()
+			return
+
+## 显示事件（带选项的标准事件或纯文本微型事件）
+func _display_event(event_data: Dictionary) -> void:
+	var title: String = event_data.get("title", "")
+	var text: String = event_data.get("text", "")
+	var event_type: String = event_data.get("type", "micro")
+
+	if event_type == "micro":
+		# 微型事件：直接显示文本和应用效果
+		if not text.is_empty():
+			_append_log("📌 %s：%s" % [title, text])
+		var effects: Dictionary = event_data.get("effects", {})
+		_apply_effects(effects)
+		_refresh_ui()
+	else:
+		# 标准/主线事件：显示文本和选项
+		var choices: Array = event_data.get("choices", [])
+		if choices.is_empty():
+			_append_log("📌 %s：%s" % [title, text])
+			var effects: Dictionary = event_data.get("effects", {})
+			_apply_effects(effects)
+			_refresh_ui()
+			return
+
+		# 显示事件文本
+		if _current_text:
+			_current_text.clear()
+			_current_text.append_text("[b]%s[/b]\n%s" % [title, text])
+
+		# 显示选项按钮
+		_clear_choices()
+		waiting_for_choice = true
+		if _next_button:
+			_next_button.disabled = true
+
+		for i: int in range(choices.size()):
+			var choice: Dictionary = choices[i]
+			var choice_text: String = choice.get("text", "选项%d" % (i + 1))
+			var btn := Button.new()
+			btn.custom_minimum_size = Vector2(0, 44)
+			btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			btn.text = "  ▸ " + choice_text
+
+			var normal_style := StyleBoxFlat.new()
+			normal_style.bg_color = Color(0.10, 0.13, 0.18, 0.92)
+			normal_style.set_corner_radius_all(8)
+			normal_style.content_margin_left = 10
+			normal_style.content_margin_right = 10
+			btn.add_theme_stylebox_override("normal", normal_style)
+			var hover_style: StyleBoxFlat = normal_style.duplicate()
+			hover_style.bg_color = Color(0.16, 0.22, 0.30, 1.0)
+			btn.add_theme_stylebox_override("hover", hover_style)
+			btn.add_theme_color_override("font_color", Color(0.92, 0.95, 0.99))
+
+			btn.pressed.connect(_on_event_choice_selected.bind(choice))
+			_choices_container.add_child(btn)
+
+		event_triggered.emit(event_data.get("id", ""))
+
+## 处理事件选项选择
+func _on_event_choice_selected(choice: Dictionary) -> void:
+	var choice_text: String = choice.get("text", "")
+	_append_log("→ 你选择了：%s" % choice_text)
+
+	var effects: Dictionary = choice.get("effects", {})
+	_apply_effects(effects)
+
+	# 处理标签
+	if choice.has("unlocks_flag"):
+		flags[choice["unlocks_flag"]] = true
+	if choice.has("add_tags"):
+		for tag in choice["add_tags"]:
+			if tag not in tags:
+				tags.append(tag)
+	if choice.has("remove_tags"):
+		for tag in choice["remove_tags"]:
+			tags.erase(tag)
+
+	var followup: String = choice.get("followup", "")
+	if not followup.is_empty():
+		_append_log(followup)
+
+	_clear_choices()
+	waiting_for_choice = false
+	if _next_button:
+		_next_button.disabled = false
+	_refresh_ui()
 
 ## 处理夜间结算
 func _process_night_summary() -> void:
@@ -815,9 +996,10 @@ func _process_night_summary() -> void:
 	# 检查周结算
 	if (current_day + 1) % DAYS_PER_WEEK == 0:
 		_process_week_end()
-	
-	# 检查学期结算
-	if (current_day + 1) % DAYS_PER_SEMESTER == 0:
+
+	# 检查学期结算（上学期考试周最后一天 day_in_year==120，下学期考试周最后一天 day_in_year==310）
+	var day_in_year: int = current_day % 365
+	if day_in_year == 120 or day_in_year == 310:
 		_process_semester_end()
 	
 	_append_log("夜间结算完成：生活费 -20")
@@ -840,25 +1022,52 @@ func _process_semester_end() -> void:
 	
 	if ModuleManager:
 		ModuleManager.broadcast_semester_end(current_year, current_semester)
-	
-	# 切换学期
-	if current_semester == 1:
-		current_semester = 2
-	else:
-		current_semester = 1
-		current_year += 1
 
 ## 计算GPA
 func _calculate_gpa() -> void:
-	# 简化版：根据学习点计算GPA
 	var study: float = attributes["study_points"]
-	var new_gpa: float = clamp(study / 25.0, 0.0, 4.0)  # 0-100分对应0-4.0
-	attributes["gpa"] = new_gpa
-	attributes["study_points"] = 50.0  # 重置学习点
+	var exam_diff: float = major_profile.get("exam_difficulty", 1.0)
+	# 根据学习值和专业难度计算本学期绩点
+	var semester_gpa: float = clamp((study / exam_diff) / 25.0, 0.0, 4.0)
+
+	# 本学期获得学分（简化：每学期固定获得一定学分，绩点越高学分越多）
+	var base_credits: int = int(major_required_credits / 8)  # 8个学期
+	var credits_this_semester: int = base_credits if semester_gpa >= 1.0 else int(base_credits * 0.5)
+	earned_credits += credits_this_semester
+
+	# 累计 GPA（加权平均）
+	var total_semesters: int = semester_records.size() + 1
+	var old_total: float = gpa * float(semester_records.size())
+	gpa = (old_total + semester_gpa) / float(total_semesters)
+	attributes["gpa"] = gpa
+
+	# 记录学期
+	semester_records.append({
+		"label": "大%s第%d学期" % [_year_cn(current_year), current_semester],
+		"semester_gpa": semester_gpa,
+		"credits_earned": credits_this_semester,
+		"study_points_at_end": study
+	})
+
+	# 学业预警
+	if semester_gpa < 1.5:
+		academic_warning_count += 1
+
+	# 重置学习值（保留一部分基础，不完全归零）
+	attributes["study_points"] = 50.0
+
+	_log("学期结算：GPA %.2f，学分 +%d，累计 %d/%d" % [semester_gpa, credits_this_semester, earned_credits, major_required_credits])
 
 ## 进入下一天
 func _advance_to_next_day() -> void:
 	current_day += 1
+
+	current_year = (current_day / 365) + 1
+	var day_in_year: int = current_day % 365
+	if day_in_year < 177:
+		current_semester = 1
+	else:
+		current_semester = 2
 	
 	# 更新阶段名称
 	_update_phase_name()
@@ -878,11 +1087,12 @@ func _advance_to_next_day() -> void:
 
 ## 更新阶段名称
 func _update_phase_name() -> void:
+	var day_in_year: int = current_day % 365
 	for phase_name: String in PHASE_DEFINITIONS.keys():
 		var phase_data: Dictionary = PHASE_DEFINITIONS[phase_name]
-		if current_day >= phase_data["start"] and current_day <= phase_data["end"]:
+		if day_in_year >= phase_data["start"] and day_in_year <= phase_data["end"]:
 			current_phase_name = phase_name
-			break
+			return
 
 ## 推进到指定阶段
 func _advance_to_phase(phase: DayPhase) -> void:
@@ -949,6 +1159,45 @@ func _load_actions_data() -> void:
 		
 		file.close()
 		_log("加载了 %d 个行动定义" % _actions_data.size())
+	
+	# 加载事件数据
+	_load_events_data()
+	_load_flavor_texts()
+
+## 加载事件数据（events.json）
+func _load_events_data() -> void:
+	var file: FileAccess = FileAccess.open("res://data/events.json", FileAccess.READ)
+	if not file:
+		_log("无法加载 events.json")
+		return
+	var json: JSON = JSON.new()
+	json.parse(file.get_as_text())
+	file.close()
+	var data: Dictionary = json.get_data()
+	if data is Dictionary:
+		_events_data_cache = data
+		# 将 events 字典中的事件填充到 all_events 数组（供 PlayerInfoPanel 使用）
+		all_events.clear()
+		var events_dict: Dictionary = data.get("events", {})
+		for event_id: String in events_dict.keys():
+			var event: Dictionary = events_dict[event_id].duplicate()
+			event["id"] = event_id
+			all_events.append(event)
+		_log("加载了 %d 个事件定义" % all_events.size())
+
+## 加载微事件数据（flavor_texts.json）
+func _load_flavor_texts() -> void:
+	var file: FileAccess = FileAccess.open("res://data/flavor_texts.json", FileAccess.READ)
+	if not file:
+		_log("无法加载 flavor_texts.json")
+		return
+	var json: JSON = JSON.new()
+	json.parse(file.get_as_text())
+	file.close()
+	var data: Dictionary = json.get_data()
+	if data is Dictionary:
+		_flavor_texts_cache = data
+		_log("加载了微事件数据")
 
 ## 获取行动数据
 func _get_action_data(action_id: String) -> Dictionary:
@@ -1004,11 +1253,33 @@ func _check_action_conditions(conditions: Dictionary) -> bool:
 				if current_year < value:
 					return false
 			"min_semester":
-				if current_year == value and current_semester < value:
+				var required_year: int = conditions.get("min_year", 1)
+				if current_year == required_year and current_semester < value:
 					return false
-			"min_study", "min_social", "min_ability", "min_health", "min_mental":
+				elif current_year < required_year:
+					return false
+			"min_study", "min_social", "min_health", "min_mental":
 				var attr: String = key.replace("min_", "")
 				if attributes.get(attr, 0) < value:
+					return false
+			"has_relationship":
+				if RelationshipManager and not RelationshipManager.is_met(str(value)):
+					return false
+			"has_relationship_level":
+				if RelationshipManager:
+					var level_name: String = RelationshipManager.get_level_name(str(value))
+					# 简化检查：friend 以上算满足
+					if RelationshipManager.get_level(str(value)) < RelationshipManager.RelLevel.FRIEND:
+						return false
+			"has_talent":
+				var talent_module = ModuleManager.get_module("talent") if ModuleManager else null
+				if talent_module and talent_module is TalentModule:
+					if not talent_module.has_talent(str(value)):
+						return false
+				else:
+					return false
+			"min_ability":
+				if attributes.get("ability", 0) < value:
 					return false
 	
 	return true
@@ -1052,6 +1323,14 @@ func get_save_data() -> Dictionary:
 	# 序列化模块数据
 	if ModuleManager:
 		data["modules"] = ModuleManager.serialize_all()
+
+	# 序列化子系统数据
+	if WechatSystem:
+		data["wechat"] = WechatSystem.serialize()
+	if RelationshipManager:
+		data["relationships_data"] = RelationshipManager.serialize()
+	if NamePool:
+		data["name_pool"] = NamePool.serialize()
 	
 	return data
 
@@ -1092,6 +1371,14 @@ func load_save_data(data: Dictionary) -> void:
 	# 反序列化模块数据
 	if ModuleManager and data.has("modules"):
 		ModuleManager.deserialize_all(data["modules"])
+
+	# 反序列化子系统数据
+	if WechatSystem and data.has("wechat"):
+		WechatSystem.deserialize(data["wechat"])
+	if RelationshipManager and data.has("relationships_data"):
+		RelationshipManager.deserialize(data["relationships_data"])
+	if NamePool and data.has("name_pool"):
+		NamePool.deserialize(data["name_pool"])
 	
 	_log("存档加载完成 - 第%d天" % current_day)
 
@@ -1303,3 +1590,9 @@ func set_schedule_template(template_id: String) -> void:
 ## 手动推进（调试用）
 func debug_advance() -> void:
 	_advance_phase()
+
+# ✅ 阶段1完成
+# ✅ 阶段2完成
+# ✅ 阶段4完成
+# ✅ 阶段5完成
+# ✅ 阶段6完成

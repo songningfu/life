@@ -148,9 +148,8 @@ func on_day_start(day_index: int, phase: String) -> void:
 		# 检查是否到达可遇见年份
 		if data["phase"] == LovePhase.NOT_MET:
 			var available_year: int = interest_data.get("available_from_year", 1)
-			if year >= available_year:
-				# 检查是否触发初遇
-				_try_trigger_first_meet(role_id, day_index)
+			if year < available_year:
+				continue
 		
 		# 更新未互动天数
 		if data["phase"] > LovePhase.NOT_MET:
@@ -177,6 +176,9 @@ func on_day_start(day_index: int, phase: String) -> void:
 
 func on_action_performed(action_id: String, time_slot: String, context: Dictionary) -> void:
 	"""行动执行后处理恋爱相关逻辑"""
+	# 检查是否触发初遇
+	_check_first_meet_on_action(action_id)
+
 	# 检查是否是与恋爱对象的互动
 	var target_role: String = context.get("target_role", "")
 	if target_role.is_empty():
@@ -210,6 +212,32 @@ func on_action_performed(action_id: String, time_slot: String, context: Dictiona
 	
 	# 检查阶段推进
 	_check_phase_advance(target_role)
+
+## 基于实际行动检查初遇
+func _check_first_meet_on_action(action_id: String) -> void:
+	var year: int = (_get_current_day() / 365) + 1
+	for role_id: String in _love_data.keys():
+		var data: Dictionary = _love_data[role_id]
+		if data["phase"] != LovePhase.NOT_MET:
+			continue
+		var interest_data: Dictionary = LOVE_INTERESTS[role_id]
+		var available_year: int = interest_data.get("available_from_year", 1)
+		if year < available_year:
+			continue
+		var meet_action: String = interest_data.get("meet_action", "")
+		if meet_action == "auto":
+			continue  # 自动遇见的在 on_new_game 中已处理
+		if meet_action != action_id:
+			continue
+		# 行动匹配，按概率触发
+		var probability: float = interest_data.get("meet_probability", 0.0)
+		if randf() <= probability:
+			data["phase"] = LovePhase.MET
+			data["meet_day"] = _get_current_day()
+			# 同步到 RelationshipManager
+			if RelationshipManager:
+				RelationshipManager.change_affinity(role_id, 5, _get_current_day())
+			_log("初遇触发：%s（通过行动 %s）" % [role_id, action_id])
 
 func on_day_end(day_index: int, phase: String) -> void:
 	"""每天结束时处理"""
@@ -777,3 +805,5 @@ func deserialize(data: Dictionary) -> void:
 
 func _log(message: String) -> void:
 	print("[LoveModule] %s" % message)
+
+# ✅ 阶段3完成
