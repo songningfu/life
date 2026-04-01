@@ -161,6 +161,7 @@ var _flavor_texts_cache: Dictionary = {}
 var _time_speed: float = 1.0
 var _phone_ui: CanvasLayer
 var _profile_ui: CanvasLayer
+var _pause_menu_ui: CanvasLayer
 var _selected_actions: Dictionary = {"morning": "", "afternoon": "", "evening": ""}
 
 # ==================== 生命周期 ====================
@@ -201,6 +202,9 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
+			KEY_ESCAPE:
+				if _pause_menu_ui and _pause_menu_ui.has_method("toggle_pause"):
+					_pause_menu_ui.toggle_pause()
 			KEY_P:
 				_on_pause_pressed()
 			KEY_I:
@@ -243,6 +247,13 @@ func _attach_overlay_scenes() -> void:
 		if profile_scene:
 			_profile_ui = profile_scene.instantiate() as CanvasLayer
 			add_child(_profile_ui)
+	if not _pause_menu_ui:
+		var pause_scene: PackedScene = load("res://scenes/menus/PauseMenu.tscn")
+		if pause_scene:
+			_pause_menu_ui = pause_scene.instantiate() as CanvasLayer
+			add_child(_pause_menu_ui)
+			if _pause_menu_ui.has_method("setup"):
+				_pause_menu_ui.setup(self)
 	
 	if _profile_ui:
 		_profile_ui.visible = false

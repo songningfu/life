@@ -3,7 +3,7 @@ extends Node
 # 场景名到路径映射
 const SCENE_MAP := {
 	"studio_logo": "res://scenes/studio_logo.tscn",
-	"main_menu": "res://scenes/main_menu.tscn",
+	"main_menu": "res://scenes/menus/MainMenu.tscn",
 	"game": "res://scenes/Game.tscn",
 	"char_creation": "res://scenes/CharacterCreation.tscn"
 }
