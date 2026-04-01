@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/MsgBubble.gd" id="1"]
+
+[node name="MsgBubble" type="HBoxContainer"]
+script = ExtResource("1")
+
+[node name="LeftSpacer" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Bubble" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="MsgLabel" type="Label" parent="Bubble"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="RightSpacer" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3

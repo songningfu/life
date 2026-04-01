@@ -22,6 +22,7 @@ const RESOLUTIONS := ["1280x720", "1600x900", "1920x1080", "2560x1440"]
 
 func _ready() -> void:
 	_bind_options()
+	_apply_visual_style()
 	close_btn.pressed.connect(func():
 		_save_settings()
 		visible = false
@@ -95,3 +96,38 @@ func _set_option_by_text(opt: OptionButton, text: String) -> void:
 		if opt.get_item_text(i) == text:
 			opt.select(i)
 			return
+
+func _apply_visual_style() -> void:
+	var panel := StyleBoxFlat.new()
+	panel.bg_color = Color("#0f1730")
+	panel.border_width_left = 1
+	panel.border_width_top = 1
+	panel.border_width_right = 1
+	panel.border_width_bottom = 1
+	panel.border_color = Color("#27406b")
+	panel.corner_radius_top_left = 10
+	panel.corner_radius_top_right = 10
+	panel.corner_radius_bottom_left = 10
+	panel.corner_radius_bottom_right = 10
+	add_theme_stylebox_override("panel", panel)
+
+	$VBox/Header.add_theme_color_override("font_color", Color("#e4f0ff"))
+	$VBox/Header.add_theme_font_size_override("font_size", 30)
+
+	for btn in [close_btn]:
+		var n := StyleBoxFlat.new()
+		n.bg_color = Color("#1a2950")
+		n.border_width_left = 1
+		n.border_width_top = 1
+		n.border_width_right = 1
+		n.border_width_bottom = 1
+		n.border_color = Color("#4a9eff")
+		n.corner_radius_top_left = 8
+		n.corner_radius_top_right = 8
+		n.corner_radius_bottom_left = 8
+		n.corner_radius_bottom_right = 8
+		btn.add_theme_stylebox_override("normal", n)
+		var h := n.duplicate()
+		h.bg_color = Color("#243b70")
+		btn.add_theme_stylebox_override("hover", h)
+		btn.add_theme_color_override("font_color", Color("#edf3ff"))

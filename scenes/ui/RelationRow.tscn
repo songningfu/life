@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/RelationRow.gd" id="1"]
+
+[node name="RelationRow" type="HBoxContainer"]
+script = ExtResource("1")
+theme_override_constants/separation = 6
+
+[node name="NpcName" type="Label" parent="."]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+
+[node name="HeartsContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Heart_0" type="TextureRect" parent="HeartsContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+
+[node name="Heart_1" type="TextureRect" parent="HeartsContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+
+[node name="Heart_2" type="TextureRect" parent="HeartsContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+
+[node name="Heart_3" type="TextureRect" parent="HeartsContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+
+[node name="Heart_4" type="TextureRect" parent="HeartsContainer"]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+
+[node name="StatusTag" type="Label" parent="."]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545098, 0.545098, 0.545098, 1)

@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/StatRow.gd" id="1"]
+
+[node name="StatRow" type="HBoxContainer"]
+script = ExtResource("1")
+theme_override_constants/separation = 6
+
+[node name="StatIcon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+stretch_mode = 3
+
+[node name="StatName" type="Label" parent="."]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+horizontal_alignment = 0
+
+[node name="StatBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatValue" type="Label" parent="."]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+horizontal_alignment = 2

@@ -261,4 +261,19 @@ func get_all_relationships() -> Array:
 func modify_affinity(role_id: String, amount: int, day_index: int = -1) -> Dictionary:
 	return change_affinity(role_id, amount, day_index)
 
+## PhoneSystem._refresh_chat_list / _refresh_contacts 中调用
+func get_known_characters() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for role_id in npc_data.keys():
+		var data: Dictionary = npc_data[role_id]
+		if not data.get("met", false):
+			continue
+		result.append({
+			"id": role_id,
+			"name": get_npc_display(role_id).get("name", role_id),
+			"affection": float(data.get("affinity", 0)),
+			"status": REL_NAMES.get(data.get("level", RelLevel.STRANGER), "陌生"),
+		})
+	return result
+
 # ✅ 阶段3完成

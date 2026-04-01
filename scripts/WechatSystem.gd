@@ -168,14 +168,20 @@ func _add_message(role_id: String, message_data: Dictionary) -> void:
 
 ## 获取聊天记录
 func get_chat_history(role_id: String) -> Array[Dictionary]:
-	return _chat_history.get(role_id, []).duplicate()
+	var raw_history: Array = _chat_history.get(role_id, [])
+	var result: Array[Dictionary] = []
+	for item in raw_history:
+		if item is Dictionary:
+			result.append(item)
+	return result
 
 ## 获取最后一条消息
 func get_last_message(role_id: String) -> Dictionary:
-	var history: Array[Dictionary] = _chat_history.get(role_id, [])
+	var history: Array = _chat_history.get(role_id, [])
 	if history.is_empty():
 		return {}
-	return history[-1]
+	var last = history[-1]
+	return last if last is Dictionary else {}
 
 ## 清空聊天记录
 func clear_chat_history(role_id: String) -> void:

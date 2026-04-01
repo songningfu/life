@@ -142,6 +142,7 @@ var _flavor_texts_cache: Dictionary = {}
 @onready var _choices_container: VBoxContainer = $MainHBox/LeftPanel/ChoicesContainer
 @onready var _event_text: RichTextLabel = $MainHBox/LeftPanel/EventText
 @onready var _next_button: Button = $MainHBox/LeftPanel/NextButton
+@onready var _right_content: VBoxContainer = $MainHBox/RightPanel/RightScroll/RightContent
 
 @onready var _campus_map: Control = $MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap
 @onready var _gpa_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow/GpaValue
@@ -163,6 +164,8 @@ var _phone_ui: CanvasLayer
 var _profile_ui: CanvasLayer
 var _pause_menu_ui: CanvasLayer
 var _selected_actions: Dictionary = {"morning": "", "afternoon": "", "evening": ""}
+var _stat_rows: Dictionary = {}
+var _relation_rows_box: VBoxContainer
 
 # ==================== 生命周期 ====================
 
@@ -183,10 +186,9 @@ func _ready() -> void:
 	_load_actions_data()
 	_connect_module_signals()
 	_bind_ui()
+	_rebuild_right_panel_ui()
 	_attach_overlay_scenes()
 	_refresh_ui()
-	if _campus_map and _campus_map.has_method("setup"):
-		_campus_map.setup(self)
 	Notify.info("游戏加载完成")
 
 func _process(delta: float) -> void:
@@ -322,31 +324,6 @@ func _refresh_ui() -> void:
 			_event_text.clear()
 			_event_text.append_text("欢迎进入大学生活。")
 	
-	if _gpa_value:
-		_gpa_value.text = "%.2f / 4.00" % float(attributes.get("gpa", 0.0))
-	if _gpa_sub_value:
-		_gpa_sub_value.text = "学习: %d/100" % int(attributes.get("study_points", 0))
-	if _social_value:
-		_social_value.text = str(int(attributes.get("social", 0)))
-	if _social_bar:
-		_social_bar.value = float(attributes.get("social", 0.0))
-	if _ability_value:
-		_ability_value.text = str(int(attributes.get("ability", 0)))
-	if _ability_bar:
-		_ability_bar.value = float(attributes.get("ability", 0.0))
-	if _money_value:
-		_money_value.text = "¥%s" % _format_money(int(attributes.get("living_money", 0)))
-	if _mental_value:
-		_mental_value.text = str(int(attributes.get("mental", 0)))
-	if _mental_bar:
-		_mental_bar.value = float(attributes.get("mental", 0.0))
-	if _health_value:
-		_health_value.text = str(int(attributes.get("health", 0)))
-	if _health_bar:
-		_health_bar.value = float(attributes.get("health", 0.0))
-	if _tags_label:
-		_tags_label.text = "暂无标签" if tags.is_empty() else " · ".join(tags)
-	
 	if _money_info:
 		_money_info.text = "生活费: ¥%s" % _format_money(int(attributes.get("living_money", 0)))
 	if _gpa_info:
@@ -355,9 +332,108 @@ func _refresh_ui() -> void:
 		_study_info.text = "学习: %d" % int(attributes.get("study_points", 0))
 	if _credits_info:
 		_credits_info.text = "学分: %d/%d" % [earned_credits, major_required_credits]
+
+	_refresh_stat_rows()
+	_refresh_relation_rows()
 	
 	if _next_button:
 		_next_button.disabled = waiting_for_choice
+
+func _rebuild_right_panel_ui() -> void:
+	if not _right_content:
+		return
+	for child in _right_content.get_children():
+		child.queue_free()
+
+	var gpa_label := Label.new()
+	gpa_label.name = "GpaHeadline"
+	gpa_label.text = "绩点 -- / 4.00"
+	gpa_label.add_theme_color_override("font_color", UIColors.STAT_STUDY)
+	gpa_label.add_theme_font_size_override("font_size", 16)
+	_right_content.add_child(gpa_label)
+
+	var stats_box := VBoxContainer.new()
+	stats_box.name = "StatsBox"
+	stats_box.add_theme_constant_override("separation", 8)
+	_right_content.add_child(stats_box)
+
+	_add_stat_row(stats_box, "social", "社交")
+	_add_stat_row(stats_box, "ability", "能力")
+	_add_stat_row(stats_box, "mental", "心理")
+	_add_stat_row(stats_box, "health", "健康")
+
+	var money_row := HBoxContainer.new()
+	money_row.name = "MoneyRow"
+	var money_name := Label.new()
+	money_name.text = "生活费"
+	var money_val := Label.new()
+	money_val.name = "MoneyValue"
+	money_val.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	money_val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	money_val.add_theme_color_override("font_color", UIColors.STAT_ABILITY)
+	money_row.add_child(money_name)
+	money_row.add_child(money_val)
+	_right_content.add_child(money_row)
+
+	var relation_header := Label.new()
+	relation_header.text = "人际关系"
+	relation_header.add_theme_font_size_override("font_size", 15)
+	relation_header.add_theme_color_override("font_color", Color("#d8e2f4"))
+	_right_content.add_child(relation_header)
+
+	_relation_rows_box = VBoxContainer.new()
+	_relation_rows_box.name = "RelationRows"
+	_relation_rows_box.add_theme_constant_override("separation", 6)
+	_right_content.add_child(_relation_rows_box)
+
+	var tags := Label.new()
+	tags.name = "TagsLabel"
+	tags.add_theme_color_override("font_color", UIColors.TEXT_SECONDARY)
+	_right_content.add_child(tags)
+
+func _add_stat_row(parent: VBoxContainer, key: String, display_name: String) -> void:
+	var packed: PackedScene = load("res://scenes/ui/StatRow.tscn")
+	if not packed:
+		return
+	var row = packed.instantiate()
+	parent.add_child(row)
+	row.setup(key, display_name)
+	_stat_rows[key] = row
+
+func _refresh_stat_rows() -> void:
+	if _right_content == null:
+		return
+	var gpa_head := _right_content.get_node_or_null("GpaHeadline") as Label
+	if gpa_head:
+		gpa_head.text = "绩点 %.2f / 4.00" % float(attributes.get("gpa", 0.0))
+
+	for key in _stat_rows.keys():
+		var row = _stat_rows[key]
+		if row and row.has_method("update_value"):
+			row.update_value(float(attributes.get(key, 0.0)), 100.0)
+
+	var money_val := _right_content.get_node_or_null("MoneyRow/MoneyValue") as Label
+	if money_val:
+		money_val.text = "¥%s" % _format_money(int(attributes.get("living_money", 0)))
+
+	var tags_label := _right_content.get_node_or_null("TagsLabel") as Label
+	if tags_label:
+		tags_label.text = "暂无标签" if tags.is_empty() else " · ".join(tags)
+
+func _refresh_relation_rows() -> void:
+	if _relation_rows_box == null:
+		return
+	for child in _relation_rows_box.get_children():
+		child.queue_free()
+	if not RelationshipManager or not RelationshipManager.has_method("get_known_characters"):
+		return
+	for npc in RelationshipManager.get_known_characters():
+		var packed: PackedScene = load("res://scenes/ui/RelationRow.tscn")
+		if not packed:
+			continue
+		var row = packed.instantiate()
+		_relation_rows_box.add_child(row)
+		row.setup(npc.get("name", ""), float(npc.get("affection", 0.0)), npc.get("status", ""))
 
 func _append_log(line: String) -> void:
 	if not _event_text:
@@ -643,38 +719,19 @@ func _show_action_menu(time_slot: String) -> void:
 		_current_text.append_text("[b]%s时段[/b]\n请选择一个行动：" % _translate_time_slot(time_slot))
 	
 	for action in available_actions:
-		var action_id: String = action.get("id", "")
-		var action_name: String = action.get("name", action_id)
-		var action_desc: String = action.get("description", "")
-		var action_data: Dictionary = action
-		
-		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(0, 50)
-		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		var effects_preview: String = _format_effects_preview(action_data.get("effects", {}))
-		var cost: int = action_data.get("cost", 0)
-		var cost_text: String = "  |  费用 ¥%d" % cost if cost > 0 else ""
-		btn.text = "  %s  ·  %s\n  %s%s" % [action_name, action_desc, effects_preview, cost_text]
-		
-		var normal_style := StyleBoxFlat.new()
-		normal_style.bg_color = Color(0.10, 0.13, 0.18, 0.92)
-		normal_style.set_corner_radius_all(10)
-		normal_style.border_width_left = 1
-		normal_style.border_width_top = 1
-		normal_style.border_width_right = 1
-		normal_style.border_width_bottom = 1
-		normal_style.border_color = Color(0.28, 0.43, 0.58, 0.65)
-		normal_style.content_margin_left = 10
-		normal_style.content_margin_right = 10
-		btn.add_theme_stylebox_override("normal", normal_style)
-		var hover_style: StyleBoxFlat = normal_style.duplicate()
-		hover_style.bg_color = Color(0.14, 0.2, 0.28, 1.0)
-		hover_style.border_color = Color(0.42, 0.66, 0.9, 0.95)
-		btn.add_theme_stylebox_override("hover", hover_style)
-		btn.add_theme_color_override("font_color", Color(0.92, 0.95, 0.99, 1.0))
-		btn.pressed.connect(_on_action_choice_pressed.bind(action_id, time_slot))
-		
-		_choices_container.add_child(btn)
+		var card_scene: PackedScene = load("res://scenes/ui/ActionCard.tscn")
+		if not card_scene:
+			continue
+		var card = card_scene.instantiate()
+		_choices_container.add_child(card)
+		card.setup(action)
+		var reason := _get_action_disable_reason(action)
+		if not reason.is_empty():
+			card.set_disabled(true, reason)
+		else:
+			card.action_pressed.connect(func(action_data: Dictionary):
+				_on_action_choice_pressed(action_data.get("id", ""), time_slot)
+			)
 	
 	_next_button.disabled = true
 	_append_log("[%s] 请选择行动" % _translate_time_slot(time_slot))
@@ -1323,6 +1380,14 @@ func _check_action_conditions(conditions: Dictionary) -> bool:
 					return false
 	
 	return true
+
+func _get_action_disable_reason(action: Dictionary) -> String:
+	var cost: int = int(action.get("cost", 0))
+	if cost > int(attributes.get("living_money", 0)):
+		return "余额不足"
+	if not _check_action_conditions(action.get("conditions", {})):
+		return "条件不满足"
+	return ""
 
 # ==================== 存档/读档 ====================
 

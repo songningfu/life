@@ -19,6 +19,7 @@ func _ready() -> void:
 	title_label.text = "大学四年"
 	subtitle_label.text = "你的选择，书写你的青春"
 	_apply_boot_settings()
+	_apply_visual_style()
 
 	new_game_btn.pressed.connect(_on_new_game_pressed)
 	continue_btn.pressed.connect(_on_continue_pressed)
@@ -33,6 +34,10 @@ func _ready() -> void:
 
 func _update_continue_state() -> void:
 	continue_btn.disabled = _get_latest_save_slot() < 0
+	if continue_btn.disabled:
+		continue_btn.modulate = Color(1, 1, 1, 0.55)
+	else:
+		continue_btn.modulate = Color(1, 1, 1, 1)
 
 func _on_new_game_pressed() -> void:
 	_open_save_slots_for_new_game()
@@ -145,3 +150,54 @@ func _apply_boot_settings() -> void:
 		DisplayServer.window_set_size(Vector2i(int(res[0]), int(res[1])))
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if settings.get("fullscreen", false) else DisplayServer.WINDOW_MODE_WINDOWED)
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if settings.get("vsync", true) else DisplayServer.VSYNC_DISABLED)
+
+func _apply_visual_style() -> void:
+	var bg: ColorRect = $Background
+	bg.color = Color("#070b1a")
+	dim_layer.color = Color(0.01, 0.02, 0.06, 0.72)
+
+	title_label.add_theme_font_size_override("font_size", 66)
+	title_label.add_theme_color_override("font_color", Color("#e4f0ff"))
+	subtitle_label.add_theme_font_size_override("font_size", 20)
+	subtitle_label.add_theme_color_override("font_color", Color("#8ea6c6"))
+
+	_style_menu_button(new_game_btn)
+	_style_menu_button(continue_btn)
+	_style_menu_button(save_manage_btn)
+	_style_menu_button(options_btn)
+	_style_menu_button(credits_btn)
+	_style_menu_button(exit_btn)
+
+func _style_menu_button(btn: Button) -> void:
+	btn.add_theme_font_size_override("font_size", 18)
+	btn.add_theme_color_override("font_color", Color("#edf3ff"))
+
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = Color("#111a32")
+	normal.border_width_left = 1
+	normal.border_width_top = 1
+	normal.border_width_right = 1
+	normal.border_width_bottom = 1
+	normal.border_color = Color("#2b3f66")
+	normal.corner_radius_top_left = 8
+	normal.corner_radius_top_right = 8
+	normal.corner_radius_bottom_left = 8
+	normal.corner_radius_bottom_right = 8
+	normal.content_margin_left = 14
+	normal.content_margin_top = 10
+	normal.content_margin_right = 14
+	normal.content_margin_bottom = 10
+	btn.add_theme_stylebox_override("normal", normal)
+
+	var hover := normal.duplicate()
+	hover.bg_color = Color("#1b294c")
+	hover.border_color = Color("#3d588e")
+	btn.add_theme_stylebox_override("hover", hover)
+
+	var pressed := normal.duplicate()
+	pressed.bg_color = Color("#0d1430")
+	pressed.border_color = Color("#4c6dab")
+	btn.add_theme_stylebox_override("pressed", pressed)
+
+	if btn == continue_btn and continue_btn.disabled:
+		continue_btn.modulate = Color(1, 1, 1, 0.55)

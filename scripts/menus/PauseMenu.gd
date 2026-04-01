@@ -13,6 +13,7 @@ var _options_menu
 
 func _ready() -> void:
 	visible = false
+	_apply_visual_style()
 	resume_btn.pressed.connect(_toggle_pause)
 	save_btn.pressed.connect(_save_game)
 	load_btn.pressed.connect(_open_load_panel)
@@ -68,3 +69,36 @@ func _open_options() -> void:
 func _back_to_main_menu() -> void:
 	get_tree().paused = false
 	SceneTransitions.back_to_menu()
+
+func _apply_visual_style() -> void:
+	$Shade.color = Color(0.01, 0.02, 0.07, 0.68)
+	var panel := StyleBoxFlat.new()
+	panel.bg_color = Color("#111a32")
+	panel.border_width_left = 1
+	panel.border_width_top = 1
+	panel.border_width_right = 1
+	panel.border_width_bottom = 1
+	panel.border_color = Color("#3a5e90")
+	panel.corner_radius_top_left = 10
+	panel.corner_radius_top_right = 10
+	panel.corner_radius_bottom_left = 10
+	panel.corner_radius_bottom_right = 10
+	root.add_theme_stylebox_override("panel", panel)
+	$PauseRoot/VBox/Title.add_theme_color_override("font_color", Color("#e4f0ff"))
+	for btn in [resume_btn, save_btn, load_btn, options_btn, back_menu_btn]:
+		var n := StyleBoxFlat.new()
+		n.bg_color = Color("#1a2950")
+		n.border_width_left = 1
+		n.border_width_top = 1
+		n.border_width_right = 1
+		n.border_width_bottom = 1
+		n.border_color = Color("#4a9eff")
+		n.corner_radius_top_left = 8
+		n.corner_radius_top_right = 8
+		n.corner_radius_bottom_left = 8
+		n.corner_radius_bottom_right = 8
+		btn.add_theme_stylebox_override("normal", n)
+		var h := n.duplicate()
+		h.bg_color = Color("#243b70")
+		btn.add_theme_stylebox_override("hover", h)
+		btn.add_theme_color_override("font_color", Color("#edf3ff"))

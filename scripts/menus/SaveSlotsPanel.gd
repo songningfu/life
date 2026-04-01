@@ -11,6 +11,7 @@ signal closed()
 var _mode: String = "manage"
 
 func _ready() -> void:
+	_apply_visual_style()
 	back_btn.pressed.connect(func():
 		visible = false
 		closed.emit()
@@ -44,6 +45,23 @@ func _build_slot_row(info: Dictionary) -> Control:
 	slot_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slot_btn.custom_minimum_size = Vector2(0, 56)
 	slot_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+
+	var base_style := StyleBoxFlat.new()
+	base_style.bg_color = Color("#16213e")
+	base_style.border_width_left = 1
+	base_style.border_width_top = 1
+	base_style.border_width_right = 1
+	base_style.border_width_bottom = 1
+	base_style.border_color = Color("#2e4f80")
+	base_style.corner_radius_top_left = 6
+	base_style.corner_radius_top_right = 6
+	base_style.corner_radius_bottom_left = 6
+	base_style.corner_radius_bottom_right = 6
+	slot_btn.add_theme_stylebox_override("normal", base_style)
+	var hover_style := base_style.duplicate()
+	hover_style.bg_color = Color("#1d2b50")
+	slot_btn.add_theme_stylebox_override("hover", hover_style)
+	slot_btn.add_theme_color_override("font_color", Color("#e6efff"))
 
 	var slot_id: int = int(info.get("slot", 0))
 	var exists: bool = bool(info.get("exists", false))
@@ -91,3 +109,34 @@ func _build_slot_row(info: Dictionary) -> Control:
 		row.add_child(del_btn)
 
 	return row
+
+func _apply_visual_style() -> void:
+	var panel := StyleBoxFlat.new()
+	panel.bg_color = Color("#101a34")
+	panel.border_width_left = 1
+	panel.border_width_top = 1
+	panel.border_width_right = 1
+	panel.border_width_bottom = 1
+	panel.border_color = Color("#3a5e90")
+	panel.corner_radius_top_left = 10
+	panel.corner_radius_top_right = 10
+	panel.corner_radius_bottom_left = 10
+	panel.corner_radius_bottom_right = 10
+	add_theme_stylebox_override("panel", panel)
+	title_label.add_theme_color_override("font_color", Color("#e4f0ff"))
+	var n := StyleBoxFlat.new()
+	n.bg_color = Color("#1a2950")
+	n.border_width_left = 1
+	n.border_width_top = 1
+	n.border_width_right = 1
+	n.border_width_bottom = 1
+	n.border_color = Color("#4a9eff")
+	n.corner_radius_top_left = 8
+	n.corner_radius_top_right = 8
+	n.corner_radius_bottom_left = 8
+	n.corner_radius_bottom_right = 8
+	back_btn.add_theme_stylebox_override("normal", n)
+	var h := n.duplicate()
+	h.bg_color = Color("#243b70")
+	back_btn.add_theme_stylebox_override("hover", h)
+	back_btn.add_theme_color_override("font_color", Color("#edf3ff"))
