@@ -273,6 +273,9 @@ func end_timeline(skip_ending := false) -> void:
 	if Styles.has_active_layout_node() and Styles.get_layout_node().is_inside_tree():
 		match ProjectSettings.get_setting('dialogic/layout/end_behaviour', 0):
 			0:
+				var tree := get_tree()
+				if tree != null and tree.has_meta('dialogic_layout_node'):
+					tree.remove_meta('dialogic_layout_node')
 				Styles.get_layout_node().get_parent().remove_child(Styles.get_layout_node())
 				Styles.get_layout_node().queue_free()
 			1:

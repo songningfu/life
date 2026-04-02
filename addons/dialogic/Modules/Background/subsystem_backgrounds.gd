@@ -34,7 +34,14 @@ func clear_game_state(_clear_flag := DialogicGameHandler.ClearFlags.FULL_CLEAR) 
 func load_game_state(_load_flag := LoadFlags.FULL_LOAD) -> void:
 	update_background(dialogic.current_state_info.get('background_scene', ''), dialogic.current_state_info.get('background_argument', ''), 0.0, default_transition, true)
 
-#endregion
+func _ready() -> void:
+	pass
+
+
+func _exit_tree() -> void:
+	for node in get_children():
+		if node is DialogicBackgroundTransition:
+			node.queue_free()
 
 
 #region MAIN METHODS

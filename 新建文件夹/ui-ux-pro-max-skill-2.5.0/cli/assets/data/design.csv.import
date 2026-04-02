@@ -1,0 +1,16 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://buff1nuvmd3i2"
+
+[deps]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/design.csv"
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

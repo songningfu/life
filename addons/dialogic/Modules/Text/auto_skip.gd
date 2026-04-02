@@ -68,3 +68,12 @@ func _handle_unseen_event() -> void:
 
 	if disable_on_unread_text:
 		enabled = false
+
+
+func cleanup() -> void:
+	var autoload := DialogicUtil.autoload()
+	if autoload.has_subsystem("History"):
+		if autoload.History.visited_event.is_connected(_handle_seen_event):
+			autoload.History.visited_event.disconnect(_handle_seen_event)
+		if autoload.History.unvisited_event.is_connected(_handle_unseen_event):
+			autoload.History.unvisited_event.disconnect(_handle_unseen_event)

@@ -1,21 +1,33 @@
 # res://scripts/ui/ChatWindow.gd
 extends PanelContainer
 
+const MESSAGE_BUBBLE_SCENE := preload("res://scenes/ui/MessageBubble.tscn")
+const REPLY_OPTION_BUTTON_SCENE := preload("res://scenes/ui/ReplyOptionButton.tscn")
+
 signal back_pressed
 
 var current_contact_id: String = ""
 
+@onready var back_button: Button = $VBox2/ChatTopBar/BackButton
+@onready var send_button: Button = $VBox2/InputBar/SendButton
+@onready var input_field: LineEdit = $VBox2/InputBar/InputField
+@onready var chat_title: Label = $VBox2/ChatTopBar/ChatTitle
+@onready var message_list: VBoxContainer = $VBox2/ScrollContainer/MessageList
+@onready var reply_options: VBoxContainer = $VBox2/ReplyOptions
+@onready var input_bar: HBoxContainer = $VBox2/InputBar
+@onready var scroll_container: ScrollContainer = $VBox2/ScrollContainer
+
 func _ready() -> void:
 	visible = false
 
-	if not %BackButton.pressed.is_connected(_on_back_button_pressed):
-		%BackButton.pressed.connect(_on_back_button_pressed)
+	if not back_button.pressed.is_connected(_on_back_button_pressed):
+		back_button.pressed.connect(_on_back_button_pressed)
 
-	if not %SendButton.pressed.is_connected(_on_send_button_pressed):
-		%SendButton.pressed.connect(_on_send_button_pressed)
+	if not send_button.pressed.is_connected(_on_send_button_pressed):
+		send_button.pressed.connect(_on_send_button_pressed)
 
-	if not %InputField.text_submitted.is_connected(_on_input_submitted):
-		%InputField.text_submitted.connect(_on_input_submitted)
+	if not input_field.text_submitted.is_connected(_on_input_submitted):
+		input_field.text_submitted.connect(_on_input_submitted)
 
 func load_chat(contact_id: String) -> void:
 	current_contact_id = contact_id
@@ -25,9 +37,9 @@ func load_chat(contact_id: String) -> void:
 	if WechatSystem and WechatSystem.has_method("get_contact_info"):
 		contact_info = WechatSystem.get_contact_info(contact_id)
 
-	%ChatTitle.text = str(contact_info.get("name", contact_id))
+	chat_title.text = str(contact_info.get("name", contact_id))
 
-	for child: Node in %MessageList.get_children():
+	for child: Node in message_list.get_children():
 		child.queue_free()
 
 	if WechatSystem and WechatSystem.has_method("get_chat_history"):
@@ -46,47 +58,70 @@ func load_chat(contact_id: String) -> void:
 	_scroll_to_bottom()
 
 func _add_message_bubble(msg: Dictionary) -> void:
-	var bubble: PanelContainer = PanelContainer.new()
-	bubble.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var bubble := MESSAGE_BUBBLE_SCENE.instantiate() as HBoxContainer
+	if bubble == null:
+		return
 
-	var rich: RichTextLabel = RichTextLabel.new()
-	rich.bbcode_enabled = true
-	rich.fit_content = true
-	rich.scroll_active = false
-	rich.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	rich.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var left_spacer := bubble.get_node("LeftSpacer") as Control
+	var right_spacer := bubble.get_node("RightSpacer") as Control
+	var bubble_panel := bubble.get_node("BubblePanel") as PanelContainer
+	var message_label := bubble.get_node("BubblePanel/BubbleMargin/MessageLabel") as RichTextLabel
+	if left_spacer == null or right_spacer == null or bubble_panel == null or message_label == null:
+		return
 
 	var sender: String = str(msg.get("from", "npc"))
 	var text: String = str(msg.get("text", ""))
+	var style := StyleBoxFlat.new()
+	style.set_corner_radius_all(14)
+	style.content_margin_left = 0
+	style.content_margin_top = 0
+	style.content_margin_right = 0
+	style.content_margin_bottom = 0
 
 	if sender == "player":
-		rich.text = "[right][color=#9fe7ff][b]你[/b][/color]\n%s[/right]" % text
+		left_spacer.size_flags_stretch_ratio = 1.3
+		right_spacer.size_flags_stretch_ratio = 0.35
+		style.bg_color = Color(0.12, 0.32, 0.46, 0.96)
+		style.border_width_left = 1
+		style.border_width_top = 1
+		style.border_width_right = 1
+		style.border_width_bottom = 1
+		style.border_color = Color(0.34, 0.72, 0.92, 0.88)
+		message_label.text = "[right][color=#9fe7ff][b]你[/b][/color]\n%s[/right]" % text
 	else:
-		rich.text = "[left][color=#ffffff][b]对方[/b][/color]\n%s[/left]" % text
+		left_spacer.size_flags_stretch_ratio = 0.35
+		right_spacer.size_flags_stretch_ratio = 1.3
+		style.bg_color = Color(0.10, 0.12, 0.18, 0.96)
+		style.border_width_left = 1
+		style.border_width_top = 1
+		style.border_width_right = 1
+		style.border_width_bottom = 1
+		style.border_color = Color(0.26, 0.30, 0.40, 0.9)
+		message_label.text = "[left][color=#ffffff][b]对方[/b][/color]\n%s[/left]" % text
 
-	bubble.add_child(rich)
-	%MessageList.add_child(bubble)
+	bubble_panel.add_theme_stylebox_override("panel", style)
+	message_list.add_child(bubble)
 
 func _show_reply_options(options: Array) -> void:
-	for child: Node in %ReplyOptions.get_children():
+	for child: Node in reply_options.get_children():
 		child.queue_free()
 
 	if options.size() > 0:
-		%ReplyOptions.visible = true
-		%InputBar.visible = false
+		reply_options.visible = true
+		input_bar.visible = false
 
 		for item: Variant in options:
 			if item is Dictionary:
 				var option: Dictionary = item
-				var btn: Button = Button.new()
+				var btn := REPLY_OPTION_BUTTON_SCENE.instantiate() as Button
+				if btn == null:
+					continue
 				btn.text = str(option.get("text", "（空消息）"))
-				btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-				btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				btn.pressed.connect(_on_reply_option_pressed.bind(option))
-				%ReplyOptions.add_child(btn)
+				reply_options.add_child(btn)
 	else:
-		%ReplyOptions.visible = false
-		%InputBar.visible = true
+		reply_options.visible = false
+		input_bar.visible = true
 
 func _on_reply_option_pressed(option: Dictionary) -> void:
 	if current_contact_id.is_empty():
@@ -109,7 +144,7 @@ func _send_free_text() -> void:
 	if not WechatSystem:
 		return
 
-	var text: String = %InputField.text.strip_edges()
+	var text: String = input_field.text.strip_edges()
 	if text.is_empty():
 		return
 
@@ -119,7 +154,7 @@ func _send_free_text() -> void:
 		"effects": {}
 	}
 	WechatSystem.send_message(current_contact_id, message)
-	%InputField.text = ""
+	input_field.text = ""
 	load_chat(current_contact_id)
 
 func _on_back_button_pressed() -> void:
@@ -127,4 +162,4 @@ func _on_back_button_pressed() -> void:
 
 func _scroll_to_bottom() -> void:
 	await get_tree().process_frame
-	%ScrollContainer.scroll_vertical = int(%ScrollContainer.get_v_scroll_bar().max_value)
+	scroll_container.scroll_vertical = int(scroll_container.get_v_scroll_bar().max_value)

@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="ReplyOptionButton" type="Button"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 0
+text = "回复选项"

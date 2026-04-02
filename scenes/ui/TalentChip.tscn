@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[node name="TalentChip" type="PanelContainer"]
+
+[node name="ChipMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="ChipMargin"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="ChipMargin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+[node name="DescLabel" type="Label" parent="ChipMargin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 2

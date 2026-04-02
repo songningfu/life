@@ -63,6 +63,13 @@ func _ready() -> void:
 	voice_player.finished.connect(_on_voice_finished)
 
 
+func _exit_tree() -> void:
+	voice_player.stop()
+	voice_player.stream = null
+	if voice_player.finished.is_connected(_on_voice_finished):
+		voice_player.finished.disconnect(_on_voice_finished)
+
+
 ## Whether the current event is a text event and has a voice
 ## event before it.
 func is_voiced(index: int) -> bool:

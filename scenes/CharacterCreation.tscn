@@ -510,3 +510,43 @@ layout_mode = 2
 [node name="Dot6" type="Panel" parent="ProgressIndicator" unique_id=1888005031]
 custom_minimum_size = Vector2(12, 12)
 layout_mode = 2
+
+[node name="IntroOverlay" type="ColorRect" parent="." unique_id=1888005036]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.01, 0.01, 0.02, 1)
+
+[node name="IntroLabel" type="RichTextLabel" parent="IntroOverlay" unique_id=1888005037]
+custom_minimum_size = Vector2(820, 340)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -410.0
+offset_top = -170.0
+offset_right = 410.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+scroll_active = false
+fit_content = true
+
+[node name="IntroHint" type="Label" parent="IntroOverlay" unique_id=1888005038]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -190.0
+offset_top = -48.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "点击屏幕继续..."

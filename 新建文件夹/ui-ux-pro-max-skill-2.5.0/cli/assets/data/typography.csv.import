@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://do54rj7n45uf2"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Font Pairing Name.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Heading Font.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Body Font.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Mood/Style Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Best For.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Google Fonts URL.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.CSS Import.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Tailwind Config.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Notes.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Font Pairing Name.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Heading Font.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Body Font.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Mood/Style Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Best For.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Google Fonts URL.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.CSS Import.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Tailwind Config.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/typography.Notes.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

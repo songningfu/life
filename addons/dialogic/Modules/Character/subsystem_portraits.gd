@@ -589,10 +589,22 @@ func remove_character(character: DialogicCharacter) -> void:
 	var character_node := get_character_node(character)
 
 	if is_instance_valid(character_node) and character_node is Node:
+		for portrait_node in character_node.get_children():
+			if portrait_node.has_meta('animation_node') and is_instance_valid(portrait_node.get_meta('animation_node')):
+				portrait_node.get_meta('animation_node').queue_free()
+			if portrait_node is DialogicPortrait:
+				portrait_node.cleanup_texture_holder()
+			elif portrait_node is CanvasItem and portrait_node.has_node("Portrait"):
+				var portrait_texture: Node = portrait_node.get_node("Portrait")
+				if portrait_texture is Sprite2D or portrait_texture is TextureRect:
+					portrait_texture.texture = null
+		if character_node.has_meta('animation_node') and is_instance_valid(character_node.get_meta('animation_node')):
+			character_node.get_meta('animation_node').queue_free()
+		if character_node.has_meta('move_tween') and is_instance_valid(character_node.get_meta('move_tween')):
+			character_node.get_meta('move_tween').kill()
 		var container := character_node.get_parent()
-		container.get_parent().remove_child(container)
-		container.queue_free()
-		character_node.queue_free()
+		if is_instance_valid(container):
+			container.queue_free()
 		character_left.emit({'character': character})
 
 	dialogic.current_state_info['portraits'].erase(character.get_identifier())

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bmqqh876gl4id"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Product Type.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Primary Style Recommendation.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Secondary Styles.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Landing Page Pattern.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Dashboard Style (if applicable).translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Color Palette Focus.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Key Considerations.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Product Type.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Primary Style Recommendation.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Secondary Styles.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Landing Page Pattern.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Dashboard Style (if applicable).translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Color Palette Focus.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/products.Key Considerations.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

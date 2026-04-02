@@ -4,8 +4,8 @@ extends RefCounted
 
 func check_event_trigger(game: Node, action_id: String, _time_slot: String) -> void:
 	var module_events: Array[Dictionary] = []
-	if game.ModuleManager:
-		module_events = game.ModuleManager.collect_event_injections(game.current_day, game.current_phase_name, action_id)
+	if ModuleManager:
+		module_events = ModuleManager.collect_event_injections(game.current_day, game.current_phase_name, action_id)
 	for event: Dictionary in module_events:
 		display_event(game, event)
 

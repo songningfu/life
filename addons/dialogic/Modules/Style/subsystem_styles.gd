@@ -12,6 +12,12 @@ func _ready() -> void:
 	DialogicStylesUtil.update_style_directory()
 
 
+func _exit_tree() -> void:
+	var tree := get_tree()
+	if tree != null and tree.has_meta('dialogic_layout_node'):
+		tree.remove_meta('dialogic_layout_node')
+
+
 func clear_game_state(_clear_flag := DialogicGameHandler.ClearFlags.FULL_CLEAR) -> void:
 	pass
 

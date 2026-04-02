@@ -1,5 +1,7 @@
 extends Control
 
+const GameStaticData = preload("res://scripts/GameStaticData.gd")
+
 # 分页式角色创建系统
 var current_page: int = 1
 var total_pages: int = 6
@@ -23,9 +25,9 @@ var pages: Array = []
 var progress_dots: Array = []
 
 # 开场过场
-var intro_overlay: ColorRect
-var intro_label: RichTextLabel
-var intro_hint: Label
+@onready var intro_overlay: ColorRect = $IntroOverlay
+@onready var intro_label: RichTextLabel = $IntroOverlay/IntroLabel
+@onready var intro_hint: Label = $IntroOverlay/IntroHint
 var intro_texts: Array = []
 var intro_phase: int = 0
 var intro_active: bool = false
@@ -48,79 +50,21 @@ var colors = {
 	"bad": Color(0.72, 0.8, 0.92),
 }
 
-const BACKGROUNDS = {
-	"normal": {"name": "普通家庭", "desc": "父母朝九晚五，平凡但温暖。各项均衡，没有明显优劣。", "effects": {}},
-	"business": {"name": "经商家庭", "desc": "家里做生意，不差钱。但父母常年在外，从小缺少陪伴。", "effects": {"living_money_bonus": 500, "monthly_bonus": 400, "social": 8, "mental": -10}},
-	"teacher": {"name": "教师家庭", "desc": "从小在书堆里长大，学习习惯好。但管束太多，性格偏压抑。", "effects": {"study_points": 8, "mental": -8, "social": -5}},
-	"rural": {"name": "农村家庭", "desc": "穷人家的孩子早当家。生活费紧张，但能吃苦，身体好。", "effects": {"living_money_bonus": -400, "monthly_bonus": -300, "health": 8, "ability": 8}},
-	"single_parent": {"name": "单亲家庭", "desc": "很早就学会了独立。能力比同龄人强，但内心深处总有缺口。", "effects": {"ability": 10, "mental": -12, "living_money_bonus": -200, "monthly_bonus": -200}},
-}
-
-const UNIVERSITY_OPTIONS = [
-	{"id": "985", "tier": "985", "name": "东岚大学", "desc": "老牌研究型名校，学业压力大，资源也最集中。"},
-	{"id": "normal", "tier": "normal", "name": "江城理工大学", "desc": "综合实力稳定，就业导向清晰，校园生活比较均衡。"},
-	{"id": "low", "tier": "low", "name": "临海学院", "desc": "城市氛围轻松，平台普通一些，但机会要靠自己争取。"},
-]
-
-const MAJOR_OPTIONS = [
-	{"id": "clinical_medicine", "name": "临床医学", "required_credits": 200, "exam_difficulty": 1.35, "desc": "学制长、课程密、实习重，典型难毕业专业。"},
-	{"id": "architecture", "name": "建筑学", "required_credits": 185, "exam_difficulty": 1.28, "desc": "课程之外还有大量设计作业和熬图。"},
-	{"id": "law", "name": "法学", "required_credits": 170, "exam_difficulty": 1.22, "desc": "记忆量大、案例多，对持续投入要求高。"},
-	{"id": "mathematics", "name": "数学与应用数学", "required_credits": 162, "exam_difficulty": 1.20, "desc": "基础课硬核，抽象课程多，容错率不高。"},
-	{"id": "electronic_info", "name": "电子信息工程", "required_credits": 168, "exam_difficulty": 1.20, "desc": "数理基础和实验课都不轻松。"},
-	{"id": "computer_science", "name": "计算机科学与技术", "required_credits": 165, "exam_difficulty": 1.18, "desc": "核心课密集，项目和考试双线并行。"},
-	{"id": "mechanical_engineering", "name": "机械工程", "required_credits": 168, "exam_difficulty": 1.17, "desc": "理论与实践都要兼顾，课程负担偏重。"},
-	{"id": "automation", "name": "自动化", "required_credits": 166, "exam_difficulty": 1.16, "desc": "控制、数电、模电等课程组合比较吃基础。"},
-	{"id": "civil_engineering", "name": "土木工程", "required_credits": 165, "exam_difficulty": 1.14, "desc": "专业课和制图计算都比较讲究。"},
-	{"id": "pharmacy", "name": "药学", "required_credits": 162, "exam_difficulty": 1.10, "desc": "记忆和实验都不少，稳定偏难。"},
-	{"id": "finance", "name": "金融学", "required_credits": 158, "exam_difficulty": 1.08, "desc": "课程难度中上，但整体节奏可控。"},
-	{"id": "psychology", "name": "心理学", "required_credits": 155, "exam_difficulty": 1.06, "desc": "统计、实验和理论课都要兼顾。"},
-	{"id": "nursing", "name": "护理学", "required_credits": 160, "exam_difficulty": 1.05, "desc": "课程和实践安排都比较满。"},
-	{"id": "accounting", "name": "会计学", "required_credits": 156, "exam_difficulty": 1.04, "desc": "偏稳定，细致度要求高。"},
-	{"id": "english", "name": "英语", "required_credits": 150, "exam_difficulty": 1.00, "desc": "整体中等，重在日常积累。"},
-	{"id": "international_trade", "name": "国际经济与贸易", "required_credits": 150, "exam_difficulty": 0.98, "desc": "课程分布较均衡，毕业压力适中。"},
-	{"id": "journalism", "name": "新闻学", "required_credits": 148, "exam_difficulty": 0.97, "desc": "专业课压力不算最大，但实践会占时间。"},
-	{"id": "chinese_literature", "name": "汉语言文学", "required_credits": 150, "exam_difficulty": 0.96, "desc": "阅读写作多，考试强度相对友好。"},
-	{"id": "marketing", "name": "市场营销", "required_credits": 145, "exam_difficulty": 0.92, "desc": "整体偏灵活，属于相对好毕业的一类。"},
-]
-
-# ==================== 本地天赋池（fallback用） ====================
-const GOOD_TALENTS: Array = [
-	{"id": "optimist", "name": "乐天派", "desc": "天生心态好，每天心理自然恢复+0.15", "icon": "☀️", "color": "#f0c040", "type": "good"},
-	{"id": "study_gifted", "name": "学霸体质", "desc": "学习效率极高，学习点日常增长×1.4", "icon": "📖", "color": "#4db8e6", "type": "good"},
-	{"id": "social_butterfly", "name": "天生社牛", "desc": "自带亲和力，所有社交收益×1.3，解锁'搭讪'行动", "icon": "🤝", "color": "#ff9933", "type": "good"},
-	{"id": "craftsman", "name": "手艺人", "desc": "动手能力出众，能力成长×1.3", "icon": "🔧", "color": "#99e64d", "type": "good"},
-	{"id": "iron_body", "name": "铁打身板", "desc": "体质过硬，所有健康损失减半", "icon": "💪", "color": "#e64d56", "type": "good"},
-	{"id": "frugal", "name": "省钱达人", "desc": "精打细算，每日消费降低30%", "icon": "💰", "color": "#e6d94d", "type": "good"},
-	{"id": "lucky", "name": "好运来", "desc": "欧皇体质，正面事件触发概率+25%", "icon": "🍀", "color": "#50c878", "type": "good"},
-	{"id": "big_heart", "name": "大心脏", "desc": "心理韧性极强，心理值保底不低于15", "icon": "❤️", "color": "#ff6b9d", "type": "good"},
-]
-
-const BAD_TALENTS: Array = [
-	{"id": "glass_heart", "name": "玻璃心", "desc": "情绪敏感，所有心理负面效果×1.5", "icon": "💔", "color": "#c0392b", "type": "bad"},
-	{"id": "weak_body", "name": "体弱多病", "desc": "容易生病，所有健康损失×1.5", "icon": "🤒", "color": "#a0522d", "type": "bad"},
-	{"id": "social_phobia", "name": "社恐", "desc": "害怕社交，所有社交收益×0.6", "icon": "😰", "color": "#7f8c8d", "type": "bad"},
-	{"id": "procrastinator", "name": "拖延症", "desc": "总是拖到最后，学习点日常增长×0.6", "icon": "🐌", "color": "#95a5a6", "type": "bad"},
-	{"id": "spendthrift", "name": "月光族", "desc": "花钱没数，每日消费增加40%", "icon": "🛍️", "color": "#e74c3c", "type": "bad"},
-	{"id": "unlucky", "name": "倒霉蛋", "desc": "走路踩狗屎，负面事件触发概率+30%", "icon": "🌧️", "color": "#636e72", "type": "bad"},
-	{"id": "insomnia", "name": "失眠体质", "desc": "越忙越睡不着，考试/复习周心理每天额外-0.3", "icon": "🌙", "color": "#6c5ce7", "type": "bad"},
-	{"id": "directionless", "name": "路痴", "desc": "方向感为零，迟到类事件触发概率翻倍", "icon": "🗺️", "color": "#b2bec3", "type": "bad"},
-]
-
 func _ready():
 	# ★ 关键修复：确保模块已加载
 	ModuleManager.ensure_modules_loaded()
-	
+
 	_init_pages()
 	_init_progress_dots()
 	_style_all()
 	_bind_events()
-	_build_intro_overlay()
-	
+	if intro_overlay and not intro_overlay.gui_input.is_connected(_on_intro_input):
+		intro_overlay.gui_input.connect(_on_intro_input)
+
 	if SaveManager.has_temp("pending_char_creation_slot"):
 		save_slot = SaveManager.get_temp("pending_char_creation_slot")
 		SaveManager.store_temp("pending_char_creation_slot", null)
-	
+
 	_show_page(1)
 	_start_intro()
 
@@ -133,39 +77,6 @@ func _init_pages():
 		$PageContainer/Page5_Major,
 		$PageContainer/Page6_Talent
 	]
-
-func _build_intro_overlay():
-	intro_overlay = ColorRect.new()
-	intro_overlay.color = Color(0.01, 0.01, 0.02, 1)
-	intro_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	intro_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(intro_overlay)
-	
-	intro_label = RichTextLabel.new()
-	intro_label.bbcode_enabled = true
-	intro_label.fit_content = true
-	intro_label.scroll_active = false
-	intro_label.add_theme_font_size_override("normal_font_size", 26)
-	intro_label.add_theme_color_override("default_color", Color(0.82, 0.84, 0.88))
-	intro_label.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
-	intro_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	intro_label.custom_minimum_size = Vector2(820, 340)
-	intro_label.offset_left = -410
-	intro_label.offset_top = -170
-	intro_label.offset_right = 410
-	intro_label.offset_bottom = 170
-	intro_overlay.add_child(intro_label)
-	
-	intro_hint = Label.new()
-	intro_hint.text = "点击屏幕继续..."
-	intro_hint.add_theme_color_override("font_color", Color(0.34, 0.36, 0.4))
-	intro_hint.add_theme_font_size_override("font_size", 14)
-	intro_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	intro_hint.offset_left = -190
-	intro_hint.offset_top = -48
-	intro_overlay.add_child(intro_hint)
-	
-	intro_overlay.gui_input.connect(_on_intro_input)
 
 func _start_intro():
 	intro_texts = [
@@ -181,6 +92,7 @@ func _start_intro():
 	intro_active = true
 	intro_overlay.visible = true
 	intro_overlay.modulate = Color(1, 1, 1, 1)
+	intro_hint.text = "点击屏幕继续..."
 	_show_intro_text(intro_texts[0])
 
 func _show_intro_text(text: String):
@@ -366,8 +278,8 @@ func _style_gender_card(btn: Button, base_color: Color, selected: bool):
 
 func _build_background_list():
 	var list = $PageContainer/Page3_Background/ScrollContainer/VBox/BackgroundList
-	for bg_id in BACKGROUNDS:
-		var bg = BACKGROUNDS[bg_id]
+	for bg_id in GameStaticData.BACKGROUNDS:
+		var bg = GameStaticData.BACKGROUNDS[bg_id]
 		var btn = Button.new()
 		btn.text = "%s\n%s" % [bg.name, bg.desc]
 		btn.custom_minimum_size = Vector2(0, 94)
@@ -382,7 +294,7 @@ func _build_background_list():
 
 func _build_university_list():
 	var list = $PageContainer/Page4_University/ScrollContainer/VBox/UniversityList
-	for option in UNIVERSITY_OPTIONS:
+	for option in GameStaticData.UNIVERSITY_OPTIONS:
 		var btn = Button.new()
 		btn.text = "%s · %s\n%s" % [_tier_str(option.get("tier", "")), option.get("name", ""), option.get("desc", "")]
 		btn.custom_minimum_size = Vector2(0, 92)
@@ -397,7 +309,7 @@ func _build_university_list():
 
 func _build_major_list():
 	major_page_index = 0
-	selected_major_profile = MAJOR_OPTIONS[0].duplicate(true)
+	selected_major_profile = GameStaticData.get_major_by_id(selected_major_id)
 	_render_major_page()
 
 func _bind_events():
@@ -494,10 +406,7 @@ func _update_university_selection():
 
 func _on_major_selected(major_id: String):
 	selected_major_id = major_id
-	for major in MAJOR_OPTIONS:
-		if major.get("id", "") == major_id:
-			selected_major_profile = major.duplicate(true)
-			break
+	selected_major_profile = GameStaticData.get_major_by_id(major_id)
 	_update_major_selection()
 
 func _update_major_selection():
@@ -509,12 +418,12 @@ func _render_major_page():
 	for child in list.get_children():
 		child.queue_free()
 	major_buttons.clear()
-	
+
 	var start_index = major_page_index * MAJORS_PER_PAGE
-	var end_index = mini(start_index + MAJORS_PER_PAGE, MAJOR_OPTIONS.size())
-	
+	var end_index = mini(start_index + MAJORS_PER_PAGE, GameStaticData.MAJOR_OPTIONS.size())
+
 	for i in range(start_index, end_index):
-		var major = MAJOR_OPTIONS[i]
+		var major = GameStaticData.MAJOR_OPTIONS[i]
 		var btn = Button.new()
 		btn.text = "%s\n%s" % [major.get("name", ""), major.get("desc", "")]
 		btn.custom_minimum_size = Vector2(420, 82)
@@ -526,9 +435,9 @@ func _render_major_page():
 		list.add_child(btn)
 		major_buttons[major.get("id", "")] = btn
 		_style_select_card(btn, false)
-	
+
 	var page_label = $PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/PageLabel
-	var total_major_pages = int(ceil(float(MAJOR_OPTIONS.size()) / float(MAJORS_PER_PAGE)))
+	var total_major_pages = int(ceil(float(GameStaticData.MAJOR_OPTIONS.size()) / float(MAJORS_PER_PAGE)))
 	page_label.text = "第 %d / %d 组" % [major_page_index + 1, total_major_pages]
 	$PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/PrevPageBtn.visible = major_page_index > 0
 	$PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager/NextPageBtn.visible = major_page_index < total_major_pages - 1
@@ -541,7 +450,7 @@ func _prev_major_page():
 	_render_major_page()
 
 func _next_major_page():
-	var total_major_pages = int(ceil(float(MAJOR_OPTIONS.size()) / float(MAJORS_PER_PAGE)))
+	var total_major_pages = int(ceil(float(GameStaticData.MAJOR_OPTIONS.size()) / float(MAJORS_PER_PAGE)))
 	if major_page_index >= total_major_pages - 1:
 		return
 	major_page_index += 1
@@ -556,48 +465,21 @@ func _tier_str(t: String) -> String:
 
 # ==================== ★ 核心修复：天赋抽取 ★ ====================
 func _roll_talents():
-	# 尝试通过模块系统抽取
 	var talent_module: TalentModule = null
 	if ModuleManager:
 		talent_module = ModuleManager.get_module("talent") as TalentModule
-	
-	if talent_module:
-		current_talents = talent_module.roll_talents()
-		print("[CharacterCreation] 通过TalentModule抽取天赋成功")
-	else:
-		# Fallback：本地抽取
-		print("[CharacterCreation] TalentModule未找到，使用本地抽取")
-		current_talents = _local_roll_talents()
-	
+
+	if not talent_module:
+		print("[CharacterCreation] 错误：TalentModule未加载，无法抽取天赋")
+		$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.text = "天赋模块未加载，暂时无法抽取天赋"
+		$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.add_theme_color_override("font_color", colors.bad)
+		return
+
+	current_talents = talent_module.roll_talents()
+	print("[CharacterCreation] 通过TalentModule抽取天赋成功")
 	_display_talents()
 	$PageContainer/Page6_Talent/ScrollContainer/VBox/RollBtn.text = "重新抽取"
 	$PageContainer/Page6_Talent/ScrollContainer/VBox/HintLabel.text = ""
-
-## 本地天赋抽取（fallback）
-func _local_roll_talents() -> Array:
-	var good_count: int
-	var bad_count: int
-	if randf() < 0.70:
-		good_count = 1
-		bad_count = 2
-	else:
-		good_count = 2
-		bad_count = 1
-	
-	var good_pool: Array = GOOD_TALENTS.duplicate()
-	good_pool.shuffle()
-	var bad_pool: Array = BAD_TALENTS.duplicate()
-	bad_pool.shuffle()
-	
-	var result: Array = []
-	for i in range(good_count):
-		if i < good_pool.size():
-			result.append(good_pool[i].duplicate())
-	for i in range(bad_count):
-		if i < bad_pool.size():
-			result.append(bad_pool[i].duplicate())
-	result.shuffle()
-	return result
 
 func _display_talents():
 	var list = $PageContainer/Page6_Talent/ScrollContainer/VBox/TalentList

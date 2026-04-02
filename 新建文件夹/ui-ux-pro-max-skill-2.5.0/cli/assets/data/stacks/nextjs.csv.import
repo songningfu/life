@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dywwc1k88oxjk"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Docs URL.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/nextjs.Docs URL.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

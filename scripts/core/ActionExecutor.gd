@@ -27,8 +27,8 @@ func execute_action(game: Node, action_id: String, time_slot: String) -> void:
 		"effects": final_effects,
 		"action_data": action_data
 	}
-	if game.ModuleManager:
-		game.ModuleManager.broadcast_action_performed(action_id, time_slot, context)
+	if ModuleManager:
+		ModuleManager.broadcast_action_performed(action_id, time_slot, context)
 
 	game._check_event_trigger(action_id, time_slot)
 
@@ -41,6 +41,9 @@ func execute_action(game: Node, action_id: String, time_slot: String) -> void:
 
 	var action_name: String = action_data.get("name", action_id)
 	game._append_log("[%s] 执行：%s" % [time_slot, action_name])
+	var effect_summary := _format_effect_summary(final_effects)
+	if not effect_summary.is_empty():
+		game._append_log("变化：%s" % effect_summary)
 	game._refresh_ui()
 	if not game.waiting_for_choice:
 		game.action_selected.emit(action_id, time_slot)
@@ -91,3 +94,28 @@ func apply_effects(game: Node, effects: Dictionary) -> void:
 		else:
 			if game._notify and game._notify.has_method("stat_change"):
 				game._notify.stat_change(attr_names.get(attr, attr), delta)
+
+func _format_effect_summary(effects: Dictionary) -> String:
+	var attr_names: Dictionary = {
+		"study_points": "学习",
+		"social": "社交",
+		"ability": "能力",
+		"mental": "心理",
+		"health": "健康",
+		"living_money": "生活费",
+		"gpa": "绩点"
+	}
+	var parts: Array[String] = []
+	for attr: String in effects.keys():
+		if not attr_names.has(attr):
+			continue
+		var delta: float = float(effects.get(attr, 0.0))
+		if is_zero_approx(delta):
+			continue
+		if attr == "living_money":
+			parts.append("%s %s%d" % [attr_names[attr], "+" if delta > 0 else "", int(round(delta))])
+		elif attr == "gpa":
+			parts.append("%s %s%.2f" % [attr_names[attr], "+" if delta > 0 else "", delta])
+		else:
+			parts.append("%s %s%d" % [attr_names[attr], "+" if delta > 0 else "", int(round(delta))])
+	return "，".join(parts)

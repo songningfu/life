@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cf7gwfr1hrbwe"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Issue.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Platform.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Code Example Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Code Example Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Severity.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Issue.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Platform.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Code Example Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Code Example Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/ux-guidelines.Severity.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

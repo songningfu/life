@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dhfu1dgrrmbw1"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Product Type.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Primary.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.On Primary.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Secondary.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.On Secondary.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Accent.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.On Accent.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Background.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Foreground.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Card.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Card Foreground.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Muted.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Muted Foreground.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Border.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Destructive.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.On Destructive.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Ring.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Notes.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Product Type.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Primary.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.On Primary.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Secondary.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.On Secondary.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Accent.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.On Accent.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Background.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Foreground.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Card.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Card Foreground.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Muted.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Muted Foreground.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Border.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Destructive.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.On Destructive.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Ring.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/colors.Notes.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

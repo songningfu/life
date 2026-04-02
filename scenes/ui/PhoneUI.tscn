@@ -1,7 +1,59 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/PhoneUI.gd" id="1_phone_ui"]
 [ext_resource type="Script" path="res://scripts/ui/ChatWindow.gd" id="2_chat_window"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shell"]
+bg_color = Color(0.05, 0.06, 0.08, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.22, 0.25, 0.32, 1)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 36
+corner_radius_bottom_left = 36
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_screen"]
+bg_color = Color(0.95, 0.97, 1, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+bg_color = Color(0.90, 0.94, 1, 1)
+border_width_bottom = 1
+border_color = Color(0.78, 0.84, 0.92, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_list"]
+bg_color = Color(0.97, 0.98, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_home"]
+bg_color = Color(0.1, 0.12, 0.16, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close"]
+bg_color = Color(0.83, 0.88, 0.95, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+bg_color = Color(0.92, 0.24, 0.34, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="PhoneUI" type="CanvasLayer"]
 layer = 10
@@ -15,108 +67,228 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
-color = Color(0, 0, 0, 0.5)
+color = Color(0.01, 0.02, 0.04, 0.72)
 
 [node name="PhonePanel" type="PanelContainer" parent="." unique_name_in_owner=true]
 visible = false
-custom_minimum_size = Vector2(360, 640)
+custom_minimum_size = Vector2(430, 820)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -320.0
-offset_right = 180.0
-offset_bottom = 320.0
+offset_left = -215.0
+offset_top = -410.0
+offset_right = 215.0
+offset_bottom = 410.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_shell")
 
 [node name="AnimPlayer" type="AnimationPlayer" parent="PhonePanel" unique_name_in_owner=true]
 
-[node name="VBox" type="VBoxContainer" parent="PhonePanel"]
+[node name="ShellMargin" type="MarginContainer" parent="PhonePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ScreenFrame" type="PanelContainer" parent="PhonePanel/ShellMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_screen")
+
+[node name="ScreenVBox" type="VBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TopBar" type="HBoxContainer" parent="PhonePanel/VBox"]
+[node name="StatusInset" type="MarginContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 2
+
+[node name="StatusRow" type="HBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/StatusInset"]
 layout_mode = 2
 
-[node name="PhoneTitle" type="Label" parent="PhonePanel/VBox/TopBar"]
+[node name="TimeLabel" type="Label" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/StatusInset/StatusRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.16, 0.2, 0.28, 1)
+theme_override_font_sizes/font_size = 13
+text = "21:08"
+
+[node name="NotchSpacer" type="Control" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/StatusInset/StatusRow"]
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "消息"
 
-[node name="CloseBtn" type="Button" parent="PhonePanel/VBox/TopBar" unique_name_in_owner=true]
+[node name="SignalLabel" type="Label" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/StatusInset/StatusRow"]
 layout_mode = 2
-text = "✕"
+theme_override_colors/font_color = Color(0.16, 0.2, 0.28, 1)
+theme_override_font_sizes/font_size = 13
+text = "5G 100%"
 
-[node name="ContactScroll" type="ScrollContainer" parent="PhonePanel/VBox"]
+[node name="Notch" type="PanelContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox"]
+custom_minimum_size = Vector2(120, 28)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_shell")
+
+[node name="AppHeader" type="PanelContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox"]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="HeaderMargin" type="MarginContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/AppHeader"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 12
+
+[node name="TopBar" type="HBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/AppHeader/HeaderMargin"]
+layout_mode = 2
+alignment = 1
+
+[node name="PhoneTitleWrap" type="VBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/AppHeader/HeaderMargin/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="PhoneTitle" type="Label" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/AppHeader/HeaderMargin/TopBar/PhoneTitleWrap"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.16, 0.22, 1)
+theme_override_font_sizes/font_size = 22
+text = "微信"
+
+[node name="PhoneSubtitle" type="Label" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/AppHeader/HeaderMargin/TopBar/PhoneTitleWrap"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.38, 0.46, 0.56, 1)
+theme_override_font_sizes/font_size = 12
+text = "校园消息"
+
+[node name="CloseBtn" type="Button" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/AppHeader/HeaderMargin/TopBar" unique_name_in_owner=true]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_close")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close")
+text = "×"
+
+[node name="BodyFrame" type="MarginContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="BodyStack" type="VBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ContactList" type="VBoxContainer" parent="PhonePanel/VBox/ContactScroll" unique_name_in_owner=true]
+[node name="ContactScroll" type="ScrollContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+theme_override_styles/panel = SubResource("StyleBoxFlat_list")
+
+[node name="ContactList" type="VBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ContactScroll" unique_name_in_owner=true]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
-[node name="ChatWindow" type="PanelContainer" parent="PhonePanel/VBox" unique_name_in_owner=true]
+[node name="ChatWindow" type="PanelContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack" unique_name_in_owner=true]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("2_chat_window")
 
-[node name="VBox2" type="VBoxContainer" parent="PhonePanel/VBox/ChatWindow"]
+[node name="VBox2" type="VBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ChatTopBar" type="HBoxContainer" parent="PhonePanel/VBox/ChatWindow/VBox2"]
+[node name="ChatTopBar" type="HBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2"]
 layout_mode = 2
 
-[node name="BackButton" type="Button" parent="PhonePanel/VBox/ChatWindow/VBox2/ChatTopBar" unique_name_in_owner=true]
+theme_override_constants/separation = 8
+
+[node name="BackButton" type="Button" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2/ChatTopBar" unique_name_in_owner=true]
+custom_minimum_size = Vector2(44, 38)
 layout_mode = 2
 text = "←"
 
-[node name="ChatTitle" type="Label" parent="PhonePanel/VBox/ChatWindow/VBox2/ChatTopBar" unique_name_in_owner=true]
+[node name="ChatTitle" type="Label" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2/ChatTopBar" unique_name_in_owner=true]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.12, 0.16, 0.22, 1)
+theme_override_font_sizes/font_size = 18
 text = "聊天"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PhonePanel/VBox/ChatWindow/VBox2" unique_name_in_owner=true]
+[node name="ScrollContainer" type="ScrollContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2" unique_name_in_owner=true]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="MessageList" type="VBoxContainer" parent="PhonePanel/VBox/ChatWindow/VBox2/ScrollContainer" unique_name_in_owner=true]
+[node name="MessageList" type="VBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2/ScrollContainer" unique_name_in_owner=true]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 10
 
-[node name="ReplyOptions" type="VBoxContainer" parent="PhonePanel/VBox/ChatWindow/VBox2" unique_name_in_owner=true]
+[node name="ReplyOptions" type="VBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2" unique_name_in_owner=true]
 layout_mode = 2
+theme_override_constants/separation = 8
 
-[node name="InputBar" type="HBoxContainer" parent="PhonePanel/VBox/ChatWindow/VBox2" unique_name_in_owner=true]
+[node name="InputBar" type="HBoxContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2" unique_name_in_owner=true]
 layout_mode = 2
+theme_override_constants/separation = 8
 
-[node name="InputField" type="LineEdit" parent="PhonePanel/VBox/ChatWindow/VBox2/InputBar" unique_name_in_owner=true]
+[node name="InputField" type="LineEdit" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2/InputBar" unique_name_in_owner=true]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "输入消息"
 
-[node name="SendButton" type="Button" parent="PhonePanel/VBox/ChatWindow/VBox2/InputBar" unique_name_in_owner=true]
+[node name="SendButton" type="Button" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BodyFrame/BodyStack/ChatWindow/VBox2/InputBar" unique_name_in_owner=true]
 layout_mode = 2
 text = "发送"
 
+[node name="BottomInset" type="MarginContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="HomeIndicator" type="PanelContainer" parent="PhonePanel/ShellMargin/ScreenFrame/ScreenVBox/BottomInset"]
+custom_minimum_size = Vector2(92, 6)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_home")
+
 [node name="PhoneToggleBtn" type="Button" parent="." unique_name_in_owner=true]
+visible = true
 layout_mode = 1
 anchors_preset = 9
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -96.0
-offset_top = -96.0
-offset_right = -24.0
-offset_bottom = -24.0
+offset_left = -108.0
+offset_top = -108.0
+offset_right = -28.0
+offset_bottom = -28.0
 grow_horizontal = 0
 grow_vertical = 0
+theme_override_font_sizes/font_size = 24
 text = "📱"
 
 [node name="NotificationBadge" type="Label" parent="PhoneToggleBtn" unique_name_in_owner=true]
@@ -125,9 +297,13 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -20.0
+offset_left = -24.0
+offset_top = -2.0
 offset_right = 6.0
-offset_bottom = 22.0
+offset_bottom = 18.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_badge")
 horizontal_alignment = 1
 vertical_alignment = 1
 text = "0"

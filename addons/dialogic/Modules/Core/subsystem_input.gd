@@ -173,6 +173,18 @@ func _ready() -> void:
 	set_process(false)
 
 
+func _exit_tree() -> void:
+	stop_timers()
+	set_process(false)
+	if auto_skip != null and auto_skip.has_method("cleanup"):
+		auto_skip.cleanup()
+	if auto_advance != null and auto_advance.has_method("cleanup"):
+		auto_advance.cleanup()
+	manual_advance = null
+	auto_skip = null
+	auto_advance = null
+
+
 ## Stops all timers of the subsystem. Used by the Text subsystem.
 func stop_timers() -> void:
 	auto_advance.autoadvance_timer.stop()

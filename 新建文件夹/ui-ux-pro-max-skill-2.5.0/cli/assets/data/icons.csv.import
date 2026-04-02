@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://d3mkba4eiqlsx"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Icon Name.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Library.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Import Code.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Usage.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Best For.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Style.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Icon Name.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Library.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Import Code.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Usage.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Best For.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/icons.Style.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

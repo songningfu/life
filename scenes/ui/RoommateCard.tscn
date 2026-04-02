@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[node name="RoommateCard" type="PanelContainer"]
+custom_minimum_size = Vector2(260, 420)
+
+[node name="CardMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="CardMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="Portrait" type="TextureRect" parent="CardMargin/VBox"]
+custom_minimum_size = Vector2(220, 180)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="CardMargin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PersonalityLabel" type="Label" parent="CardMargin/VBox"]
+layout_mode = 2
+
+[node name="TraitsLabel" type="Label" parent="CardMargin/VBox"]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DescriptionLabel" type="Label" parent="CardMargin/VBox"]
+layout_mode = 2
+autowrap_mode = 2
+size_flags_vertical = 3

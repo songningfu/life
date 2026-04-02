@@ -18,8 +18,11 @@ func _ready():
 			heart.queue_free()
 
 func setup(char_name: String, affection: float, status: String):
-	npc_name.text = char_name
-	status_tag.text = status
+	var display_name := char_name.strip_edges()
+	if display_name.is_empty():
+		display_name = "暂未结识"
+	npc_name.text = display_name
+	status_tag.text = status.strip_edges() if not status.strip_edges().is_empty() else "等待互动"
 
 	var full_hearts := int(affection / 20.0)
 	for i in range(min(5, hearts_container.get_child_count())):

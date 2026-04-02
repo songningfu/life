@@ -511,6 +511,18 @@ func _on_start_or_end_autosave() -> void:
 		perform_autosave()
 
 
+func _exit_tree() -> void:
+	autosave_timer.stop()
+	if autosave_timer.timeout.is_connected(_on_autosave_timer_timeout):
+		autosave_timer.timeout.disconnect(_on_autosave_timer_timeout)
+	if dialogic.event_handled.is_connected(_on_dialogic_event_handled):
+		dialogic.event_handled.disconnect(_on_dialogic_event_handled)
+	if dialogic.timeline_started.is_connected(_on_start_or_end_autosave):
+		dialogic.timeline_started.disconnect(_on_start_or_end_autosave)
+	if dialogic.timeline_ended.is_connected(_on_start_or_end_autosave):
+		dialogic.timeline_ended.disconnect(_on_start_or_end_autosave)
+
+
 ## Perform an autosave.
 ## This method will be called automatically if the auto-save mode is enabled.
 func perform_autosave() -> Error:

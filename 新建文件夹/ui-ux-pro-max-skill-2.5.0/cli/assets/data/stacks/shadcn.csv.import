@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://s6c4000bgptm"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Docs URL.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/shadcn.Docs URL.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

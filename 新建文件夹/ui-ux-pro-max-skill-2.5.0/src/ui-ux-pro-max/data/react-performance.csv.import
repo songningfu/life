@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://c85f0rp30gg6h"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Issue.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Platform.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Code Example Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Code Example Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Severity.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Issue.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Platform.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Code Example Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Code Example Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/react-performance.Severity.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

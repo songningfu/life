@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cguarmxjdblkb"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Docs URL.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/vue.Docs URL.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

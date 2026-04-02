@@ -1,8 +1,176 @@
-[gd_scene format=3 uid="uid://p1b6xq6kawkv"]
+[gd_scene load_steps=2 format=3 uid="uid://p1b6xq6kawkv"]
 
 [ext_resource type="Script" uid="uid://x6h0btf0rl44" path="res://scripts/StudioLogo.gd" id="1_hc5o5"]
 
-[node name="StudioLogo_tscn" type="Control" unique_id=1514545320]
+[node name="StudioLogo" type="Control" unique_id=1514545320]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_hc5o5")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.01, 0.01, 0.02, 1)
+
+[node name="ParticlesLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Particle01" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle02" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle03" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle04" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle05" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle06" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle07" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle08" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle09" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle10" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle11" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle12" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle13" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle14" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle15" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle16" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle17" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle18" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle19" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Particle20" type="ColorRect" parent="ParticlesLayer"]
+custom_minimum_size = Vector2(3, 3)
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.3, 0.6, 0.9, 0.08)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Logo" type="TextureRect" parent="Center"]
+custom_minimum_size = Vector2(420, 210)
+layout_mode = 2
+size_flags_horizontal = 4
+stretch_mode = 6
+
+[node name="SkipLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "点击屏幕或按任意键跳过"
+horizontal_alignment = 1

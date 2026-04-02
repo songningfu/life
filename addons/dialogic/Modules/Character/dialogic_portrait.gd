@@ -118,4 +118,15 @@ func apply_texture(node:Node, texture_path:String) -> void:
 
 	set_meta('texture_holder_node', node)
 
+
+func cleanup_texture_holder() -> void:
+	if has_meta('texture_holder_node') and get_meta('texture_holder_node', null) != null and is_instance_valid(get_meta('texture_holder_node')):
+		var node: Node = get_meta('texture_holder_node')
+		if node is Sprite2D or node is TextureRect:
+			node.texture = null
+
+
+func _exit_tree() -> void:
+	cleanup_texture_holder()
+
 #endregion

@@ -87,6 +87,24 @@ func _ready() -> void:
 	add_child(one_shot_audio_node)
 
 
+func _exit_tree() -> void:
+	stop_all_channels()
+	stop_all_one_shot_sounds()
+	for child in audio_node.get_children():
+		if child is AudioStreamPlayer:
+			child.stop()
+			child.stream = null
+			if child.finished.is_connected(_on_audio_finished):
+				child.finished.disconnect(_on_audio_finished)
+	for child in one_shot_audio_node.get_children():
+		if child is AudioStreamPlayer:
+			child.stop()
+			child.stream = null
+	if dialogic.timeline_ended.is_connected(_on_dialogic_timeline_ended):
+		dialogic.timeline_ended.disconnect(_on_dialogic_timeline_ended)
+	current_audio_channels.clear()
+
+
 ## Plays the given file (or nothing) on the given channel.
 ## No channel given defaults to the "One-Shot SFX" channel,
 ##   which does not save audio but can have multiple audios playing simultaneously.

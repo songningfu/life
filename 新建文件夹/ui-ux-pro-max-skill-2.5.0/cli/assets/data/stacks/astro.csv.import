@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://ck8h8r01stw3j"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Docs URL.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/astro.Docs URL.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

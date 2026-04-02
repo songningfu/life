@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://u2er03y4efj1"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Pattern Name.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Section Order.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Primary CTA Placement.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Color Strategy.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Recommended Effects.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Conversion Optimization.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Pattern Name.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Section Order.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Primary CTA Placement.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Color Strategy.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Recommended Effects.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/landing.Conversion Optimization.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

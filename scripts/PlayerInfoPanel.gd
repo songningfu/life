@@ -1,12 +1,11 @@
 extends CanvasLayer
 
-const BACKGROUNDS = {
-	"normal": {"name": "普通家庭"},
-	"business": {"name": "经商家庭"},
-	"teacher": {"name": "教师家庭"},
-	"rural": {"name": "农村家庭"},
-	"single_parent": {"name": "单亲家庭"},
-}
+const GameStaticData = preload("res://scripts/GameStaticData.gd")
+const PROFILE_STAT_CARD_SCENE := preload("res://scenes/ui/ProfileStatCard.tscn")
+const PROFILE_SIMPLE_CARD_SCENE := preload("res://scenes/ui/ProfileSimpleCard.tscn")
+const PROFILE_KV_ROW_SCENE := preload("res://scenes/ui/ProfileKvRow.tscn")
+const TALENT_CHIP_SCENE := preload("res://scenes/ui/TalentChip.tscn")
+const TAG_CHIP_SCENE := preload("res://scenes/ui/TagChip.tscn")
 
 const STORY_TITLE_MAP := {
 	"y1s1_roommate": "初到宿舍",
@@ -37,6 +36,7 @@ const STORY_TITLE_MAP := {
 
 var game_node: Node = null
 var was_time_running_before_open := false
+var _active_tween: Tween
 
 @onready var overlay_rect: ColorRect = $Overlay
 @onready var panel_host: MarginContainer = $MarginContainer
@@ -60,6 +60,12 @@ var was_time_running_before_open := false
 @onready var data_content: VBoxContainer = $MarginContainer/Shell/MainVBox/ScrollContainer/ContentMargin/ContentVBox/BodyColumns/RightColumn/DataPanel/SectionMargin/SectionVBox/RawDataContent
 
 
+func _kill_active_tween() -> void:
+	if _active_tween and _active_tween.is_valid():
+		_active_tween.kill()
+	_active_tween = null
+
+
 func _ready():
 	visible = false
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -76,6 +82,10 @@ func _input(event: InputEvent):
 		get_viewport().set_input_as_handled()
 
 
+func _exit_tree() -> void:
+	_kill_active_tween()
+
+
 func toggle(game_ref: Node = null):
 	if visible:
 		_close()
@@ -89,7 +99,7 @@ func open(game_ref: Node = null):
 	if game_node == null:
 		return
 
-	was_time_running_before_open = bool(game_node.time_running) and not bool(game_node.waiting_for_choice)
+	was_time_running_before_open = game_node.time_running and not game_node.waiting_for_choice
 	if was_time_running_before_open:
 		game_node.time_running = false
 		if game_node.has_method("_update_time_display"):
@@ -108,19 +118,22 @@ func close():
 func _close():
 	if not visible:
 		return
-	var should_restore_time := (
+	var should_restore_time: bool = (
 		game_node != null
 		and was_time_running_before_open
-		and not bool(game_node.waiting_for_choice)
-		and not bool(game_node.game_over)
+		and not game_node.waiting_for_choice
+		and not game_node.is_game_over
 	)
 
+	_kill_active_tween()
 	var tw = create_tween()
+	_active_tween = tw
 	tw.set_parallel(true)
 	tw.tween_property(overlay_rect, "modulate:a", 0.0, 0.14)
 	tw.tween_property(panel_host, "modulate:a", 0.0, 0.14)
 	tw.tween_property(panel_host, "scale", Vector2(0.98, 0.98), 0.14)
 	tw.finished.connect(func():
+		_active_tween = null
 		visible = false
 		if should_restore_time:
 			game_node.time_running = true
@@ -140,12 +153,16 @@ func _animate_open():
 	panel_host.scale = Vector2(0.985, 0.985)
 	panel_host.pivot_offset = panel_host.size * 0.5
 
+	_kill_active_tween()
 	var tw = create_tween()
+	_active_tween = tw
 	tw.set_parallel(true)
 	tw.tween_property(overlay_rect, "modulate:a", 1.0, 0.18)
 	tw.tween_property(panel_host, "modulate:a", 1.0, 0.18)
 	tw.tween_property(panel_host, "scale", Vector2.ONE, 0.18)
-
+	tw.finished.connect(func():
+		_active_tween = null
+	)
 
 func _apply_styles():
 	var shell_style = StyleBoxFlat.new()
@@ -280,7 +297,15 @@ func _populate_talents():
 
 	for talent in talents:
 		var color = Color.from_string(str(talent.get("color", "#4db8e6")), Color(0.30, 0.74, 1.0))
-		var chip = PanelContainer.new()
+		var chip := TALENT_CHIP_SCENE.instantiate() as PanelContainer
+		if chip == null:
+			continue
+
+		var title := chip.get_node("ChipMargin/VBox/TitleLabel") as Label
+		var desc := chip.get_node("ChipMargin/VBox/DescLabel") as Label
+		if title == null or desc == null:
+			continue
+
 		var style = StyleBoxFlat.new()
 		style.bg_color = color.darkened(0.70)
 		style.border_width_left = 1
@@ -289,30 +314,12 @@ func _populate_talents():
 		style.border_width_bottom = 1
 		style.border_color = color.darkened(0.35)
 		style.set_corner_radius_all(10)
-		style.content_margin_left = 12
-		style.content_margin_right = 12
-		style.content_margin_top = 10
-		style.content_margin_bottom = 10
 		chip.add_theme_stylebox_override("panel", style)
 
-		var box = VBoxContainer.new()
-		box.custom_minimum_size = Vector2(180, 0)
-		box.add_theme_constant_override("separation", 4)
-		chip.add_child(box)
-
-		var title = Label.new()
 		title.text = "%s %s" % [str(talent.get("icon", "")), str(talent.get("name", "未命名天赋"))]
-		title.add_theme_font_size_override("font_size", 14)
 		title.add_theme_color_override("font_color", color.lightened(0.28))
-		box.add_child(title)
-
-		var desc = Label.new()
 		desc.text = str(talent.get("desc", ""))
-		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc.add_theme_font_size_override("font_size", 12)
 		desc.add_theme_color_override("font_color", Color(0.74, 0.80, 0.88))
-		box.add_child(desc)
-
 		talents_flow.add_child(chip)
 
 
@@ -323,7 +330,14 @@ func _populate_tags():
 		return
 
 	for tag in game_node.tags:
-		var chip = PanelContainer.new()
+		var chip := TAG_CHIP_SCENE.instantiate() as PanelContainer
+		if chip == null:
+			continue
+
+		var lbl := chip.get_node("ChipMargin/TextLabel") as Label
+		if lbl == null:
+			continue
+
 		var style = StyleBoxFlat.new()
 		style.bg_color = Color(0.12, 0.18, 0.28)
 		style.border_width_left = 1
@@ -332,17 +346,10 @@ func _populate_tags():
 		style.border_width_bottom = 1
 		style.border_color = Color(0.24, 0.42, 0.72)
 		style.set_corner_radius_all(8)
-		style.content_margin_left = 10
-		style.content_margin_right = 10
-		style.content_margin_top = 6
-		style.content_margin_bottom = 6
 		chip.add_theme_stylebox_override("panel", style)
 
-		var lbl = Label.new()
 		lbl.text = str(game_node._translate_tag(str(tag)))
-		lbl.add_theme_font_size_override("font_size", 13)
 		lbl.add_theme_color_override("font_color", Color(0.58, 0.82, 1.0))
-		chip.add_child(lbl)
 		tags_flow.add_child(chip)
 
 
@@ -404,8 +411,8 @@ func _populate_achievements():
 	
 	var sorted_defs: Array = defs.duplicate()
 	sorted_defs.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		var a_unlocked: bool = bool(unlocked_map.get(a.get("id", ""), false))
-		var b_unlocked: bool = bool(unlocked_map.get(b.get("id", ""), false))
+		var a_unlocked: bool = unlocked_map.get(a.get("id", ""), false)
+		var b_unlocked: bool = unlocked_map.get(b.get("id", ""), false)
 		if a_unlocked == b_unlocked:
 			return str(a.get("name", "")) < str(b.get("name", ""))
 		return (not a_unlocked) and b_unlocked
@@ -415,7 +422,7 @@ func _populate_achievements():
 		var aid: String = str(def.get("id", ""))
 		if aid.is_empty():
 			continue
-		var is_unlocked: bool = bool(unlocked_map.get(aid, false))
+		var is_unlocked: bool = unlocked_map.get(aid, false)
 		var title := "%s %s" % ["🏆" if is_unlocked else "🔒", str(def.get("name", aid))]
 		var progress := _achievement_progress_text(def, counters, is_unlocked)
 		var accent := Color(1.0, 0.82, 0.24) if is_unlocked else Color(0.56, 0.62, 0.72)
@@ -461,7 +468,7 @@ func _populate_relationships():
 
 	for role_id in role_ids:
 		var npc_info = RelationshipManager.get_npc_display(role_id)
-		if not bool(npc_info.get("met", false)) and int(npc_info.get("interactions", 0)) <= 0:
+		if not npc_info.get("met", false) and int(npc_info.get("interactions", 0)) <= 0:
 			continue
 
 		var affinity = int(npc_info.get("affinity", 0))
@@ -491,7 +498,7 @@ func _populate_data_details():
 	_add_kv_row(data_content, "已认识角色", "%d" % RelationshipManager.get_met_npcs().size(), Color(0.72, 0.78, 0.86))
 	_add_kv_row(data_content, "宿舍人数", "%d" % game_node.roommate_roster.size(), Color(0.72, 0.78, 0.86))
 	_add_kv_row(data_content, "上次自动存档", "第%d天" % int(game_node.last_auto_save_day), Color(0.72, 0.78, 0.86))
-	_add_kv_row(data_content, "财务状态", "透支" if bool(game_node.in_overdraft) else "正常", Color(0.96, 0.40, 0.44) if bool(game_node.in_overdraft) else Color(0.52, 0.90, 0.60))
+	_add_kv_row(data_content, "财务状态", "透支" if game_node.in_overdraft else "正常", Color(0.96, 0.40, 0.44) if game_node.in_overdraft else Color(0.52, 0.90, 0.60))
 
 
 func _add_story_group(title: String, items: Array, accent: Color):
@@ -516,8 +523,16 @@ func _add_story_group(title: String, items: Array, accent: Color):
 
 
 func _make_stat_card(title: String, value: String, accent: Color, note: String) -> PanelContainer:
-	var card = PanelContainer.new()
-	card.custom_minimum_size = Vector2(0, 108)
+	var card := PROFILE_STAT_CARD_SCENE.instantiate() as PanelContainer
+	if card == null:
+		return PanelContainer.new()
+
+	var title_label := card.get_node("CardMargin/VBox/TitleLabel") as Label
+	var value_label := card.get_node("CardMargin/VBox/ValueLabel") as Label
+	var note_label := card.get_node("CardMargin/VBox/NoteLabel") as Label
+	if title_label == null or value_label == null or note_label == null:
+		return card
+
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.08, 0.11, 0.17)
 	style.border_width_left = 1
@@ -526,69 +541,38 @@ func _make_stat_card(title: String, value: String, accent: Color, note: String) 
 	style.border_width_bottom = 1
 	style.border_color = accent.darkened(0.35)
 	style.set_corner_radius_all(14)
-	style.content_margin_left = 14
-	style.content_margin_right = 14
-	style.content_margin_top = 12
-	style.content_margin_bottom = 12
 	card.add_theme_stylebox_override("panel", style)
 
-	var box = VBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
-	card.add_child(box)
-
-	var t = Label.new()
-	t.text = title
-	t.add_theme_font_size_override("font_size", 12)
-	t.add_theme_color_override("font_color", Color(0.58, 0.66, 0.76))
-	box.add_child(t)
-
-	var v = Label.new()
-	v.text = value
-	v.add_theme_font_size_override("font_size", 22)
-	v.add_theme_color_override("font_color", accent)
-	box.add_child(v)
-
-	var n = Label.new()
-	n.text = note
-	n.add_theme_font_size_override("font_size", 11)
-	n.add_theme_color_override("font_color", Color(0.46, 0.52, 0.62))
-	n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(n)
-
+	title_label.text = title
+	title_label.add_theme_color_override("font_color", Color(0.58, 0.66, 0.76))
+	value_label.text = value
+	value_label.add_theme_color_override("font_color", accent)
+	note_label.text = note
+	note_label.add_theme_color_override("font_color", Color(0.46, 0.52, 0.62))
 	return card
 
 
 func _make_simple_card(title: String, body: String, accent: Color) -> PanelContainer:
-	var card = PanelContainer.new()
+	var card := PROFILE_SIMPLE_CARD_SCENE.instantiate() as PanelContainer
+	if card == null:
+		return PanelContainer.new()
+
+	var title_label := card.get_node("CardMargin/VBox/TitleLabel") as Label
+	var body_label := card.get_node("CardMargin/VBox/BodyLabel") as Label
+	if title_label == null or body_label == null:
+		return card
+
 	var style = StyleBoxFlat.new()
 	style.bg_color = Color(0.075, 0.09, 0.14)
 	style.border_width_left = 3
 	style.border_color = accent
 	style.set_corner_radius_all(12)
-	style.content_margin_left = 14
-	style.content_margin_right = 14
-	style.content_margin_top = 12
-	style.content_margin_bottom = 12
 	card.add_theme_stylebox_override("panel", style)
 
-	var box = VBoxContainer.new()
-	box.add_theme_constant_override("separation", 5)
-	card.add_child(box)
-
-	var t = Label.new()
-	t.text = title
-	t.add_theme_font_size_override("font_size", 14)
-	t.add_theme_color_override("font_color", Color(0.94, 0.97, 1.0))
-	box.add_child(t)
-
-	var d = Label.new()
-	d.text = body
-	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	d.add_theme_font_size_override("font_size", 12)
-	d.add_theme_color_override("font_color", Color(0.68, 0.74, 0.84))
-	d.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	box.add_child(d)
-
+	title_label.text = title
+	title_label.add_theme_color_override("font_color", Color(0.94, 0.97, 1.0))
+	body_label.text = body
+	body_label.add_theme_color_override("font_color", Color(0.68, 0.74, 0.84))
 	return card
 
 
@@ -632,24 +616,19 @@ func _make_empty_label(text_value: String) -> Label:
 
 
 func _add_kv_row(parent: VBoxContainer, key: String, value: String, value_color: Color):
-	var row = HBoxContainer.new()
-	row.add_theme_constant_override("separation", 14)
+	var row := PROFILE_KV_ROW_SCENE.instantiate() as HBoxContainer
+	if row == null:
+		return
 
-	var k = Label.new()
+	var k := row.get_node("KeyLabel") as Label
+	var v := row.get_node("ValueLabel") as Label
+	if k == null or v == null:
+		return
+
 	k.text = key
-	k.custom_minimum_size = Vector2(96, 0)
-	k.add_theme_font_size_override("font_size", 13)
 	k.add_theme_color_override("font_color", Color(0.50, 0.58, 0.68))
-	row.add_child(k)
-
-	var v = Label.new()
 	v.text = value
-	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	v.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	v.add_theme_font_size_override("font_size", 13)
 	v.add_theme_color_override("font_color", value_color)
-	row.add_child(v)
-
 	parent.add_child(row)
 
 
@@ -731,9 +710,7 @@ func _weekday_label(info: Dictionary) -> String:
 
 func _get_background_name() -> String:
 	var bg_key = str(game_node.selected_background)
-	if BACKGROUNDS.has(bg_key):
-		return str(BACKGROUNDS[bg_key].get("name", bg_key))
-	return bg_key
+	return GameStaticData.get_background_name(bg_key)
 
 
 func _get_semester_label(info: Dictionary) -> String:
@@ -744,9 +721,9 @@ func _get_semester_label(info: Dictionary) -> String:
 
 
 func _get_time_status_text() -> String:
-	if bool(game_node.waiting_for_choice):
+	if game_node.waiting_for_choice:
 		return "事件暂停中"
-	if bool(game_node.time_running):
+	if game_node.time_running:
 		return "时间流动中"
 	return "已暂停"
 
@@ -826,7 +803,7 @@ func _get_pending_reply_count() -> int:
 		if history.is_empty():
 			continue
 		var last_msg: Dictionary = history[-1]
-		if last_msg.get("sender", "") == "npc" and not last_msg.get("read", true):
+		if last_msg.get("from", "") == "npc" and not last_msg.get("read", true):
 			count += 1
 	return count
 

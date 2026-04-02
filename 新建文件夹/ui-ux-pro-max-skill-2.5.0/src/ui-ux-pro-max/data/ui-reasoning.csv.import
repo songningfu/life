@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://drwyv1b4adrov"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.UI.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Recommended.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Style.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Color.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Typography.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Key.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Decision.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Anti.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Severity.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.UI.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Recommended.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Style.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Color.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Typography.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Key.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Decision.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Anti.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/ui-reasoning.Severity.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

@@ -69,13 +69,13 @@ func advance_to_next_day(game: Node) -> void:
 func process_morning_info(game: Node) -> void:
 	game._log("处理晨间信息 - 第%d天" % game.current_day)
 
-	if game.ModuleManager:
-		game.ModuleManager.set_player_state(game._get_player_state())
-		game.ModuleManager.broadcast_day_start(game.current_day, game.current_phase_name)
+	if ModuleManager:
+		ModuleManager.set_player_state(game._get_player_state())
+		ModuleManager.broadcast_day_start(game.current_day, game.current_phase_name)
 
 	var morning_infos: Array[Dictionary] = []
-	if game.ModuleManager:
-		morning_infos = game.ModuleManager.collect_morning_info(game.current_day)
+	if ModuleManager:
+		morning_infos = ModuleManager.collect_morning_info(game.current_day)
 
 	var base_info: Array[Dictionary] = get_base_morning_info(game)
 	morning_infos.append_array(base_info)

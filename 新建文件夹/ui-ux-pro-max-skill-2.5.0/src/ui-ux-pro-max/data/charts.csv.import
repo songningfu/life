@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cjymyda8u6fkm"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Data Type.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Best Chart Type.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Secondary Options.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.When to Use.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.When NOT to Use.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Data Volume Threshold.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Color Guidance.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Accessibility Grade.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Accessibility Notes.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.A11y Fallback.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Library Recommendation.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Interactive Level.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Data Type.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Best Chart Type.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Secondary Options.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.When to Use.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.When NOT to Use.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Data Volume Threshold.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Color Guidance.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Accessibility Grade.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Accessibility Notes.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.A11y Fallback.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Library Recommendation.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/charts.Interactive Level.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://daho4fxcijqur"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Icon Name.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Library.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Import Code.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Usage.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Best For.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Style.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Icon Name.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Keywords.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Library.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Import Code.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Usage.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Best For.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/src/ui-ux-pro-max/data/icons.Style.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

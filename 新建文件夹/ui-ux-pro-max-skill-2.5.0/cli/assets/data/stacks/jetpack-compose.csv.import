@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bo1m4pjhps8ln"
+
+[deps]
+
+files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Docs URL.translation"]
+
+source_file="res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.csv"
+dest_files=["res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Category.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Guideline.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Description.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Do.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Don't.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Code Good.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Code Bad.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Severity.translation", "res://新建文件夹/ui-ux-pro-max-skill-2.5.0/cli/assets/data/stacks/jetpack-compose.Docs URL.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

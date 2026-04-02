@@ -131,39 +131,40 @@ var _events_data_cache: Dictionary = {}
 var _flavor_texts_cache: Dictionary = {}
 
 # UI 节点（主界面绑定）
-@onready var _status_hint: Label = $StatusBar/StatusMargin/StatusVBox/StatusHint
-@onready var _day_progress: ProgressBar = $StatusBar/StatusMargin/StatusVBox/DayProgress
-@onready var _time_control_bar: HBoxContainer = $TimeControlBar
-@onready var _pause_btn: Button = $TimeControlBar/PauseBtn
-@onready var _speed_1x_btn: Button = $TimeControlBar/Speed1xBtn
-@onready var _speed_2x_btn: Button = $TimeControlBar/Speed2xBtn
-@onready var _speed_4x_btn: Button = $TimeControlBar/Speed4xBtn
-@onready var _speed_label: Label = $TimeControlBar/SpeedLabel
-@onready var _phone_btn: TextureButton = $TimeControlBar/PhoneBtn
-@onready var _profile_btn: Button = $TimeControlBar/ProfileBtn
-@onready var _money_info: Label = $TimeControlBar/TopStatusInfo/MoneyInfo
-@onready var _gpa_info: Label = $TimeControlBar/TopStatusInfo/GpaInfo
-@onready var _study_info: Label = $TimeControlBar/TopStatusInfo/StudyInfo
-@onready var _credits_info: Label = $TimeControlBar/TopStatusInfo/CreditsInfo
-@onready var _date_label: Label = $TimeControlBar/DateLabel
+@onready var _status_hint: Label = $StatusBar/StatusMargin/StatusMainRow/StatusInfo/StatusHint
+@onready var _day_progress: ProgressBar = $StatusBar/StatusMargin/StatusMainRow/StatusInfo/DayProgress
+@onready var _time_toggle_button: Button = $StatusBar/StatusMargin/StatusMainRow/TimeControls/TimeToggleBtn
+@onready var _speed_1x_button: Button = $StatusBar/StatusMargin/StatusMainRow/TimeControls/Speed1xBtn
+@onready var _speed_2x_button: Button = $StatusBar/StatusMargin/StatusMainRow/TimeControls/Speed2xBtn
 
 @onready var _current_text: RichTextLabel = $MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox/CurrentText
 @onready var _choices_container: VBoxContainer = $MainHBox/LeftPanel/ChoicesContainer
 @onready var _event_text: RichTextLabel = $MainHBox/LeftPanel/EventText
-@onready var _next_button: Button = $MainHBox/LeftPanel/NextButton
-@onready var _right_content: VBoxContainer = $MainHBox/RightPanel/RightScroll/RightContent
+@onready var _next_button: Button = $MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox/NextButton
 
 @onready var _campus_map: Control = $MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap
+@onready var _gpa_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaNameRow/GpaValue
+@onready var _gpa_sub_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/GpaRow/GpaSubValue
+@onready var _social_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialNameRow/SocialValue
+@onready var _social_bar: ProgressBar = $MainHBox/RightPanel/RightScroll/RightContent/SocialRow/SocialBar
+@onready var _ability_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityNameRow/AbilityValue
+@onready var _ability_bar: ProgressBar = $MainHBox/RightPanel/RightScroll/RightContent/AbilityRow/AbilityBar
+@onready var _money_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/MoneyRow/MoneyNameRow/MoneyValue
+@onready var _mental_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalNameRow/MentalValue
+@onready var _mental_bar: ProgressBar = $MainHBox/RightPanel/RightScroll/RightContent/MentalRow/MentalBar
+@onready var _health_value: Label = $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthNameRow/HealthValue
+@onready var _health_bar: ProgressBar = $MainHBox/RightPanel/RightScroll/RightContent/HealthRow/HealthBar
+@onready var _relation_rows_box: VBoxContainer = $MainHBox/RightPanel/RightScroll/RightContent/RelationRows
+@onready var _tags_label: Label = $MainHBox/RightPanel/RightScroll/RightContent/TagsLabel
+@onready var _overlay_root: CanvasLayer = $OverlayRoot
+@onready var _popup_root: CanvasLayer = $PopupRoot
 
 # 运行态UI
 var _time_speed: float = 1.0
-var _phone_ui: CanvasLayer
 var _phone_ui_v2: CanvasLayer
 var _profile_ui: CanvasLayer
 var _pause_menu_ui: CanvasLayer
 var _selected_actions: Dictionary = {"morning": "", "afternoon": "", "evening": ""}
-var _stat_rows: Dictionary = {}
-var _relation_rows_box: VBoxContainer
 
 var _phase_advancing: bool = false
 var _game_flow: RefCounted
@@ -214,8 +215,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_ESCAPE:
-				if _pause_menu_ui and _pause_menu_ui.has_method("toggle_pause"):
-					_pause_menu_ui.toggle_pause()
+				_on_pause_pressed()
 			KEY_P:
 				_on_pause_pressed()
 			KEY_I:
@@ -228,44 +228,34 @@ func _unhandled_input(event: InputEvent) -> void:
 func _bind_ui() -> void:
 	if _next_button and not _next_button.pressed.is_connected(_on_next_button_pressed):
 		_next_button.pressed.connect(_on_next_button_pressed)
-	if _pause_btn and not _pause_btn.pressed.is_connected(_on_pause_pressed):
-		_pause_btn.pressed.connect(_on_pause_pressed)
-	if _speed_1x_btn and not _speed_1x_btn.pressed.is_connected(_on_speed_1x_pressed):
-		_speed_1x_btn.pressed.connect(_on_speed_1x_pressed)
-	if _speed_2x_btn and not _speed_2x_btn.pressed.is_connected(_on_speed_2x_pressed):
-		_speed_2x_btn.pressed.connect(_on_speed_2x_pressed)
-	if _speed_4x_btn and not _speed_4x_btn.pressed.is_connected(_on_speed_4x_pressed):
-		_speed_4x_btn.pressed.connect(_on_speed_4x_pressed)
-	if _phone_btn and not _phone_btn.pressed.is_connected(_on_phone_pressed):
-		_phone_btn.pressed.connect(_on_phone_pressed)
-	if _profile_btn and not _profile_btn.pressed.is_connected(_on_profile_pressed):
-		_profile_btn.pressed.connect(_on_profile_pressed)
+		_next_button.visible = true
 
-	_next_button.visible = true
-	_time_control_bar.visible = true
-	_set_speed(1.0)
-	_pause_btn.text = "开始"
+	if _time_toggle_button and not _time_toggle_button.pressed.is_connected(_on_time_toggle_pressed):
+		_time_toggle_button.pressed.connect(_on_time_toggle_pressed)
+	if _speed_1x_button and not _speed_1x_button.pressed.is_connected(_on_speed_1x_pressed):
+		_speed_1x_button.pressed.connect(_on_speed_1x_pressed)
+	if _speed_2x_button and not _speed_2x_button.pressed.is_connected(_on_speed_2x_pressed):
+		_speed_2x_button.pressed.connect(_on_speed_2x_pressed)
 
 func _attach_overlay_scenes() -> void:
-	if not _phone_ui:
-		_phone_ui = CanvasLayer.new()
-		_phone_ui.name = "PhoneSystemLayer"
-		_phone_ui.layer = 100
-		_phone_ui.set_script(load("res://scripts/PhoneSystem.gd"))
-		add_child(_phone_ui)
-
 	_attach_phone_ui_v2()
-	
+
 	if not _profile_ui:
 		var profile_scene: PackedScene = load("res://scenes/PlayerInfoPanel.tscn")
 		if profile_scene:
 			_profile_ui = profile_scene.instantiate() as CanvasLayer
-			add_child(_profile_ui)
+			if _popup_root:
+				_popup_root.add_child(_profile_ui)
+			else:
+				add_child(_profile_ui)
 	if not _pause_menu_ui:
 		var pause_scene: PackedScene = load("res://scenes/menus/PauseMenu.tscn")
 		if pause_scene:
 			_pause_menu_ui = pause_scene.instantiate() as CanvasLayer
-			add_child(_pause_menu_ui)
+			if _popup_root:
+				_popup_root.add_child(_pause_menu_ui)
+			else:
+				add_child(_pause_menu_ui)
 			if _pause_menu_ui.has_method("setup"):
 				_pause_menu_ui.setup(self)
 	
@@ -273,14 +263,13 @@ func _attach_overlay_scenes() -> void:
 		_profile_ui.visible = false
 
 func _on_pause_pressed() -> void:
-	time_running = not time_running
-	_pause_btn.text = "暂停" if time_running else "开始"
-	_append_log("时间流速：%s" % ("运行中" if time_running else "已暂停"))
+	if _pause_menu_ui and _pause_menu_ui.has_method("toggle_pause"):
+		_pause_menu_ui.toggle_pause()
 
 func _set_speed(speed: float) -> void:
 	_time_speed = speed
-	if _speed_label:
-		_speed_label.text = " %.0fx " % _time_speed
+	_append_log("时间速度调整为 %sx" % int(speed))
+	_refresh_ui()
 
 func _on_speed_1x_pressed() -> void:
 	_set_speed(1.0)
@@ -288,15 +277,22 @@ func _on_speed_1x_pressed() -> void:
 func _on_speed_2x_pressed() -> void:
 	_set_speed(2.0)
 
+func _on_time_toggle_pressed() -> void:
+	if is_game_over:
+		return
+	time_running = not time_running
+	if time_running:
+		_append_log("时间继续流逝")
+	else:
+		_append_log("时间已暂停")
+	_refresh_ui()
+
 func _on_speed_4x_pressed() -> void:
 	_set_speed(4.0)
 
 func _on_phone_pressed() -> void:
 	if _phone_ui_v2 and _phone_ui_v2.has_method("toggle_phone"):
 		_phone_ui_v2.toggle_phone()
-		return
-	if _phone_ui and _phone_ui.has_method("toggle_phone"):
-		_phone_ui.toggle_phone()
 
 func _attach_phone_ui_v2() -> void:
 	if _phone_ui_v2 != null:
@@ -304,7 +300,10 @@ func _attach_phone_ui_v2() -> void:
 	if PHONE_UI_SCENE == null:
 		return
 	_phone_ui_v2 = PHONE_UI_SCENE.instantiate() as CanvasLayer
-	add_child(_phone_ui_v2)
+	if _overlay_root:
+		_overlay_root.add_child(_phone_ui_v2)
+	else:
+		add_child(_phone_ui_v2)
 	if _phone_ui_v2.has_signal("phone_opened") and not _phone_ui_v2.phone_opened.is_connected(_on_phone_ui_opened):
 		_phone_ui_v2.phone_opened.connect(_on_phone_ui_opened)
 	if _phone_ui_v2.has_signal("phone_closed") and not _phone_ui_v2.phone_closed.is_connected(_on_phone_ui_closed):
@@ -339,123 +338,77 @@ func _on_next_button_pressed() -> void:
 	_advance_phase()
 
 func _refresh_ui() -> void:
-	if _time_control_bar:
-		_time_control_bar.visible = true
-	
-	var progress: float = (float(current_day) / float(TOTAL_DAYS)) * 100.0
+	var phase_progress := 0.0
+	match current_phase_enum:
+		DayPhase.MORNING_INFO:
+			phase_progress = 10.0
+		DayPhase.SLOT_MORNING:
+			phase_progress = 35.0
+		DayPhase.SLOT_AFTERNOON:
+			phase_progress = 60.0
+		DayPhase.SLOT_EVENING:
+			phase_progress = 85.0
+		DayPhase.NIGHT_SUMMARY:
+			phase_progress = 100.0
 	if _day_progress:
-		_day_progress.value = progress
-	
+		_day_progress.value = phase_progress
+
 	if _status_hint:
-		_status_hint.text = "第%d天 · %s" % [current_day + 1, _get_phase_name(current_phase_enum)]
-	
-	if _date_label:
-		_date_label.text = "大%d · %s" % [current_year, current_phase_name]
-	
+		_status_hint.text = "第%d天 · %s · %s" % [current_day + 1, _get_phase_name(current_phase_enum), "时间流逝中" if time_running else "时间已暂停"]
+
+	if _time_toggle_button:
+		_time_toggle_button.text = "暂停时间" if time_running else "开始时间"
+	if _speed_1x_button:
+		_speed_1x_button.disabled = is_zero_approx(_time_speed - 1.0)
+	if _speed_2x_button:
+		_speed_2x_button.disabled = is_zero_approx(_time_speed - 2.0)
+
 	if _current_text:
 		_current_text.clear()
-		_current_text.append_text("[b]今天是第 %d 天[/b]\n%s\n选择行动后点击『下一步』推进流程。" % [current_day + 1, _get_phase_name(current_phase_enum)])
-	
+		_current_text.append_text("[b]第 %d 天 · %s[/b]\n当前阶段：%s\n%s" % [
+			current_day + 1,
+			_translate_time_slot(_phase_to_time_slot(current_phase_enum)),
+			current_phase_name,
+			"请先完成当前行动选择。" if waiting_for_choice else "准备好后可继续推进流程。"
+		])
+
 	if _event_text:
 		if _event_text.text.strip_edges() == "":
 			_event_text.clear()
 			_event_text.append_text("欢迎进入大学生活。")
-	
-	if _money_info:
-		_money_info.text = "生活费: ¥%s" % _format_money(int(attributes.get("living_money", 0)))
-	if _gpa_info:
-		_gpa_info.text = "绩点: %.2f" % float(attributes.get("gpa", 0.0))
-	if _study_info:
-		_study_info.text = "学习: %d" % int(attributes.get("study_points", 0))
-	if _credits_info:
-		_credits_info.text = "学分: %d/%d" % [earned_credits, major_required_credits]
 
 	_refresh_stat_rows()
 	_refresh_relation_rows()
-	
+
 	if _next_button:
 		_next_button.disabled = waiting_for_choice
-
-func _rebuild_right_panel_ui() -> void:
-	if not _right_content:
-		return
-	for child in _right_content.get_children():
-		child.queue_free()
-
-	var gpa_label := Label.new()
-	gpa_label.name = "GpaHeadline"
-	gpa_label.text = "绩点 -- / 4.00"
-	gpa_label.add_theme_color_override("font_color", UI_COLORS.STAT_STUDY)
-	gpa_label.add_theme_font_size_override("font_size", 16)
-	_right_content.add_child(gpa_label)
-
-	var stats_box := VBoxContainer.new()
-	stats_box.name = "StatsBox"
-	stats_box.add_theme_constant_override("separation", 8)
-	_right_content.add_child(stats_box)
-
-	_add_stat_row(stats_box, "social", "社交")
-	_add_stat_row(stats_box, "ability", "能力")
-	_add_stat_row(stats_box, "mental", "心理")
-	_add_stat_row(stats_box, "health", "健康")
-
-	var money_row := HBoxContainer.new()
-	money_row.name = "MoneyRow"
-	var money_name := Label.new()
-	money_name.text = "生活费"
-	var money_val := Label.new()
-	money_val.name = "MoneyValue"
-	money_val.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	money_val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	money_val.add_theme_color_override("font_color", UI_COLORS.STAT_ABILITY)
-	money_row.add_child(money_name)
-	money_row.add_child(money_val)
-	_right_content.add_child(money_row)
-
-	var relation_header := Label.new()
-	relation_header.text = "人际关系"
-	relation_header.add_theme_font_size_override("font_size", 15)
-	relation_header.add_theme_color_override("font_color", Color("#d8e2f4"))
-	_right_content.add_child(relation_header)
-
-	_relation_rows_box = VBoxContainer.new()
-	_relation_rows_box.name = "RelationRows"
-	_relation_rows_box.add_theme_constant_override("separation", 6)
-	_right_content.add_child(_relation_rows_box)
-
-	var tags := Label.new()
-	tags.name = "TagsLabel"
-	tags.add_theme_color_override("font_color", UI_COLORS.TEXT_SECONDARY)
-	_right_content.add_child(tags)
-
-func _add_stat_row(parent: VBoxContainer, key: String, display_name: String) -> void:
-	var packed: PackedScene = load("res://scenes/ui/StatRow.tscn")
-	if not packed:
-		return
-	var row = packed.instantiate()
-	parent.add_child(row)
-	row.setup(key, display_name)
-	_stat_rows[key] = row
+		_next_button.text = "等待行动选择" if waiting_for_choice else "推进到下一阶段"
 
 func _refresh_stat_rows() -> void:
-	if _right_content == null:
-		return
-	var gpa_head := _right_content.get_node_or_null("GpaHeadline") as Label
-	if gpa_head:
-		gpa_head.text = "绩点 %.2f / 4.00" % float(attributes.get("gpa", 0.0))
-
-	for key in _stat_rows.keys():
-		var row = _stat_rows[key]
-		if row and row.has_method("update_value"):
-			row.update_value(float(attributes.get(key, 0.0)), 100.0)
-
-	var money_val := _right_content.get_node_or_null("MoneyRow/MoneyValue") as Label
-	if money_val:
-		money_val.text = "¥%s" % _format_money(int(attributes.get("living_money", 0)))
-
-	var tags_label := _right_content.get_node_or_null("TagsLabel") as Label
-	if tags_label:
-		tags_label.text = "暂无标签" if tags.is_empty() else " · ".join(tags)
+	if _gpa_value:
+		_gpa_value.text = "%.2f / 4.00" % float(attributes.get("gpa", 0.0))
+	if _gpa_sub_value:
+		_gpa_sub_value.text = "学习: %d/100 · 绩点按学期结算" % int(attributes.get("study_points", 0))
+	if _social_value:
+		_social_value.text = "%d" % int(attributes.get("social", 0))
+	if _social_bar:
+		_social_bar.value = float(attributes.get("social", 0.0))
+	if _ability_value:
+		_ability_value.text = "%d" % int(attributes.get("ability", 0))
+	if _ability_bar:
+		_ability_bar.value = float(attributes.get("ability", 0.0))
+	if _money_value:
+		_money_value.text = "¥%s" % _format_money(int(attributes.get("living_money", 0)))
+	if _mental_value:
+		_mental_value.text = "%d" % int(attributes.get("mental", 0))
+	if _mental_bar:
+		_mental_bar.value = float(attributes.get("mental", 0.0))
+	if _health_value:
+		_health_value.text = "%d" % int(attributes.get("health", 0))
+	if _health_bar:
+		_health_bar.value = float(attributes.get("health", 0.0))
+	if _tags_label:
+		_tags_label.text = "暂无标签" if tags.is_empty() else " · ".join(tags)
 
 func _refresh_relation_rows() -> void:
 	if _relation_rows_box == null:
@@ -470,14 +423,47 @@ func _refresh_relation_rows() -> void:
 			continue
 		var row = packed.instantiate()
 		_relation_rows_box.add_child(row)
-		row.setup(npc.get("name", ""), float(npc.get("affection", 0.0)), npc.get("status", ""))
+		var npc_name := str(npc.get("name", "")).strip_edges()
+		var npc_status := str(npc.get("status", "")).strip_edges()
+		row.setup(npc_name, float(npc.get("affection", 0.0)), npc_status)
 
 func _append_log(line: String) -> void:
 	if not _event_text:
 		return
+	var normalized := line.strip_edges()
+	if normalized.is_empty():
+		return
 	if _event_text.text.strip_edges() != "":
 		_event_text.append_text("\n")
-	_event_text.append_text(line)
+	_event_text.append_text("[%s] %s" % [_translate_time_slot(_phase_to_time_slot(current_phase_enum)), normalized])
+
+func _translate_time_slot(time_slot: String) -> String:
+	match time_slot:
+		"morning":
+			return "上午"
+		"afternoon":
+			return "下午"
+		"evening":
+			return "晚上"
+		"summary":
+			return "结算"
+		_:
+			return "当前"
+
+func _phase_to_time_slot(phase: DayPhase) -> String:
+	match phase:
+		DayPhase.MORNING_INFO:
+			return "morning"
+		DayPhase.SLOT_MORNING:
+			return "morning"
+		DayPhase.SLOT_AFTERNOON:
+			return "afternoon"
+		DayPhase.SLOT_EVENING:
+			return "evening"
+		DayPhase.NIGHT_SUMMARY:
+			return "summary"
+		_:
+			return "morning"
 
 func _connect_module_signals() -> void:
 	# 连接ModuleManager信号
@@ -711,6 +697,9 @@ func _auto_execute_action(time_slot: String) -> void:
 ## 选择行动
 func _select_action(action_id: String, time_slot: String) -> void:
 	_selected_actions[time_slot] = action_id
+	var action_data: Dictionary = _get_action_data(action_id)
+	var action_name := str(action_data.get("name", action_id))
+	_append_log("你选择了「%s」" % action_name)
 	_next_button.disabled = false
 	_clear_choices()
 	_execute_action(action_id, time_slot)
@@ -777,7 +766,8 @@ func _on_event_choice_selected(choice: Dictionary) -> void:
 ## 处理夜间结算
 func _process_night_summary() -> void:
 	_log("处理夜间结算")
-	
+	_append_log("进入夜间结算")
+
 	# 应用每日被动效果
 	if ModuleManager:
 		var passive_effects: Array[Dictionary] = ModuleManager.collect_daily_passive_effects()
@@ -786,21 +776,21 @@ func _process_night_summary() -> void:
 			var amount: float = effect.get("amount", 0.0)
 			if attributes.has(attr):
 				attributes[attr] += amount
-	
+
 	# 每日消耗
 	attributes["living_money"] -= 20  # 每日基础消费
 	if _notify and _notify.has_method("money_change"):
 		_notify.money_change(-20)
 	attributes["health"] = clamp(attributes["health"], 0, 100)
 	attributes["mental"] = clamp(attributes["mental"], 0, 100)
-	
+
 	# 广播每天结束
 	if ModuleManager:
 		ModuleManager.broadcast_day_end(current_day, current_phase_name)
-	
+
 	if WechatSystem and WechatSystem.has_method("process_daily_npc_messages"):
 		WechatSystem.process_daily_npc_messages(current_day, current_phase_name)
-	
+
 	# 检查周结算
 	if (current_day + 1) % DAYS_PER_WEEK == 0:
 		_process_week_end()
@@ -809,7 +799,7 @@ func _process_night_summary() -> void:
 	var day_in_year: int = current_day % 365
 	if day_in_year == 120 or day_in_year == 310:
 		_process_semester_end()
-	
+
 	_append_log("夜间结算完成：生活费 -20")
 	_refresh_ui()
 
@@ -1313,25 +1303,16 @@ func _show_game_over_panel(end_type: String) -> void:
 	)
 	_choices_container.add_child(restart_btn)
 
-func _translate_time_slot(slot: String) -> String:
-	match slot:
-		"morning": return "上午"
-		"afternoon": return "下午"
-		"evening": return "晚上"
-	return slot
-
 ## 触发游戏结束
 func _trigger_game_end() -> void:
 	_log("游戏结束")
 	is_game_over = true
 	time_running = false
 	waiting_for_choice = false
-	if _pause_btn:
-		_pause_btn.text = "结束"
 	if _next_button:
 		_next_button.disabled = true
 	_clear_choices()
-	
+
 	# 计算结局
 	var end_type: String = _calculate_ending()
 	if ModuleManager and ModuleManager.has_module("achievement"):

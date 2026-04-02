@@ -29,3 +29,7 @@ func _update_background(argument:String, _time:float) -> void:
 	else:
 		image_node.texture = null
 		color_node.color = Color.from_string(argument, Color.TRANSPARENT)
+
+
+func _exit_tree() -> void:
+	image_node.texture = null

@@ -70,6 +70,15 @@ func _back_to_main_menu() -> void:
 	get_tree().paused = false
 	SceneTransitions.back_to_menu()
 
+func _exit_tree() -> void:
+	get_tree().paused = false
+	if _save_panel != null and is_instance_valid(_save_panel):
+		_save_panel.queue_free()
+		_save_panel = null
+	if _options_menu != null and is_instance_valid(_options_menu):
+		_options_menu.queue_free()
+		_options_menu = null
+
 func _apply_visual_style() -> void:
 	$Shade.color = Color(0.01, 0.02, 0.07, 0.68)
 	var panel := StyleBoxFlat.new()

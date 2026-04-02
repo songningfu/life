@@ -174,6 +174,14 @@ func _on_toggled(enabled: bool) -> void:
 	# we want to cancel the auto-advance mode.
 	elif !enabled and is_advancing():
 		DialogicUtil.autoload().Inputs.stop_timers()
+
+
+func cleanup() -> void:
+	autoadvance_timer.stop()
+	if autoadvance_timer.timeout.is_connected(_on_autoadvance_timer_timeout):
+		autoadvance_timer.timeout.disconnect(_on_autoadvance_timer_timeout)
+	if toggled.is_connected(_on_toggled):
+		toggled.disconnect(_on_toggled)
 #endregion
 
 #region AUTOADVANCE HELPERS

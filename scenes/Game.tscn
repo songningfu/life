@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://bs4uhhtvcp7vj" path="res://scripts/Game.gd" id="1_ibkli"]
 [ext_resource type="Texture2D" uid="uid://balo6r1cxcihr" path="res://images/backgrounds/dorm_room_day.png" id="2_bg"]
 [ext_resource type="Script" uid="uid://b1phefp5ybb0r" path="res://scripts/CampusMap.gd" id="3_campus_map"]
-[ext_resource type="Texture2D" uid="uid://couc8drhwnm3" path="res://images/phone_icons/phone.png" id="4_phone_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background_window"]
 bg_color = Color(0.03, 0.04, 0.06, 0.16)
@@ -49,16 +48,19 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_speed_active"]
+bg_color = Color(0.27, 0.45, 0.58, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_speed_hover"]
 bg_color = Color(0.3, 0.32, 0.38, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_phone"]
-atlas = ExtResource("4_phone_icon")
-region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_current_card"]
 content_margin_left = 18.0
@@ -131,7 +133,7 @@ mouse_filter = 2
 color = Color(0.01, 0.015, 0.03, 0.5)
 
 [node name="StatusBar" type="PanelContainer" parent="." unique_id=1966547894]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_status_normal")
 
@@ -142,127 +144,55 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 8
 
-[node name="StatusVBox" type="VBoxContainer" parent="StatusBar/StatusMargin" unique_id=1651679711]
+[node name="StatusMainRow" type="HBoxContainer" parent="StatusBar/StatusMargin" unique_id=1030532125]
 layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="StatusInfo" type="VBoxContainer" parent="StatusBar/StatusMargin/StatusMainRow" unique_id=49923175]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="StatusHint" type="Label" parent="StatusBar/StatusMargin/StatusVBox" unique_id=12381822]
+[node name="StatusHint" type="Label" parent="StatusBar/StatusMargin/StatusMainRow/StatusInfo" unique_id=12381822]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
 theme_override_font_sizes/font_size = 14
 text = "准备开始新的一天"
 autowrap_mode = 2
 
-[node name="DayProgress" type="ProgressBar" parent="StatusBar/StatusMargin/StatusVBox" unique_id=300088419]
+[node name="DayProgress" type="ProgressBar" parent="StatusBar/StatusMargin/StatusMainRow/StatusInfo" unique_id=300088419]
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
+show_percentage = false
 
-[node name="TimeControlBar" type="HBoxContainer" parent="." unique_id=1829996257]
-visible = false
-custom_minimum_size = Vector2(0, 40)
+[node name="TimeControls" type="HBoxContainer" parent="StatusBar/StatusMargin/StatusMainRow" unique_id=1984273285]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
-[node name="PauseBtn" type="Button" parent="TimeControlBar" unique_id=1876304598]
-custom_minimum_size = Vector2(100, 36)
+[node name="TimeToggleBtn" type="Button" parent="StatusBar/StatusMargin/StatusMainRow/TimeControls" unique_id=301825490]
+custom_minimum_size = Vector2(92, 36)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
-theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_pause_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pause_hover")
 theme_override_styles/hover = SubResource("StyleBoxFlat_pause_hover")
-text = "开始"
+text = "暂停时间"
 
-[node name="VSeparator" type="VSeparator" parent="TimeControlBar" unique_id=645846296]
+[node name="Speed1xBtn" type="Button" parent="StatusBar/StatusMargin/StatusMainRow/TimeControls" unique_id=188239493]
+custom_minimum_size = Vector2(56, 36)
 layout_mode = 2
-
-[node name="Speed1xBtn" type="Button" parent="TimeControlBar" unique_id=282133543]
-custom_minimum_size = Vector2(50, 36)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
-theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_speed_active")
 theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
-text = " 1x "
+text = "1x"
 
-[node name="Speed2xBtn" type="Button" parent="TimeControlBar" unique_id=1151653704]
-custom_minimum_size = Vector2(50, 36)
+[node name="Speed2xBtn" type="Button" parent="StatusBar/StatusMargin/StatusMainRow/TimeControls" unique_id=256140910]
+custom_minimum_size = Vector2(56, 36)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
-theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_speed_active")
 theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
-text = " 2x "
-
-[node name="Speed4xBtn" type="Button" parent="TimeControlBar" unique_id=2103304173]
-custom_minimum_size = Vector2(50, 36)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
-theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
-text = " 4x "
-
-[node name="SpeedLabel" type="Label" parent="TimeControlBar" unique_id=1941861155]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
-theme_override_font_sizes/font_size = 14
-text = " 1x "
-
-[node name="PhoneBtn" type="TextureButton" parent="TimeControlBar" unique_id=432073483]
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 2
-tooltip_text = "手机"
-texture_normal = SubResource("AtlasTexture_phone")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="ProfileBtn" type="Button" parent="TimeControlBar" unique_id=272465694]
-custom_minimum_size = Vector2(78, 36)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.86, 0.9, 0.96, 1)
-theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("StyleBoxFlat_speed_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_speed_hover")
-text = "档案"
-
-[node name="VSeparator2" type="VSeparator" parent="TimeControlBar" unique_id=285384388]
-layout_mode = 2
-
-[node name="TopStatusInfo" type="HBoxContainer" parent="TimeControlBar" unique_id=1800439253]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 16
-
-[node name="MoneyInfo" type="Label" parent="TimeControlBar/TopStatusInfo" unique_id=75602435]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
-theme_override_font_sizes/font_size = 14
-text = "生活费: ¥2,000"
-
-[node name="GpaInfo" type="Label" parent="TimeControlBar/TopStatusInfo" unique_id=1770867193]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
-theme_override_font_sizes/font_size = 14
-text = "绩点: --"
-
-[node name="StudyInfo" type="Label" parent="TimeControlBar/TopStatusInfo" unique_id=244812350]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
-theme_override_font_sizes/font_size = 14
-text = "学习: 65"
-
-[node name="CreditsInfo" type="Label" parent="TimeControlBar/TopStatusInfo" unique_id=21168467]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.9, 0.3, 1)
-theme_override_font_sizes/font_size = 14
-text = "学分: 0/150"
-
-[node name="DateLabel" type="Label" parent="TimeControlBar" unique_id=1858693335]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.72, 0.78, 1)
-theme_override_font_sizes/font_size = 14
-text = "日期"
-horizontal_alignment = 2
+text = "2x"
 
 [node name="MainHBox" type="HBoxContainer" parent="." unique_id=993001991]
 layout_mode = 2
@@ -276,7 +206,7 @@ size_flags_stretch_ratio = 3.0
 theme_override_constants/separation = 8
 
 [node name="CurrentCard" type="PanelContainer" parent="MainHBox/LeftPanel" unique_id=123905771]
-custom_minimum_size = Vector2(0, 220)
+custom_minimum_size = Vector2(0, 164)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_current_card")
 
@@ -289,7 +219,7 @@ theme_override_constants/margin_bottom = 2
 
 [node name="CurrentVBox" type="VBoxContainer" parent="MainHBox/LeftPanel/CurrentCard/CurrentMargin" unique_id=123905773]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="CurrentHint" type="Label" parent="MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox" unique_id=123905774]
 layout_mode = 2
@@ -298,11 +228,18 @@ theme_override_font_sizes/font_size = 13
 text = "阶段播报"
 
 [node name="CurrentText" type="RichTextLabel" parent="MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox" unique_id=123905775]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/default_color = Color(0.95, 0.96, 0.98, 1)
-theme_override_font_sizes/normal_font_size = 20
+theme_override_font_sizes/normal_font_size = 18
 bbcode_enabled = true
+
+[node name="NextButton" type="Button" parent="MainHBox/LeftPanel/CurrentCard/CurrentMargin/CurrentVBox" unique_id=712348296]
+visible = false
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "推进到下一阶段"
 
 [node name="ChoicesContainer" type="VBoxContainer" parent="MainHBox/LeftPanel" unique_id=1553769099]
 layout_mode = 2
@@ -315,6 +252,7 @@ theme_override_font_sizes/font_size = 13
 text = "日志记录"
 
 [node name="EventText" type="RichTextLabel" parent="MainHBox/LeftPanel" unique_id=1714752636]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -323,12 +261,6 @@ theme_override_font_sizes/normal_font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_event_text")
 bbcode_enabled = true
 scroll_following = true
-
-[node name="NextButton" type="Button" parent="MainHBox/LeftPanel" unique_id=1586175151]
-visible = false
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-text = "下一步 ▶"
 
 [node name="RightPanel" type="PanelContainer" parent="MainHBox" unique_id=1620602194]
 custom_minimum_size = Vector2(280, 0)
@@ -517,9 +449,25 @@ show_percentage = false
 [node name="HSeparator2" type="HSeparator" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=325425232]
 layout_mode = 2
 
+[node name="RelationHeader" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1963000001]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.89, 0.96, 1)
+theme_override_font_sizes/font_size = 15
+text = "人际关系"
+
+[node name="RelationRows" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=1963000002]
+layout_mode = 2
+theme_override_constants/separation = 6
+
 [node name="TagsLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=410344070]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.62, 0.68, 1)
 theme_override_font_sizes/font_size = 13
 text = "暂无标签"
 autowrap_mode = 2
+
+[node name="OverlayRoot" type="CanvasLayer" parent="." unique_id=2030000001]
+layer = 90
+
+[node name="PopupRoot" type="CanvasLayer" parent="." unique_id=2030000002]
+layer = 110

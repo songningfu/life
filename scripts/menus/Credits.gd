@@ -10,13 +10,17 @@ var _scroll_speed := 42.0
 var _running := false
 
 func _ready() -> void:
+	set_process(false)
 	content.text = _build_credits_text()
 	_apply_visual_style()
 	close_btn.pressed.connect(func():
-		_running = false
+		_stop_scroll()
 		visible = false
 		close_requested.emit()
 	)
+
+func _exit_tree() -> void:
+	_stop_scroll()
 
 func _process(delta: float) -> void:
 	if not _running:
@@ -26,9 +30,14 @@ func _process(delta: float) -> void:
 	if bar.value >= bar.max_value:
 		bar.value = 0
 
+func _stop_scroll() -> void:
+	_running = false
+	set_process(false)
+
 func start_scroll() -> void:
 	visible = true
 	_running = true
+	set_process(true)
 	scroll.scroll_vertical = 0
 
 func _build_credits_text() -> String:
