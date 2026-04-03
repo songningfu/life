@@ -285,8 +285,121 @@ layout_mode = 2
 [node name="CampusMap" type="Control" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel" unique_id=1334639374]
 custom_minimum_size = Vector2(400, 300)
 layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
 script = ExtResource("3_campus_map")
+
+[node name="CardMargin" type="MarginContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 16.0
+offset_right = -18.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ContentOffset" type="Control" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Card" type="VBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="AccentBar" type="ColorRect" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+color = Color(0.52, 0.64, 0.98, 1)
+
+[node name="HeaderRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PhaseLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.72, 0.81, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "开学季"
+
+[node name="TimeLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card/HeaderRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "上午 · 08:00 - 12:00"
+horizontal_alignment = 2
+
+[node name="LocationName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.97, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "宿舍"
+
+[node name="LocationSubtitle" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.78, 0.86, 1)
+theme_override_font_sizes/font_size = 13
+text = "这里收纳了你一天里最松弛、也最真实的状态。"
+autowrap_mode = 2
+
+[node name="ActionTitle" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.86, 0.98, 1)
+theme_override_font_sizes/font_size = 12
+text = "当前安排"
+
+[node name="ActionName" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "等待安排"
+
+autowrap_mode = 2
+
+[node name="ActionDescription" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.76, 0.81, 0.89, 1)
+theme_override_font_sizes/font_size = 13
+text = "下一段校园生活还没开始，你短暂停在此刻。"
+autowrap_mode = 2
+
+[node name="AtmosphereLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.91, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "氛围提示：室友分享了他的零食，很好吃。"
+autowrap_mode = 2
+
+[node name="FooterRow" type="HBoxContainer" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="StatusLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card/FooterRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.81, 0.98, 1)
+theme_override_font_sizes/font_size = 12
+text = "待选择"
+
+[node name="DateLabel" type="Label" parent="MainHBox/RightPanel/RightScroll/RightContent/CampusMapPanel/CampusMap/CardMargin/ContentOffset/Card/FooterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.62, 0.68, 0.76, 1)
+theme_override_font_sizes/font_size = 12
+text = "第1天 · 9月1日 · 星期一"
+horizontal_alignment = 2
 
 [node name="HSeparator1" type="HSeparator" parent="MainHBox/RightPanel/RightScroll/RightContent" unique_id=2129482212]
 layout_mode = 2

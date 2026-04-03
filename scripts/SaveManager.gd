@@ -185,6 +185,9 @@ func get_temp(key: String, default: Variant = null) -> Variant:
 func has_temp(key: String) -> bool:
 	return _temp_store.has(key)
 
+func clear_temp(key: String) -> void:
+	_temp_store.erase(key)
+
 # ==================== 舍友数据缓存 ====================
 
 var _roommates_cache: Array = []

@@ -8,6 +8,8 @@
       "sleep_habit": "早睡早起",
       "cleanliness": 9,
       "noise_level": 2,
+      "rarity": "r",
+      "weight": 18,
       "portrait": "res://images/portraits/roommates/rm_scholar_01.png",
       "traits": ["自律", "计划控", "笔记狂魔"],
       "description": "作息像闹钟一样精确，书桌永远整洁，考试周能带飞全寝。",
@@ -26,6 +28,8 @@
       "sleep_habit": "晚睡晚起",
       "cleanliness": 6,
       "noise_level": 8,
+      "rarity": "r",
+      "weight": 18,
       "portrait": "res://images/portraits/roommates/rm_social_01.png",
       "traits": ["外向", "人脉广", "情绪感染力强"],
       "description": "朋友圈比课表还复杂，走在路上三步一个熟人，寝室气氛担当。",
@@ -44,6 +48,8 @@
       "sleep_habit": "昼夜颠倒",
       "cleanliness": 5,
       "noise_level": 7,
+      "rarity": "r",
+      "weight": 18,
       "portrait": "res://images/portraits/roommates/rm_gamer_01.png",
       "traits": ["夜猫子", "梗王", "设备党"],
       "description": "键盘声是寝室夜间背景乐，虽然偶尔摆烂，但关键时刻很讲义气。",
@@ -62,6 +68,8 @@
       "sleep_habit": "规律早睡",
       "cleanliness": 8,
       "noise_level": 4,
+      "rarity": "r",
+      "weight": 17,
       "portrait": "res://images/portraits/roommates/rm_sport_01.png",
       "traits": ["自律", "执行力强", "正能量"],
       "description": "冰箱里永远有鸡胸肉，寝室地板都能反光，行动力拉满。",
@@ -80,6 +88,8 @@
       "sleep_habit": "不固定",
       "cleanliness": 7,
       "noise_level": 3,
+      "rarity": "sr",
+      "weight": 10,
       "portrait": "res://images/portraits/roommates/rm_art_01.png",
       "traits": ["细腻", "感性", "审美在线"],
       "description": "说话像写句子，常在窗边发呆，偶尔一句话能让你沉默很久。",
@@ -98,6 +108,8 @@
       "sleep_habit": "随机",
       "cleanliness": 3,
       "noise_level": 5,
+      "rarity": "r",
+      "weight": 19,
       "portrait": "res://images/portraits/roommates/rm_slack_01.png",
       "traits": ["随缘", "乐天", "抗压奇高"],
       "description": "他的口头禅是‘明天再说’，但总能在最后时刻奇迹补救。",
@@ -107,11 +119,35 @@
         "study": "他说复习计划已经在脑子里完成了。",
         "weekend": "周末他和被子完成了深度绑定。"
       }
+    },
+    {
+      "id": "rm_ssr_01",
+      "name": "沈星回",
+      "personality": "天花板舍友",
+      "hobby": "晨跑、竞赛、做饭、乐队排练",
+      "sleep_habit": "极稳",
+      "cleanliness": 10,
+      "noise_level": 1,
+      "rarity": "ssr",
+      "weight": 2,
+      "portrait": "res://images/portraits/roommates/rm_ssr_01.png",
+      "traits": ["靠谱", "会照顾人", "强得离谱"],
+      "description": "他像把大学生活的难题都提前做过一遍，强到有点不真实，却总在最普通的时刻照顾到你。",
+      "flavor_texts": {
+        "morning": "你醒来时，他已经把早餐顺手放在桌角。",
+        "night": "熄灯前他轻声提醒你：明天别忘了带资料。",
+        "study": "你卡住的地方，他看一眼就能讲到你听懂。",
+        "weekend": "周末他会把寝室收拾好，再问你要不要一起出去走走。"
+      }
     }
   ],
   "draw_config": {
     "roommate_count": 3,
     "allow_redraw": true,
-    "max_redraw": 2
+    "max_redraw": 20,
+    "ssr_rarity": "ssr",
+    "late_draw_threshold": 20,
+    "late_draw_tip": "抽到这里你该懂了，真正难得的不是极品，是一直陪着你过日子的人。",
+    "ssr_tip": "这次真让你欧到了。可再稀有的人，也要能陪你把日子过下去。"
   }
 }

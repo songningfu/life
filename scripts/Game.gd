@@ -4,6 +4,7 @@
 extends Node
 
 const UI_COLORS = preload("res://scripts/ui/UIColors.gd")
+const GAME_STATIC_DATA = preload("res://scripts/GameStaticData.gd")
 const GAME_FLOW_SCRIPT = preload("res://scripts/core/GameFlow.gd")
 const ACTION_EXECUTOR_SCRIPT = preload("res://scripts/core/ActionExecutor.gd")
 const EVENT_RUNTIME_SCRIPT = preload("res://scripts/core/EventRuntime.gd")
@@ -518,17 +519,18 @@ func _load_existing_game(init_data: Dictionary) -> void:
 
 ## 应用家庭背景效果
 func _apply_background_effects(bg_id: String) -> void:
-	var bg_effects: Dictionary = {
-		"normal": {},
-		"business": {"living_money": 500, "social": 8, "mental": -10},
-		"teacher": {"study_points": 8, "mental": -8, "social": -5},
-		"rural": {"living_money": -400, "health": 8, "ability": 8},
-		"single_parent": {"ability": 10, "mental": -12, "living_money": -200},
-	}
-	var effects: Dictionary = bg_effects.get(bg_id, {})
+	var effects: Dictionary = GAME_STATIC_DATA.get_background_effects(bg_id)
+	flags["background_monthly_bonus"] = int(effects.get("monthly_bonus", 0))
 	for attr: String in effects:
-		if attributes.has(attr):
-			attributes[attr] += effects[attr]
+		var value := effects[attr]
+		match attr:
+			"living_money_bonus":
+				attributes["living_money"] += value
+			"monthly_bonus":
+				continue
+			_:
+				if attributes.has(attr):
+					attributes[attr] += value
 
 # ==================== 游戏流程控制 ====================
 

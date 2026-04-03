@@ -57,17 +57,12 @@ theme_override_constants/separation = 10
 [node name="NewGameBtn" type="Button" parent="Center/VBox/MenuButtons"]
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
-text = "新游戏"
+text = "新学期"
 
 [node name="ContinueBtn" type="Button" parent="Center/VBox/MenuButtons"]
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
-text = "继续游戏"
-
-[node name="SaveManageBtn" type="Button" parent="Center/VBox/MenuButtons"]
-custom_minimum_size = Vector2(0, 46)
-layout_mode = 2
-text = "存档管理"
+text = "继续学业"
 
 [node name="OptionsBtn" type="Button" parent="Center/VBox/MenuButtons"]
 custom_minimum_size = Vector2(0, 46)

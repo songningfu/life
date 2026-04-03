@@ -15,10 +15,18 @@ func get_module_id() -> String:
 func get_module_name() -> String:
 	return "成就系统"
 
-func on_new_game(_init_data: Dictionary) -> void:
+func on_new_game(init_data: Dictionary) -> void:
 	_load_definitions()
 	_unlocked.clear()
 	_counters.clear()
+	var roommate_draw_summary: Dictionary = init_data.get("roommate_draw_summary", {})
+	if not roommate_draw_summary.is_empty():
+		var draw_count: int = int(roommate_draw_summary.get("draw_count", 0))
+		var ssr_draw_count: int = int(roommate_draw_summary.get("ssr_draw_count", 0))
+		if draw_count > 0:
+			_set_counter("roommate_draw_total", draw_count)
+		if ssr_draw_count > 0:
+			_set_counter("roommate_ssr_total", ssr_draw_count)
 
 func on_day_start(day_index: int, _phase: String) -> void:
 	_set_counter("days_survived", day_index + 1)
@@ -107,10 +115,17 @@ func _set_counter(counter_name: String, value: int) -> void:
 		_counters[counter_name] = value
 	_check_counter_defs_for(counter_name)
 
+func add_counter(counter_name: String, value: int = 1) -> void:
+	_add_counter(counter_name, value)
+
+func set_counter(counter_name: String, value: int) -> void:
+	_set_counter(counter_name, value)
+
 func _refresh_met_npc_counter() -> void:
 	if RelationshipManager and RelationshipManager.has_method("get_met_npcs"):
 		var met: Array = RelationshipManager.get_met_npcs()
 		_set_counter("met_npcs", met.size())
+
 
 func _check_counter_defs_for(counter_name: String) -> void:
 	for def: Dictionary in _definitions:

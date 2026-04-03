@@ -37,9 +37,9 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBox" type="VBoxContainer" parent="PageContainer/Page1_Name" unique_id=592985610]
-custom_minimum_size = Vector2(600, 0)
+custom_minimum_size = Vector2(680, 0)
 layout_mode = 2
-theme_override_constants/separation = 30
+theme_override_constants/separation = 34
 
 [node name="Spacer1" type="Control" parent="PageContainer/Page1_Name/VBox" unique_id=595685874]
 custom_minimum_size = Vector2(0, 80)
@@ -85,12 +85,12 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBox" type="VBoxContainer" parent="PageContainer/Page2_Gender" unique_id=910830109]
-custom_minimum_size = Vector2(600, 0)
+custom_minimum_size = Vector2(820, 0)
 layout_mode = 2
-theme_override_constants/separation = 40
+theme_override_constants/separation = 28
 
-[node name="Spacer1" type="Control" parent="PageContainer/Page2_Gender/VBox" unique_id=1011850823]
-custom_minimum_size = Vector2(0, 60)
+[node name="TopSpacer" type="Control" parent="PageContainer/Page2_Gender/VBox"]
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 
 [node name="Title" type="Label" parent="PageContainer/Page2_Gender/VBox" unique_id=788457830]
@@ -103,30 +103,25 @@ layout_mode = 2
 text = "先决定你将以什么身份开始"
 horizontal_alignment = 1
 
-[node name="Spacer2" type="Control" parent="PageContainer/Page2_Gender/VBox" unique_id=2030233186]
-custom_minimum_size = Vector2(0, 30)
+[node name="SelectionHint" type="Label" parent="PageContainer/Page2_Gender/VBox"]
 layout_mode = 2
+text = "当前身份：男生"
+horizontal_alignment = 1
 
 [node name="GenderButtons" type="HBoxContainer" parent="PageContainer/Page2_Gender/VBox" unique_id=1800125851]
 layout_mode = 2
-theme_override_constants/separation = 30
+theme_override_constants/separation = 26
 alignment = 1
 
 [node name="MaleBtn" type="Button" parent="PageContainer/Page2_Gender/VBox/GenderButtons" unique_id=1201037125]
-custom_minimum_size = Vector2(200, 120)
+custom_minimum_size = Vector2(290, 220)
 layout_mode = 2
-text = "♂
-男"
+text = "♂\n\n男生"
 
 [node name="FemaleBtn" type="Button" parent="PageContainer/Page2_Gender/VBox/GenderButtons" unique_id=1727002455]
-custom_minimum_size = Vector2(200, 120)
+custom_minimum_size = Vector2(290, 220)
 layout_mode = 2
-text = "♀
-女"
-
-[node name="Spacer3" type="Control" parent="PageContainer/Page2_Gender/VBox" unique_id=1041020491]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
+text = "♀\n\n女生"
 
 [node name="NavButtons" type="HBoxContainer" parent="PageContainer/Page2_Gender/VBox" unique_id=265862832]
 layout_mode = 2
@@ -134,16 +129,20 @@ theme_override_constants/separation = 20
 alignment = 1
 
 [node name="BackBtn" type="Button" parent="PageContainer/Page2_Gender/VBox/NavButtons" unique_id=551608372]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(160, 52)
 layout_mode = 2
 text = "← 上一步"
 
 [node name="NextBtn" type="Button" parent="PageContainer/Page2_Gender/VBox/NavButtons" unique_id=637850626]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(170, 52)
 layout_mode = 2
 text = "下一步 →"
 
-[node name="Page3_Background" type="CenterContainer" parent="PageContainer" unique_id=1911042770]
+[node name="BottomSpacer" type="Control" parent="PageContainer/Page2_Gender/VBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="Page3_Background" type="Control" parent="PageContainer" unique_id=1911042770]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -159,20 +158,18 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 150
+offset_top = 0.0
+offset_bottom = 0.0
+theme_override_constants/margin_left = 72
 theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 150
+theme_override_constants/margin_right = 72
 theme_override_constants/margin_bottom = 76
 
 [node name="VBox" type="VBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer" unique_id=247518735]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 14
-
-[node name="Spacer1" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1940393474]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
+theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1642634167]
 layout_mode = 2
@@ -184,17 +181,106 @@ layout_mode = 2
 text = "你从什么样的地方走来"
 horizontal_alignment = 1
 
-[node name="Spacer2" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=749544819]
-custom_minimum_size = Vector2(0, 10)
+[node name="BudgetBar" type="PanelContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox"]
 layout_mode = 2
 
-[node name="BackgroundList" type="VBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1191050778]
+[node name="VBox" type="VBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BudgetBar"]
+layout_mode = 2
+
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BudgetBar/VBox"]
+layout_mode = 2
+
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BudgetTitle" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BudgetBar/VBox/HeaderRow"]
+layout_mode = 2
+text = "分配点数"
+
+[node name="BudgetValue" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BudgetBar/VBox/HeaderRow"]
+layout_mode = 2
+text = "0 / 9"
+
+[node name="BudgetHint" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BudgetBar/VBox/HeaderRow"]
+layout_mode = 2
+text = "剩余分配点数 9 · 先决定出身基底"
+
+[node name="BudgetMeter" type="ProgressBar" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BudgetBar/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+max_value = 9.0
+value = 0.0
+show_percentage = false
+
+[node name="SelectionSummary" type="PanelContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox/SelectionSummary"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox/SelectionSummary/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Spacer3" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1310182450]
-custom_minimum_size = Vector2(0, 16)
+[node name="SummaryTitle" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
 layout_mode = 2
+text = "当前选择"
+
+[node name="SummaryBody" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
+layout_mode = 2
+text = "普通家庭\n均衡开局，几乎没有明显短板。"
+autowrap_mode = 3
+
+[node name="SummaryImpact" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
+layout_mode = 2
+text = "影响：整体较均衡"
+autowrap_mode = 3
+
+[node name="SectionHeader" type="VBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SectionTitle" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/SectionHeader"]
+layout_mode = 2
+text = "出身路线"
+
+[node name="SectionSubtitle" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/SectionHeader"]
+layout_mode = 2
+text = "选一个最接近你开局节奏的出身路线。"
+
+[node name="BackgroundList" type="GridContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=1191050778]
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 2
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+
+[node name="BackgroundPager" type="HBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="PrevPageBtn" type="Button" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BackgroundPager"]
+custom_minimum_size = Vector2(132, 42)
+layout_mode = 2
+text = "← 上一组"
+
+[node name="PageLabel" type="Label" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BackgroundPager"]
+layout_mode = 2
+text = "第 1 / 2 组"
+horizontal_alignment = 1
+
+[node name="NextPageBtn" type="Button" parent="PageContainer/Page3_Background/ScrollContainer/VBox/BackgroundPager"]
+custom_minimum_size = Vector2(132, 42)
+layout_mode = 2
+text = "下一组 →"
+
 
 [node name="NavButtons" type="HBoxContainer" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=593233452]
 layout_mode = 2
@@ -202,20 +288,20 @@ theme_override_constants/separation = 20
 alignment = 1
 
 [node name="BackBtn" type="Button" parent="PageContainer/Page3_Background/ScrollContainer/VBox/NavButtons" unique_id=1866506158]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(160, 52)
 layout_mode = 2
 text = "← 上一步"
 
 [node name="NextBtn" type="Button" parent="PageContainer/Page3_Background/ScrollContainer/VBox/NavButtons" unique_id=1821148515]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(170, 52)
 layout_mode = 2
 text = "下一步 →"
 
-[node name="Spacer4" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox" unique_id=151831365]
-custom_minimum_size = Vector2(0, 8)
+[node name="BottomSpacer" type="Control" parent="PageContainer/Page3_Background/ScrollContainer/VBox"]
+custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
 
-[node name="Page4_University" type="CenterContainer" parent="PageContainer" unique_id=735025957]
+[node name="Page4_University" type="Control" parent="PageContainer" unique_id=735025957]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -231,20 +317,18 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 150
+offset_top = 0.0
+offset_bottom = 0.0
+theme_override_constants/margin_left = 120
 theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 150
+theme_override_constants/margin_right = 120
 theme_override_constants/margin_bottom = 76
 
 [node name="VBox" type="VBoxContainer" parent="PageContainer/Page4_University/ScrollContainer" unique_id=553165855]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 14
-
-[node name="Spacer1" type="Control" parent="PageContainer/Page4_University/ScrollContainer/VBox" unique_id=504870897]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
+theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="PageContainer/Page4_University/ScrollContainer/VBox" unique_id=1440052370]
 layout_mode = 2
@@ -256,21 +340,57 @@ layout_mode = 2
 text = "下一站，你会去哪里"
 horizontal_alignment = 1
 
-[node name="Spacer2" type="Control" parent="PageContainer/Page4_University/ScrollContainer/VBox" unique_id=1496172217]
-custom_minimum_size = Vector2(0, 12)
+[node name="BudgetBar" type="PanelContainer" parent="PageContainer/Page4_University/ScrollContainer/VBox"]
 layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="PageContainer/Page4_University/ScrollContainer/VBox/BudgetBar"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BudgetTitle" type="Label" parent="PageContainer/Page4_University/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "分配点数"
+
+[node name="BudgetValue" type="Label" parent="PageContainer/Page4_University/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "0 / 9"
+
+[node name="BudgetHint" type="Label" parent="PageContainer/Page4_University/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "剩余分配点数 9 · 院校越高压通常越贵"
+
+[node name="SelectionSummary" type="PanelContainer" parent="PageContainer/Page4_University/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="PageContainer/Page4_University/ScrollContainer/VBox/SelectionSummary"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="PageContainer/Page4_University/ScrollContainer/VBox/SelectionSummary/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SummaryTitle" type="Label" parent="PageContainer/Page4_University/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
+layout_mode = 2
+text = "当前选择"
+
+[node name="SummaryBody" type="Label" parent="PageContainer/Page4_University/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
+layout_mode = 2
+text = "985高校 · 东岚大学\n老牌研究型名校，学业压力大。"
+autowrap_mode = 3
+
+[node name="SummaryImpact" type="Label" parent="PageContainer/Page4_University/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
+layout_mode = 2
+text = "路线：高压高资源 / 竞争强"
+autowrap_mode = 3
 
 [node name="UniversityList" type="VBoxContainer" parent="PageContainer/Page4_University/ScrollContainer/VBox" unique_id=415035349]
 layout_mode = 2
 theme_override_constants/separation = 10
-
-[node name="Spacer3" type="Control" parent="PageContainer/Page4_University/ScrollContainer/VBox" unique_id=147924666]
-custom_minimum_size = Vector2(0, 12)
-layout_mode = 2
-
-[node name="Spacer4" type="Control" parent="PageContainer/Page4_University/ScrollContainer/VBox" unique_id=646895607]
-custom_minimum_size = Vector2(0, 18)
-layout_mode = 2
 
 [node name="NavButtons" type="HBoxContainer" parent="PageContainer/Page4_University/ScrollContainer/VBox" unique_id=1806256919]
 layout_mode = 2
@@ -278,20 +398,20 @@ theme_override_constants/separation = 20
 alignment = 1
 
 [node name="BackBtn" type="Button" parent="PageContainer/Page4_University/ScrollContainer/VBox/NavButtons" unique_id=1569683500]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(160, 52)
 layout_mode = 2
 text = "← 上一步"
 
 [node name="NextBtn" type="Button" parent="PageContainer/Page4_University/ScrollContainer/VBox/NavButtons" unique_id=784165879]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(170, 52)
 layout_mode = 2
 text = "下一步 →"
 
-[node name="Spacer5" type="Control" parent="PageContainer/Page4_University/ScrollContainer/VBox" unique_id=1253277271]
-custom_minimum_size = Vector2(0, 8)
+[node name="BottomSpacer" type="Control" parent="PageContainer/Page4_University/ScrollContainer/VBox"]
+custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
 
-[node name="Page5_Major" type="CenterContainer" parent="PageContainer" unique_id=1888005001]
+[node name="Page5_Major" type="Control" parent="PageContainer" unique_id=1888005001]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -307,6 +427,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+offset_top = 0.0
+offset_bottom = 0.0
 theme_override_constants/margin_left = 90
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 90
@@ -316,11 +438,7 @@ theme_override_constants/margin_bottom = 76
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 14
-
-[node name="Spacer1" type="Control" parent="PageContainer/Page5_Major/ScrollContainer/VBox" unique_id=1888005004]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
+theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="PageContainer/Page5_Major/ScrollContainer/VBox" unique_id=1888005005]
 layout_mode = 2
@@ -332,20 +450,60 @@ layout_mode = 2
 text = "你想把四年交给什么方向"
 horizontal_alignment = 1
 
-[node name="Spacer2" type="Control" parent="PageContainer/Page5_Major/ScrollContainer/VBox" unique_id=1888005007]
-custom_minimum_size = Vector2(0, 12)
+[node name="BudgetBar" type="PanelContainer" parent="PageContainer/Page5_Major/ScrollContainer/VBox"]
 layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="PageContainer/Page5_Major/ScrollContainer/VBox/BudgetBar"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BudgetTitle" type="Label" parent="PageContainer/Page5_Major/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "分配点数"
+
+[node name="BudgetValue" type="Label" parent="PageContainer/Page5_Major/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "0 / 9"
+
+[node name="BudgetHint" type="Label" parent="PageContainer/Page5_Major/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "剩余分配点数 9 · 专业决定长期负荷"
+
+[node name="SelectionSummary" type="PanelContainer" parent="PageContainer/Page5_Major/ScrollContainer/VBox"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="PageContainer/Page5_Major/ScrollContainer/VBox/SelectionSummary"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="PageContainer/Page5_Major/ScrollContainer/VBox/SelectionSummary/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SummaryTitle" type="Label" parent="PageContainer/Page5_Major/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
+layout_mode = 2
+text = "当前选择"
+
+[node name="SummaryBody" type="Label" parent="PageContainer/Page5_Major/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
+layout_mode = 2
+text = "计算机科学与技术\n核心课密集，项目和考试双线并行。"
+autowrap_mode = 3
+
+[node name="SummaryImpact" type="Label" parent="PageContainer/Page5_Major/ScrollContainer/VBox/SelectionSummary/Margin/VBox"]
+layout_mode = 2
+text = "学分 165 / 难度 x1.18 / 路线：项目双线"
+autowrap_mode = 3
 
 [node name="MajorList" type="GridContainer" parent="PageContainer/Page5_Major/ScrollContainer/VBox" unique_id=1888005008]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 10
-
-[node name="Spacer3" type="Control" parent="PageContainer/Page5_Major/ScrollContainer/VBox" unique_id=1888005009]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 12
 
 [node name="MajorPager" type="HBoxContainer" parent="PageContainer/Page5_Major/ScrollContainer/VBox" unique_id=1888005032]
 layout_mode = 2
@@ -353,7 +511,7 @@ theme_override_constants/separation = 14
 alignment = 1
 
 [node name="PrevPageBtn" type="Button" parent="PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager" unique_id=1888005033]
-custom_minimum_size = Vector2(120, 40)
+custom_minimum_size = Vector2(132, 42)
 layout_mode = 2
 text = "← 上一组"
 
@@ -363,7 +521,7 @@ text = "第 1 / 3 组"
 horizontal_alignment = 1
 
 [node name="NextPageBtn" type="Button" parent="PageContainer/Page5_Major/ScrollContainer/VBox/MajorPager" unique_id=1888005035]
-custom_minimum_size = Vector2(120, 40)
+custom_minimum_size = Vector2(132, 42)
 layout_mode = 2
 text = "下一组 →"
 
@@ -373,20 +531,20 @@ theme_override_constants/separation = 20
 alignment = 1
 
 [node name="BackBtn" type="Button" parent="PageContainer/Page5_Major/ScrollContainer/VBox/NavButtons" unique_id=1888005011]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(160, 52)
 layout_mode = 2
 text = "← 上一步"
 
 [node name="NextBtn" type="Button" parent="PageContainer/Page5_Major/ScrollContainer/VBox/NavButtons" unique_id=1888005012]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(170, 52)
 layout_mode = 2
 text = "下一步 →"
 
-[node name="Spacer4" type="Control" parent="PageContainer/Page5_Major/ScrollContainer/VBox" unique_id=1888005013]
-custom_minimum_size = Vector2(0, 8)
+[node name="BottomSpacer" type="Control" parent="PageContainer/Page5_Major/ScrollContainer/VBox"]
+custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
 
-[node name="Page6_Talent" type="CenterContainer" parent="PageContainer" unique_id=1888005014]
+[node name="Page6_Talent" type="Control" parent="PageContainer" unique_id=1888005014]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -402,6 +560,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+offset_top = 0.0
+offset_bottom = 0.0
 theme_override_constants/margin_left = 150
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 150
@@ -411,11 +571,7 @@ theme_override_constants/margin_bottom = 76
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 14
-
-[node name="Spacer1" type="Control" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005017]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
+theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005018]
 layout_mode = 2
@@ -427,30 +583,38 @@ layout_mode = 2
 text = "每个人身上，总会有几处与众不同"
 horizontal_alignment = 1
 
-[node name="Spacer2" type="Control" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005020]
-custom_minimum_size = Vector2(0, 12)
+[node name="BudgetBar" type="PanelContainer" parent="PageContainer/Page6_Talent/ScrollContainer/VBox"]
 layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="PageContainer/Page6_Talent/ScrollContainer/VBox/BudgetBar"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BudgetTitle" type="Label" parent="PageContainer/Page6_Talent/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "重抽次数"
+
+[node name="BudgetValue" type="Label" parent="PageContainer/Page6_Talent/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "0 / 2"
+
+[node name="BudgetHint" type="Label" parent="PageContainer/Page6_Talent/ScrollContainer/VBox/BudgetBar/HBox"]
+layout_mode = 2
+text = "首次抽取免费 · 还可重抽 2 次"
 
 [node name="TalentList" type="VBoxContainer" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005021]
 layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="Spacer3" type="Control" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005022]
-custom_minimum_size = Vector2(0, 12)
-layout_mode = 2
+theme_override_constants/separation = 12
 
 [node name="RollBtn" type="Button" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005023]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-text = "🎲 抽取天赋"
+text = "免费抽取天赋"
 
 [node name="HintLabel" type="Label" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005024]
 layout_mode = 2
 horizontal_alignment = 1
-
-[node name="Spacer4" type="Control" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005025]
-custom_minimum_size = Vector2(0, 18)
-layout_mode = 2
 
 [node name="NavButtons" type="HBoxContainer" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005026]
 layout_mode = 2
@@ -458,17 +622,17 @@ theme_override_constants/separation = 20
 alignment = 1
 
 [node name="BackBtn" type="Button" parent="PageContainer/Page6_Talent/ScrollContainer/VBox/NavButtons" unique_id=1888005027]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(160, 52)
 layout_mode = 2
 text = "← 上一步"
 
 [node name="StartBtn" type="Button" parent="PageContainer/Page6_Talent/ScrollContainer/VBox/NavButtons" unique_id=1888005028]
-custom_minimum_size = Vector2(200, 50)
+custom_minimum_size = Vector2(220, 52)
 layout_mode = 2
 text = "开始大学生活 →"
 
-[node name="Spacer5" type="Control" parent="PageContainer/Page6_Talent/ScrollContainer/VBox" unique_id=1888005029]
-custom_minimum_size = Vector2(0, 8)
+[node name="BottomSpacer" type="Control" parent="PageContainer/Page6_Talent/ScrollContainer/VBox"]
+custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
 
 [node name="ProgressIndicator" type="HBoxContainer" parent="." unique_id=686761401]
@@ -523,17 +687,17 @@ mouse_filter = 1
 color = Color(0.01, 0.01, 0.02, 1)
 
 [node name="IntroLabel" type="RichTextLabel" parent="IntroOverlay" unique_id=1888005037]
-custom_minimum_size = Vector2(820, 340)
+custom_minimum_size = Vector2(1040, 420)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -410.0
-offset_top = -170.0
-offset_right = 410.0
-offset_bottom = 170.0
+offset_left = -520.0
+offset_top = -220.0
+offset_right = 520.0
+offset_bottom = 200.0
 grow_horizontal = 2
 grow_vertical = 2
 bbcode_enabled = true
@@ -542,11 +706,16 @@ fit_content = true
 
 [node name="IntroHint" type="Label" parent="IntroOverlay" unique_id=1888005038]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -190.0
-offset_top = -48.0
+offset_left = -220.0
+offset_top = -64.0
+offset_right = -36.0
+offset_bottom = -34.0
 grow_horizontal = 0
 grow_vertical = 0
 text = "点击屏幕继续..."
+horizontal_alignment = 2

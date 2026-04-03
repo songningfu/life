@@ -101,14 +101,15 @@ func get_base_morning_info(game: Node) -> Array[Dictionary]:
 	})
 
 	if game.current_day % 30 == 0:
+		var monthly_allowance := 1500 + int(game.flags.get("background_monthly_bonus", 0))
 		infos.append({
 			"icon": "💰",
-			"text": "生活费到账 +¥1500",
+			"text": "生活费到账 +¥%d" % monthly_allowance,
 			"priority": 9
 		})
-		game.attributes["living_money"] += 1500
+		game.attributes["living_money"] += monthly_allowance
 		if game._notify and game._notify.has_method("money_change"):
-			game._notify.money_change(1500)
+			game._notify.money_change(monthly_allowance)
 
 	if game.attributes["health"] < 30:
 		infos.append({"icon": "🏥", "text": "你的健康状况不佳，注意休息", "priority": 8})

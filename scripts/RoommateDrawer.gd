@@ -18,7 +18,9 @@ static func load_pool() -> Array:
 		_draw_config_cache = {
 			"roommate_count": 3,
 			"allow_redraw": true,
-			"max_redraw": 2
+			"max_redraw": 2,
+			"ssr_rarity": "ssr",
+			"late_draw_threshold": 20,
 		}
 		return []
 
@@ -34,7 +36,9 @@ static func load_pool() -> Array:
 		_draw_config_cache = {
 			"roommate_count": 3,
 			"allow_redraw": true,
-			"max_redraw": 2
+			"max_redraw": 2,
+			"ssr_rarity": "ssr",
+			"late_draw_threshold": 20,
 		}
 		return []
 
@@ -60,7 +64,11 @@ static func get_draw_config() -> Dictionary:
 	var config: Dictionary = {
 		"roommate_count": 3,
 		"allow_redraw": true,
-		"max_redraw": 2
+		"max_redraw": 2,
+		"ssr_rarity": "ssr",
+		"late_draw_threshold": 20,
+		"late_draw_tip": "抽到这里你该懂了，真正难得的不是极品，是一直陪着你过日子的人。",
+		"ssr_tip": "这次真让你欧到了。可再稀有的人，也要能陪你把日子过下去。"
 	}
 	for key: Variant in _draw_config_cache.keys():
 		config[key] = _draw_config_cache[key]
@@ -80,14 +88,23 @@ static func draw_roommates(count: int, exclude_ids: Array) -> Array:
 				continue
 			filtered.append(info.duplicate(true))
 
-	for i: int in range(filtered.size() - 1, 0, -1):
-		var j: int = randi() % (i + 1)
-		var temp: Variant = filtered[i]
-		filtered[i] = filtered[j]
-		filtered[j] = temp
-
 	var take_n: int = mini(maxi(count, 0), filtered.size())
-	return filtered.slice(0, take_n)
+	var result: Array = []
+	while result.size() < take_n and not filtered.is_empty():
+		var pick_index := _pick_weighted_index(filtered)
+		if pick_index < 0 or pick_index >= filtered.size():
+			break
+		result.append(filtered[pick_index])
+		filtered.remove_at(pick_index)
+	return result
+
+static func has_ssr(roommates: Array) -> bool:
+	var config := get_draw_config()
+	var ssr_rarity := str(config.get("ssr_rarity", "ssr")).to_lower()
+	for item: Variant in roommates:
+		if item is Dictionary and str(item.get("rarity", "r")).to_lower() == ssr_rarity:
+			return true
+	return false
 
 static func get_roommate_by_id(id: String) -> Dictionary:
 	var pool: Array = load_pool()
@@ -97,3 +114,22 @@ static func get_roommate_by_id(id: String) -> Dictionary:
 			if str(info.get("id", "")) == id:
 				return info.duplicate(true)
 	return {}
+
+static func _pick_weighted_index(candidates: Array) -> int:
+	var total_weight := 0
+	for item: Variant in candidates:
+		if item is Dictionary:
+			total_weight += maxi(int(item.get("weight", 1)), 1)
+	if total_weight <= 0:
+		return 0
+
+	var roll := randi_range(1, total_weight)
+	var cursor := 0
+	for i in range(candidates.size()):
+		var item: Variant = candidates[i]
+		if not (item is Dictionary):
+			continue
+		cursor += maxi(int(item.get("weight", 1)), 1)
+		if roll <= cursor:
+			return i
+	return max(candidates.size() - 1, 0)

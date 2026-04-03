@@ -26,6 +26,8 @@
     {"id": "health_90", "name": "身体倍棒", "desc": "健康达到 90", "type": "attribute", "attribute": "health", "target": 90, "op": ">="},
     {"id": "mental_90", "name": "内心稳定", "desc": "心理达到 90", "type": "attribute", "attribute": "mental", "target": 90, "op": ">="},
 
+    {"id": "roommate_draw_20", "name": "陪伴才是答案", "desc": "累计抽取舍友 20 次", "type": "counter", "counter": "roommate_draw_total", "target": 20},
+    {"id": "roommate_ssr_1", "name": "欧气爆发", "desc": "抽到 1 次 SSR 舍友", "type": "counter", "counter": "roommate_ssr_total", "target": 1},
     {"id": "semester_4", "name": "学业中坚", "desc": "完成 4 次学期结算", "type": "counter", "counter": "semesters_completed", "target": 4},
     {"id": "met_npcs_5", "name": "人脉初成", "desc": "认识 5 位 NPC", "type": "counter", "counter": "met_npcs", "target": 5},
 

@@ -4,7 +4,6 @@ extends Control
 @onready var subtitle_label: Label = $Center/VBox/SubTitle
 @onready var new_game_btn: Button = $Center/VBox/MenuButtons/NewGameBtn
 @onready var continue_btn: Button = $Center/VBox/MenuButtons/ContinueBtn
-@onready var save_manage_btn: Button = $Center/VBox/MenuButtons/SaveManageBtn
 @onready var options_btn: Button = $Center/VBox/MenuButtons/OptionsBtn
 @onready var credits_btn: Button = $Center/VBox/MenuButtons/CreditsBtn
 @onready var exit_btn: Button = $Center/VBox/MenuButtons/ExitBtn
@@ -23,7 +22,6 @@ func _ready() -> void:
 
 	new_game_btn.pressed.connect(_on_new_game_pressed)
 	continue_btn.pressed.connect(_on_continue_pressed)
-	save_manage_btn.pressed.connect(_on_save_manage_pressed)
 	options_btn.pressed.connect(_on_options_pressed)
 	credits_btn.pressed.connect(_on_credits_pressed)
 	exit_btn.pressed.connect(func(): get_tree().quit())
@@ -56,9 +54,6 @@ func _on_continue_pressed() -> void:
 	})
 	SceneTransitions.fade_to("game")
 
-func _on_save_manage_pressed() -> void:
-	_open_save_slots_for_manage()
-
 func _on_options_pressed() -> void:
 	if _options_menu == null:
 		var packed: PackedScene = load("res://scenes/menus/OptionsMenu.tscn")
@@ -78,12 +73,6 @@ func _on_credits_pressed() -> void:
 	_credits_menu.start_scroll()
 
 func _open_save_slots_for_new_game() -> void:
-	if _save_slots_panel == null:
-		_create_save_slots_panel()
-	_show_popup(_save_slots_panel)
-	_save_slots_panel.open_manage()
-
-func _open_save_slots_for_manage() -> void:
 	if _save_slots_panel == null:
 		_create_save_slots_panel()
 	_show_popup(_save_slots_panel)
@@ -163,7 +152,6 @@ func _apply_visual_style() -> void:
 
 	_style_menu_button(new_game_btn)
 	_style_menu_button(continue_btn)
-	_style_menu_button(save_manage_btn)
 	_style_menu_button(options_btn)
 	_style_menu_button(credits_btn)
 	_style_menu_button(exit_btn)

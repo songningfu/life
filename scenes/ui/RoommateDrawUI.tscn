@@ -14,61 +14,150 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
-color = Color(0, 0, 0, 0.65)
+color = Color(0.01, 0.02, 0.04, 0.76)
+
+[node name="BackGlow" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.22, 0.44, 0.14)
 
 [node name="RootPanel" type="PanelContainer" parent="." unique_name_in_owner=true]
-custom_minimum_size = Vector2(980, 720)
+custom_minimum_size = Vector2(1100, 760)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -490.0
-offset_top = -360.0
-offset_right = 490.0
-offset_bottom = 360.0
+offset_left = -550.0
+offset_top = -380.0
+offset_right = 550.0
+offset_bottom = 380.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="AnimPlayer" type="AnimationPlayer" parent="RootPanel" unique_name_in_owner=true]
+[node name="InnerPanel" type="PanelContainer" parent="RootPanel" unique_name_in_owner=true]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopShine" type="ColorRect" parent="RootPanel" unique_name_in_owner=true]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 112.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.54, 0.76, 1, 0.08)
 
 [node name="VBox" type="VBoxContainer" parent="RootPanel"]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 14
+theme_override_constants/separation = 18
 
-[node name="TitleLabel" type="Label" parent="RootPanel/VBox" unique_name_in_owner=true]
+[node name="Header" type="VBoxContainer" parent="RootPanel/VBox" unique_name_in_owner=true]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="RootPanel/VBox/Header" unique_name_in_owner=true]
 layout_mode = 2
 text = "抽取舍友"
 horizontal_alignment = 1
 
-[node name="RedrawInfo" type="Label" parent="RootPanel/VBox" unique_name_in_owner=true]
+[node name="SubtitleLabel" type="Label" parent="RootPanel/VBox/Header" unique_name_in_owner=true]
 layout_mode = 2
-text = "剩余重抽次数：0 / 0"
+text = "大学第一批同行者，会悄悄改变你之后的很多日常。"
 horizontal_alignment = 1
 
-[node name="CardScroll" type="ScrollContainer" parent="RootPanel/VBox"]
+[node name="StatusBar" type="PanelContainer" parent="RootPanel/VBox" unique_name_in_owner=true]
+layout_mode = 2
+
+[node name="StatusMargin" type="MarginContainer" parent="RootPanel/VBox/StatusBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="StatusHBox" type="HBoxContainer" parent="RootPanel/VBox/StatusBar/StatusMargin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="RedrawBadge" type="PanelContainer" parent="RootPanel/VBox/StatusBar/StatusMargin/StatusHBox" unique_name_in_owner=true]
+layout_mode = 2
+
+[node name="RedrawInfo" type="Label" parent="RootPanel/VBox/StatusBar/StatusMargin/StatusHBox/RedrawBadge" unique_name_in_owner=true]
+layout_mode = 2
+text = "剩余重抽次数：0 / 0"
+
+[node name="StatusDivider" type="Label" parent="RootPanel/VBox/StatusBar/StatusMargin/StatusHBox"]
+layout_mode = 2
+text = "·"
+
+[node name="TipLabel" type="Label" parent="RootPanel/VBox/StatusBar/StatusMargin/StatusHBox" unique_name_in_owner=true]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "确认后将带着这组舍友进入大学生活。"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="CardStage" type="PanelContainer" parent="RootPanel/VBox" unique_name_in_owner=true]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CardList" type="HBoxContainer" parent="RootPanel/VBox/CardScroll" unique_name_in_owner=true]
+[node name="StageMargin" type="MarginContainer" parent="RootPanel/VBox/CardStage"]
 layout_mode = 2
-theme_override_constants/separation = 12
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
-[node name="BottomBar" type="HBoxContainer" parent="RootPanel/VBox"]
+[node name="CardScroll" type="ScrollContainer" parent="RootPanel/VBox/CardStage/StageMargin"]
 layout_mode = 2
-theme_override_constants/separation = 12
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CardList" type="HBoxContainer" parent="RootPanel/VBox/CardStage/StageMargin/CardScroll" unique_name_in_owner=true]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="BottomBar" type="HBoxContainer" parent="RootPanel/VBox" unique_name_in_owner=true]
+layout_mode = 2
+theme_override_constants/separation = 14
 alignment = 1
 
 [node name="CancelBtn" type="Button" parent="RootPanel/VBox/BottomBar" unique_name_in_owner=true]
+custom_minimum_size = Vector2(150, 54)
 layout_mode = 2
 text = "取消"
 
 [node name="RedrawBtn" type="Button" parent="RootPanel/VBox/BottomBar" unique_name_in_owner=true]
+custom_minimum_size = Vector2(170, 54)
 layout_mode = 2
-text = "重抽"
+text = "重新抽取"
 
 [node name="ConfirmBtn" type="Button" parent="RootPanel/VBox/BottomBar" unique_name_in_owner=true]
+custom_minimum_size = Vector2(228, 54)
 layout_mode = 2
-text = "确认舍友"
+text = "确认这组舍友"
